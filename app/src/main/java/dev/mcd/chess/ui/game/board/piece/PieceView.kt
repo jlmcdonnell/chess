@@ -6,6 +6,7 @@ import androidx.compose.foundation.gestures.detectDragGestures
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -38,6 +39,7 @@ fun PieceView(
     square: Square,
     squareSize: Float,
     piece: Piece,
+    canInteract: Boolean,
 ) {
     if (piece == Piece.NONE) {
         return
@@ -63,7 +65,7 @@ fun PieceView(
             .onGloballyPositioned {
                 positionInParent = it.positionInParent()
             }
-            .pointerInput(squareSize, square, piece) {
+            .pointerInput(game, canInteract, squareSize, square, piece) {
                 detectDragGestures(onDrag = { change, dragAmount ->
                     if (dragAmount != Offset.Unspecified) {
                         offset = Offset(
@@ -84,7 +86,7 @@ fun PieceView(
                     val canMove = move in legalMoves
                     val promotions = game?.board?.promotions(move) ?: emptyList()
 
-                    if (canMove) {
+                    if (canInteract && canMove && game != null) {
                         boardInteraction.placePieceFrom(square)
                         boardInteraction.releaseTarget()
                         newPosition = target.topLeft(perspective, squareSize)

@@ -18,12 +18,15 @@ val LocalGameSession = compositionLocalOf { GameSessionManager() }
 class GameSessionManager {
     val sessionUpdates = MutableStateFlow<GameSession?>(null)
     val moves = MutableStateFlow<Move?>(null)
+    val terminated = MutableStateFlow(false)
 
     fun pieceUpdates() = sessionUpdates.filterNotNull()
         .flatMapLatest { it.pieceUpdates }
 
     fun moveUpdates() = sessionUpdates.filterNotNull()
         .flatMapLatest { it.moves }
+
+    fun terminated() = terminated
 
     fun board(): Board? {
         return sessionUpdates.value?.board

@@ -44,11 +44,18 @@ class GameScreenViewModel @Inject constructor(
                 .filterNotNull()
                 .collectLatest { session ->
                     intent {
-                        reduce { State.Game(game = session) }
+                        reduce { State.Game(
+                            game = session,
+                            terminated = false,
+                        ) }
                     }
                 }
         }
         bot = state.get<String>("bot")!!.botFromSlug()
+        startGame()
+    }
+
+    fun onRestart() {
         startGame()
     }
 

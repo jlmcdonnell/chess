@@ -33,6 +33,10 @@ fun ActiveGameView(
     val boardInteraction by remember { mutableStateOf(BoardInteraction()) }
     val sessionManager = LocalGameSession.current
 
+    LaunchedEffect(terminated) {
+        sessionManager.terminated.emit(terminated)
+    }
+
     LaunchedEffect(game) {
         println("Game ID: ${game.id}")
         sessionManager.sessionUpdates.emit(game)
@@ -51,7 +55,7 @@ fun ActiveGameView(
             modifier = Modifier
                 .fillMaxWidth()
                 .aspectRatio(ratio = 1f),
-            onMove = { if (!terminated) onMove(it) },
+            onMove = { onMove(it) },
         )
         Spacer(Modifier.height(4.dp))
         CapturedPieces(side = game.selfSide.flip())

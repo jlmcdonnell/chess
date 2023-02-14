@@ -159,6 +159,7 @@ private fun Pieces(
     squareSize: Float,
 ) {
     val pieces by LocalGameSession.current.pieceUpdates().collectAsState(emptyList())
+    val terminated by LocalGameSession.current.terminated().collectAsState()
 
     pieces.forEachIndexed { index, piece ->
         PieceView(
@@ -166,6 +167,7 @@ private fun Pieces(
             piece = piece,
             square = Square.squareAt(index),
             squareSize = squareSize,
+            canInteract = !terminated
         )
     }
 }

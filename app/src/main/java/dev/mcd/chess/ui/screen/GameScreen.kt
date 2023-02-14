@@ -12,7 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.domain.model.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
-import dev.mcd.chess.ui.game.GameTerminationDialog
+import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.AnnounceTermination
 import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Game
 import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Loading
@@ -34,6 +34,14 @@ fun GameScreen(
                 }
             }
 
+            showTerminationReason?.let { reason ->
+                GameTermination(
+                    reason = reason,
+                    onRestart = { viewModel.onRestart() },
+                    onDismiss = { showTerminationReason = null }
+                )
+            }
+
             when (val s = state) {
                 is Game -> ActiveGameView(
                     game = s.game,
@@ -42,12 +50,6 @@ fun GameScreen(
                     terminated = s.terminated,
                 )
                 is Loading -> Unit
-            }
-
-            showTerminationReason?.let { reason ->
-                GameTerminationDialog(reason) {
-                    showTerminationReason = null
-                }
             }
         }
     }
