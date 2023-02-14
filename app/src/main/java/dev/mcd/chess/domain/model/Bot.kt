@@ -15,8 +15,8 @@ val bots = listOf(
         slug = "mochi",
         name = "Mochi",
         image = PlayerImage.Local(R.drawable.mochi),
-        depth = 3,
-        level = 0,
+        depth = 2,
+        level = -1,
     ),
 )
 

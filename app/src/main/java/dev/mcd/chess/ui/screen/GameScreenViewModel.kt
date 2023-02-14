@@ -97,8 +97,7 @@ class GameScreenViewModel @Inject constructor(
         intent {
             val board = Board().apply {
                 clear()
-//                loadFromFen(Constants.startStandardFENPosition)
-                loadFromFen("8/8/8/8/8/2k3p1/7p/2K5 b - - 0 1")
+                loadFromFen(Constants.startStandardFENPosition)
             }
             val game = GameSession(
                 id = UUID.randomUUID().toString(),
