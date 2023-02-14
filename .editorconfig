@@ -1,0 +1,5 @@
+root = true
+
+[*]
+max_line_length = 150
+insert_final_newline = true
