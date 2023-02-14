@@ -69,8 +69,6 @@ fun ChessBoard(
         boardInteraction.updateSquarePositions(squarePositions)
     }
 
-//    BoardSounds()
-
     Box(
         modifier = modifier.onGloballyPositioned {
             density.run {
