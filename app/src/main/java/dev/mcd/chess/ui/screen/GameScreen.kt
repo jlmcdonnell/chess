@@ -1,5 +1,6 @@
 package dev.mcd.chess.ui.screen
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Scaffold
@@ -13,7 +14,10 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.domain.model.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
 import dev.mcd.chess.ui.game.GameTermination
+import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.AnnounceTermination
+import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.ConfirmResignation
+import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.NavigateBack
 import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Game
 import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Loading
 import org.orbitmvi.orbit.compose.collectAsState
@@ -22,15 +26,25 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 @Composable
 fun GameScreen(
     viewModel: GameScreenViewModel = hiltViewModel(),
+    navigateBack: () -> Unit,
 ) {
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding)) {
             val state by viewModel.collectAsState()
             var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
+            var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
+
+            if (state is Game && (state as? Game)?.terminated == false) {
+                BackHandler {
+                    viewModel.onResign()
+                }
+            }
 
             viewModel.collectSideEffect { effect ->
                 when (effect) {
                     is AnnounceTermination -> showTerminationReason = effect.reason
+                    is ConfirmResignation -> showResignation = effect
+                    is NavigateBack -> navigateBack()
                 }
             }
 
@@ -39,6 +53,19 @@ fun GameScreen(
                     reason = reason,
                     onRestart = { viewModel.onRestart() },
                     onDismiss = { showTerminationReason = null }
+                )
+            }
+
+            showResignation?.let { effect ->
+                ResignationDialog(
+                    onConfirm = {
+                        effect.onConfirm()
+                        showResignation = null
+                    },
+                    onDismiss = {
+                        effect.onDismiss
+                        showResignation = null
+                    },
                 )
             }
 

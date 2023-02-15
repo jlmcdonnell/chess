@@ -21,13 +21,16 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
+import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
+import kotlin.coroutines.resume
 
 @HiltViewModel
 class GameScreenViewModel @Inject constructor(
@@ -44,10 +47,12 @@ class GameScreenViewModel @Inject constructor(
                 .filterNotNull()
                 .collectLatest { session ->
                     intent {
-                        reduce { State.Game(
-                            game = session,
-                            terminated = false,
-                        ) }
+                        reduce {
+                            State.Game(
+                                game = session,
+                                terminated = false,
+                            )
+                        }
                     }
                 }
         }
@@ -61,8 +66,24 @@ class GameScreenViewModel @Inject constructor(
 
     fun onResign() {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
-            endGame(game)
+            if (state !is State.Game) {
+                val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
+                runCatching {
+                    suspendCancellableCoroutine { continuation ->
+                        intent {
+                            postSideEffect(
+                                SideEffect.ConfirmResignation(
+                                    onConfirm = { continuation.resume(Unit) },
+                                    onDismiss = { continuation.cancel() }
+                                )
+                            )
+                        }
+                    }
+                    endGame(game)
+                }.onFailure {
+                    Timber.d("Will not resign")
+                }
+            }
         }
     }
 
@@ -104,8 +125,8 @@ class GameScreenViewModel @Inject constructor(
         intent {
             val board = Board().apply {
                 clear()
-                // loadFromFen(Constants.startStandardFENPosition)
-                loadFromFen("8/8/8/8/8/2k3p1/7p/2K5 b - - 0 1")
+                loadFromFen(Constants.startStandardFENPosition)
+                // loadFromFen("8/8/8/8/8/2k3p1/7p/2K5 b - - 0 1")
             }
             val game = GameSession(
                 id = UUID.randomUUID().toString(),
@@ -158,6 +179,11 @@ class GameScreenViewModel @Inject constructor(
     }
 
     sealed interface SideEffect {
+        data class ConfirmResignation(
+            val onConfirm: () -> Unit,
+            val onDismiss: () -> Unit,
+        ) : SideEffect
+
         data class AnnounceTermination(
             val reason: TerminationReason,
         ) : SideEffect

@@ -1,7 +1,5 @@
 package dev.mcd.chess.domain.model
 
-import dev.mcd.chess.R
-
 class Bot(
     override val name: String,
     override val image: PlayerImage,
@@ -12,11 +10,18 @@ class Bot(
 
 val bots = listOf(
     Bot(
-        slug = "mochi",
-        name = "Mochi",
-        image = PlayerImage.Local(R.drawable.mochi),
+        slug = "bad-bot",
+        name = "Bad Bot",
+        image = PlayerImage.None,
         depth = 2,
-        level = -1,
+        level = -5,
+    ),
+    Bot(
+        slug = "good-bot",
+        name = "Good Bot",
+        image = PlayerImage.None,
+        depth = 2,
+        level = 1,
     ),
 )
 
