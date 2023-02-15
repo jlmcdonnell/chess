@@ -36,7 +36,7 @@ fun GameScreen(
 
             if (state is Game && (state as? Game)?.terminated == false) {
                 BackHandler {
-                    viewModel.onResign()
+                    viewModel.onResign(andNavigateBack = true)
                 }
             }
 

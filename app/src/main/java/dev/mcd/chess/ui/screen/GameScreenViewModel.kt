@@ -64,25 +64,26 @@ class GameScreenViewModel @Inject constructor(
         startGame()
     }
 
-    fun onResign() {
+    fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            if (state !is State.Game) {
-                val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
-                runCatching {
-                    suspendCancellableCoroutine { continuation ->
-                        intent {
-                            postSideEffect(
-                                SideEffect.ConfirmResignation(
-                                    onConfirm = { continuation.resume(Unit) },
-                                    onDismiss = { continuation.cancel() }
-                                )
+            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
+            runCatching {
+                suspendCancellableCoroutine { continuation ->
+                    intent {
+                        postSideEffect(
+                            SideEffect.ConfirmResignation(
+                                onConfirm = { continuation.resume(Unit) },
+                                onDismiss = { continuation.cancel() }
                             )
-                        }
+                        )
                     }
-                    endGame(game)
-                }.onFailure {
-                    Timber.d("Will not resign")
                 }
+                endGame(game)
+                if (andNavigateBack) {
+                    postSideEffect(SideEffect.NavigateBack)
+                }
+            }.onFailure {
+                Timber.d("Will not resign")
             }
         }
     }
@@ -136,7 +137,7 @@ class GameScreenViewModel @Inject constructor(
                     rating = 900,
                     image = PlayerImage.None
                 ),
-                selfSide = Side.BLACK,
+                selfSide = Side.values().random(),
                 opponent = bot
             )
             gameSessionRepository.updateActiveGame(game)
@@ -187,5 +188,7 @@ class GameScreenViewModel @Inject constructor(
         data class AnnounceTermination(
             val reason: TerminationReason,
         ) : SideEffect
+
+        object NavigateBack : SideEffect
     }
 }

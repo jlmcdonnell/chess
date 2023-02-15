@@ -45,7 +45,7 @@ class StockfishAdapterImpl(
                     if (output.startsWith("Stockfish")) {
                         readyCompletable.complete(Unit)
                     } else if (output.startsWith("bestmove")) {
-                        val move = output.split(" ")[1] // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
+                        val move = output.split(" ")[1].trim() // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
                         assertStateOrNull<State.Moving>()?.completable?.complete(move)
                     } else if (output.startsWith("quitok")) {
                         assertStateOrNull<State.Quitting>()?.completable?.complete(Unit)

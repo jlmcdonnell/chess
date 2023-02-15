@@ -17,7 +17,9 @@ fun Routing() {
             SelectBotScreen { bot -> navController.navigate("/game/bot/$bot") }
         }
         composable("/game/bot/{bot}", listOf(navArgument("bot") { type = NavType.StringType })) {
-            GameScreen()
+            GameScreen {
+                navController.popBackStack()
+            }
         }
     }
 }

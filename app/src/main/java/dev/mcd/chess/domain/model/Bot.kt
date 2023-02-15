@@ -14,7 +14,7 @@ val bots = listOf(
         name = "Bad Bot",
         image = PlayerImage.None,
         depth = 2,
-        level = -5,
+        level = 0,
     ),
     Bot(
         slug = "good-bot",
