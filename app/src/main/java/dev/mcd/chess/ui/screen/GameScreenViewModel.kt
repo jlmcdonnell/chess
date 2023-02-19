@@ -8,7 +8,7 @@ import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.data.StockfishAdapter
+import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.domain.GameSession
 import dev.mcd.chess.domain.GameSessionRepository
 import dev.mcd.chess.domain.model.Bot

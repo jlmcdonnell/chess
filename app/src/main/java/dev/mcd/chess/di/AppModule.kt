@@ -7,8 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.data.BoardSounds
 import dev.mcd.chess.data.BoardSoundsImpl
-import dev.mcd.chess.data.StockfishAdapter
-import dev.mcd.chess.data.StockfishAdapterImpl
+import dev.mcd.chess.data.stockfish.StockfishAdapter
+import dev.mcd.chess.data.stockfish.StockfishAdapterImpl
 import dev.mcd.chess.domain.GameSessionRepository
 import dev.mcd.chess.domain.GameSessionRepositoryImpl
 import dev.mcd.chess.jni.StockfishJni

@@ -1,4 +1,4 @@
-package dev.mcd.chess.data
+package dev.mcd.chess.data.stockfish
 
 import dev.mcd.chess.jni.StockfishJni
 import kotlinx.coroutines.CompletableDeferred
@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.withTimeout
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 interface StockfishAdapter {
@@ -31,8 +29,6 @@ class StockfishAdapterImpl(
             val readyCompletable = CompletableDeferred<Unit>()
             bridge.init()
 
-            if (DEBUG) Timber.d("STOCKFISH INIT")
-
             launch {
                 bridge.main()
             }
@@ -40,7 +36,7 @@ class StockfishAdapterImpl(
                 while (isActive) {
                     val output = bridge.readLine()
 
-                    if (DEBUG) println("STOCKFISH: $output")
+                    println("STOCKFISH: $output")
 
                     if (output.startsWith("Stockfish")) {
                         readyCompletable.complete(Unit)
@@ -113,9 +109,4 @@ class StockfishAdapterImpl(
 
         object Ready : State
     }
-
-    companion object {
-        private const val DEBUG = true
-    }
-
 }

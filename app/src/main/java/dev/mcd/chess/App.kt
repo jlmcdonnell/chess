@@ -1,9 +1,8 @@
 package dev.mcd.chess
 
 import android.app.Application
-import android.provider.Settings.Global
 import dagger.hilt.android.HiltAndroidApp
-import dev.mcd.chess.data.StockfishAdapter
+import dev.mcd.chess.data.stockfish.StockfishAdapter
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
