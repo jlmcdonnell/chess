@@ -64,7 +64,7 @@ fun ChessBoard(
         }
     }
 
-    LaunchedEffect(squareSize) {
+    LaunchedEffect(perspective, squareSize) {
         val squarePositions = Square.values().associateWith { square -> square.center(perspective, squareSize) }
         boardInteraction.updateSquarePositions(squarePositions)
     }

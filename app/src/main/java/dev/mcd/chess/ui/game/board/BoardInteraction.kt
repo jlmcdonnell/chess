@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -25,30 +24,25 @@ class BoardInteraction {
     private var target: Square = Square.NONE
         set(value) {
             field = value
-            runBlocking {
-                targetChanges.emit(field)
-            }
+            targetChanges.value = field
         }
 
     fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
         this.squarePositions = squarePositions
     }
 
-    fun placePieceFrom(from: Square) {
-        if (target != Square.NONE) {
+    fun placePieceFrom(from: Square): Boolean {
+        return if (target != Square.NONE) {
             val move = Move(from, target)
-            runBlocking {
-                moves.emit(move)
-            }
+            moves.value = move
             target = Square.NONE
-        }
+            true
+        } else false
     }
 
     fun promote(move: Move) {
-        runBlocking {
-            selectPromotion.emit(emptyList())
-            moves.emit(move)
-        }
+        selectPromotion.value = emptyList()
+        moves.value = move
         releaseTarget()
     }
 
@@ -57,9 +51,7 @@ class BoardInteraction {
     }
 
     fun selectPromotion(moves: List<Move>) {
-        runBlocking {
-            selectPromotion.emit(moves)
-        }
+        selectPromotion.value = moves
     }
 
     fun updateDragPosition(position: Offset) {
@@ -92,8 +84,6 @@ class BoardInteraction {
     fun perspective(): Flow<Side> = perspective
 
     fun setPerspective(side: Side) {
-        runBlocking {
-            perspective.emit(side)
-        }
+        perspective.value = side
     }
 }
