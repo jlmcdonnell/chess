@@ -129,10 +129,14 @@ class GameScreenViewModel @Inject constructor(
         intent {
             val board = Board().apply {
                 clear()
-//                loadFromFen(Constants.startStandardFENPosition)
-//                 loadFromFen("8/8/8/8/2k3p1/8/7p/2K5 w - - 0 1") // Promotion
-//                loadFromFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 1 1") // Castling
-                loadFromFen("rnbqkbnr/ppp1pppp/8/8/3pP3/P6P/1PPP1PP1/RNBQKBNR b KQkq e3 0 3") // En Passant
+
+                /*
+                    For Debugging:
+                        Promotion      8/8/8/8/2k3p1/8/7p/2K5 w - - 0 1")
+                        Castling       r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 1 1
+                        En Passant     rnbqkbnr/ppp1pppp/8/8/3pP3/P6P/1PPP1PP1/RNBQKBNR b KQkq e3 0 3
+                */
+                loadFromFen(Constants.startStandardFENPosition)
             }
             val game = GameSession(
                 id = UUID.randomUUID().toString(),
