@@ -18,6 +18,6 @@ class GameSessionRepositoryImpl @Inject constructor() : GameSessionRepository {
     }
 
     override suspend fun updateActiveGame(game: GameSession?) {
-        activeSession.emit(game)
+        activeSession.value = game
     }
 }

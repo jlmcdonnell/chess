@@ -38,7 +38,7 @@ fun ActiveGameView(
 
     LaunchedEffect(game) {
         println("Game ID: ${game.id}")
-        sessionManager.sessionUpdates.emit(game)
+        sessionManager.sessionUpdates.value = game
         boardInteraction.setPerspective(game.selfSide)
     }
     CompositionLocalProvider(

@@ -1,5 +1,6 @@
 package dev.mcd.chess.ui.game.board.chessboard
 
+import ChessPiece2
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.spring
@@ -11,6 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
@@ -27,6 +29,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
@@ -37,7 +40,6 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.LocalBoardInteraction
 import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.PromotionSelector
-import dev.mcd.chess.ui.game.board.piece.PieceView
 import dev.mcd.chess.ui.theme.defaultBoardTheme
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.compose.collectAsState
@@ -156,16 +158,23 @@ private fun Pieces(
     perspective: Side,
     squareSize: Float,
 ) {
-    val pieces by LocalGameSession.current.pieceUpdates().collectAsState(emptyList())
-    val terminated by LocalGameSession.current.terminated().collectAsState()
+    var pieces by remember { mutableStateOf(emptyList<Piece>()) }
+    val game by LocalGameSession.current.sessionUpdates.collectAsState()
 
-    pieces.forEachIndexed { index, piece ->
-        PieceView(
-            perspective = perspective,
-            piece = piece,
-            square = Square.squareAt(index),
-            squareSize = squareSize,
-            canInteract = !terminated
-        )
+    LaunchedEffect(game?.id) {
+        pieces = game?.board?.boardToArray()?.toList() ?: emptyList()
+    }
+
+    ReusableContent(game?.id ?: "") {
+        pieces.forEachIndexed { index, piece ->
+            if (piece != Piece.NONE) {
+                ChessPiece2(
+                    initialSquare = Square.squareAt(index),
+                    initialPiece = piece,
+                    perspective = perspective,
+                    size = squareSize,
+                )
+            }
+        }
     }
 }
