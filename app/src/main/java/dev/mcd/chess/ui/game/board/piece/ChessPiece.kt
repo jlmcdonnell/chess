@@ -24,18 +24,19 @@ import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
+import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.ui.extension.drawableResource
+import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.LocalBoardInteraction
 import dev.mcd.chess.ui.game.board.LocalGameSession
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMap
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.launch
+
+private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
 
 @Composable
 fun ChessPiece2(
@@ -44,6 +45,9 @@ fun ChessPiece2(
     initialPiece: Piece,
     initialSquare: Square,
 ) {
+    var captured by remember { mutableStateOf(false) }
+    if (captured) return
+
     val gameManager = LocalGameSession.current
     val boardInteraction = LocalBoardInteraction.current
 
@@ -53,41 +57,50 @@ fun ChessPiece2(
     var piece by remember { mutableStateOf(initialPiece) }
     var pan by remember { mutableStateOf(Offset.Zero) }
     var dragging by remember { mutableStateOf(false) }
-    var captured by remember { mutableStateOf(false) }
 
     LaunchedEffect(square) {
-        gameManager.moveUpdates()
-            .filter { it.from == square || it.to == square }
-            .collectLatest {
-                if (it.from == square) {
-                    println("($square) MOVING TO: ${it.to}")
-                    println("($square) OLD: $squareOffset NEW:${it.to.topLeft(perspective, size)}")
-                    square = it.to
-                    squareOffset = it.to.topLeft(perspective, size)
+        launch {
+            gameManager
+                .moveUpdates()
+                .mapNotNull { gameManager.lastMove() }
+                .filter { square in listOf(it.move.from, it.move.to, it.rookCastleMove?.from) }
+                .collectLatest { backup ->
+                    val move = backup.move
+                    if (move.from == square) {
+                        square = move.to
+                        squareOffset = move.to.topLeft(perspective, size)
+                        if (move.promotion != Piece.NONE) {
+                            piece = move.promotion
+                        }
+                    } else if (piece == backup.capturedPiece && square == backup.capturedSquare) {
+                        captured = true
+                    } else if (backup.rookCastleMove?.from == square) {
+                        square = backup.rookCastleMove.to
+                        squareOffset = square.topLeft(perspective, size)
+                    }
                 }
-            }
+        }
     }
-
-    if (captured) return
 
     val animatedSize by animateDpAsState(currentSize.toDp())
 
-    val tX: Float
-    val tY: Float
-
-    if (dragging) {
-        tX = pan.x - animatedSize.value / 2f
-        tY = pan.y - animatedSize.value * 2f
+    val position = if (dragging) {
+        Offset(
+            x = (pan.x - animatedSize.value / 2f) + squareOffset.x,
+            y = (pan.y - animatedSize.value * 2f) + squareOffset.y,
+        )
     } else {
-        tX = pan.x
-        tY = pan.y
+        Offset(
+            x = pan.x + squareOffset.x,
+            y = pan.y + squareOffset.y,
+        )
     }
 
     val animatedPan by animateOffsetAsState(
-        Offset(tX + squareOffset.x, tY + squareOffset.y),
-        spring(
+        targetValue = position,
+        animationSpec = spring(
             visibilityThreshold = Offset.VisibilityThreshold,
-            stiffness = if (dragging) Spring.StiffnessHigh else Spring.StiffnessMedium
+            stiffness = if (dragging && animatedSize != currentSize.toDp()) Spring.StiffnessHigh else Spring.StiffnessMedium
         )
     )
 
@@ -99,24 +112,45 @@ fun ChessPiece2(
                 translationX = animatedPan.x
                 translationY = animatedPan.y
             }
-            .pointerInput(squareOffset, square, piece) {
+            .pointerInput(Unit) {
                 awaitPointerEventScope {
                     while (true) {
                         awaitFirstDown()
                         dragging = true
-                        currentSize = size * 2
+                        currentSize = size * PIECE_SIZE_MULT_WHEN_DRAGGED
+
                         var event: PointerEvent
                         do {
                             event = awaitPointerEvent()
                             pan += event
                                 .calculatePan()
-                                .takeIf { it != Offset.Unspecified } ?: Offset.Zero
-                            boardInteraction.updateDragPosition(pan+squareOffset+Offset(size/2, size/2))
+                                .orZero()
+
+                            val dragPosition = pan + squareOffset + Offset(size / 2f, size / 2f)
+                            boardInteraction.updateDragPosition(dragPosition)
                         } while (event.changes.none { it.changedToUp() })
+
+                        val target = boardInteraction.target
+                        val move = Move(square, target)
+                        val promotions = gameManager.promotions(move)
+
+                        if (move in gameManager.moves()) {
+                            if (boardInteraction.placePieceFrom(square)) {
+                                square = target
+                                squareOffset = square.topLeft(perspective, size)
+                            }
+                            pan = Offset.Zero
+                            boardInteraction.releaseTarget()
+                        } else if (promotions.isNotEmpty()) {
+                            boardInteraction.selectPromotion(promotions)
+                            pan = Offset.Zero
+                        } else {
+                            boardInteraction.releaseTarget()
+                            pan = Offset.Zero
+                        }
+
                         currentSize = size
                         dragging = false
-                        pan = Offset.Zero
-                        boardInteraction.releaseTarget()
                     }
                 }
             },

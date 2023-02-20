@@ -9,6 +9,8 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -21,8 +23,9 @@ class BoardInteraction {
     private val targetChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
-    private var target: Square = Square.NONE
-        set(value) {
+
+    var target: Square = Square.NONE
+        private set(value) {
             field = value
             targetChanges.value = field
         }

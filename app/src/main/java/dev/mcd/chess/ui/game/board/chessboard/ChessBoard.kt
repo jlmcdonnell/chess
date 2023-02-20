@@ -56,6 +56,7 @@ fun ChessBoard(
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
+    val game by LocalGameSession.current.sessionUpdates.collectAsState()
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
 
     viewModel.collectAsState()
@@ -79,10 +80,12 @@ fun ChessBoard(
             }
         }
     ) {
-        Squares(perspective, squareSize)
-        SquareHighlight(perspective, squareSizeDp)
-        Pieces(perspective, squareSize)
-        PromotionSelector(modifier = Modifier.align(Alignment.Center))
+        ReusableContent(game?.id ?: "") {
+            Squares(perspective, squareSize)
+            SquareHighlight(perspective, squareSizeDp)
+            Pieces(perspective, squareSize)
+            PromotionSelector(modifier = Modifier.align(Alignment.Center))
+        }
     }
 }
 
