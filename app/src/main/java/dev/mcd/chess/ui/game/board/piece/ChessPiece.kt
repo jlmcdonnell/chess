@@ -3,6 +3,7 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
@@ -39,7 +40,7 @@ import kotlinx.coroutines.launch
 private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
 
 @Composable
-fun ChessPiece2(
+fun ChessPiece(
     size: Float,
     perspective: Side,
     initialPiece: Piece,
@@ -96,18 +97,19 @@ fun ChessPiece2(
         )
     }
 
+    val dropping = animatedSize != currentSize.toDp()
     val animatedPan by animateOffsetAsState(
         targetValue = position,
         animationSpec = spring(
             visibilityThreshold = Offset.VisibilityThreshold,
-            stiffness = if (dragging && animatedSize != currentSize.toDp()) Spring.StiffnessHigh else Spring.StiffnessMedium
+            stiffness = if (dragging && dropping) Spring.StiffnessHigh else Spring.StiffnessMedium
         )
     )
 
     Image(
         modifier = Modifier
             .size(animatedSize)
-            .zIndex(if (dragging) 1f else 0f)
+            .zIndex(if (dragging || dropping) 1f else 0f)
             .graphicsLayer {
                 translationX = animatedPan.x
                 translationY = animatedPan.y
@@ -116,6 +118,7 @@ fun ChessPiece2(
                 awaitPointerEventScope {
                     while (true) {
                         awaitFirstDown()
+                        boardInteraction.highlightMoves(square)
                         dragging = true
                         currentSize = size * PIECE_SIZE_MULT_WHEN_DRAGGED
 
@@ -139,22 +142,21 @@ fun ChessPiece2(
                                 square = target
                                 squareOffset = square.topLeft(perspective, size)
                             }
-                            pan = Offset.Zero
                             boardInteraction.releaseTarget()
                         } else if (promotions.isNotEmpty()) {
                             boardInteraction.selectPromotion(promotions)
-                            pan = Offset.Zero
                         } else {
                             boardInteraction.releaseTarget()
-                            pan = Offset.Zero
                         }
 
+                        boardInteraction.disableHighlightMoves()
+                        pan = Offset.Zero
                         currentSize = size
                         dragging = false
                     }
                 }
             },
         painter = painterResource(id = piece.drawableResource()),
-        contentDescription = "",
+        contentDescription = piece.name,
     )
 }

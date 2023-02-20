@@ -1,6 +1,6 @@
 package dev.mcd.chess.ui.game.board.chessboard
 
-import ChessPiece2
+import ChessPiece
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.spring
@@ -37,6 +37,7 @@ import dev.mcd.chess.ui.extension.center
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.toPx
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.LegalMoves
 import dev.mcd.chess.ui.game.board.LocalBoardInteraction
 import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.PromotionSelector
@@ -68,7 +69,8 @@ fun ChessBoard(
     }
 
     LaunchedEffect(perspective, squareSize) {
-        val squarePositions = Square.values().associateWith { square -> square.center(perspective, squareSize) }
+        val squarePositions =
+            Square.values().associateWith { square -> square.center(perspective, squareSize) }
         boardInteraction.updateSquarePositions(squarePositions)
     }
 
@@ -83,6 +85,7 @@ fun ChessBoard(
         ReusableContent(game?.id ?: "") {
             Squares(perspective, squareSize)
             SquareHighlight(perspective, squareSizeDp)
+            LegalMoves(perspective, squareSize)
             Pieces(perspective, squareSize)
             PromotionSelector(modifier = Modifier.align(Alignment.Center))
         }
@@ -171,7 +174,7 @@ private fun Pieces(
     ReusableContent(game?.id ?: "") {
         pieces.forEachIndexed { index, piece ->
             if (piece != Piece.NONE) {
-                ChessPiece2(
+                ChessPiece(
                     initialSquare = Square.squareAt(index),
                     initialPiece = piece,
                     perspective = perspective,

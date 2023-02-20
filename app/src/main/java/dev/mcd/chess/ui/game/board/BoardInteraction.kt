@@ -9,8 +9,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.runBlocking
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -21,6 +19,7 @@ class BoardInteraction {
     private val perspective = MutableStateFlow(Side.WHITE)
     private val moves = MutableStateFlow(Move(Square.NONE, Square.NONE))
     private val targetChanges = MutableStateFlow(Square.NONE)
+    private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
 
@@ -28,6 +27,12 @@ class BoardInteraction {
         private set(value) {
             field = value
             targetChanges.value = field
+        }
+
+    var highlightMovesFrom: Square = Square.NONE
+        private set(value) {
+            field = value
+            highlightMoveChanges.value = field
         }
 
     fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
@@ -55,6 +60,14 @@ class BoardInteraction {
 
     fun selectPromotion(moves: List<Move>) {
         selectPromotion.value = moves
+    }
+
+    fun highlightMoves(from: Square) {
+        highlightMovesFrom = from
+    }
+
+    fun disableHighlightMoves() {
+        highlightMovesFrom = Square.NONE
     }
 
     fun updateDragPosition(position: Offset) {
@@ -89,4 +102,6 @@ class BoardInteraction {
     fun setPerspective(side: Side) {
         perspective.value = side
     }
+
+    fun highlightMovesFrom(): Flow<Square> = highlightMoveChanges
 }
