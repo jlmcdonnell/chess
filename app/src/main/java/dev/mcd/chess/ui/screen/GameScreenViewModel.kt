@@ -40,6 +40,7 @@ class GameScreenViewModel @Inject constructor(
 ) : ViewModel(), ContainerHost<GameScreenViewModel.State, GameScreenViewModel.SideEffect> {
 
     private lateinit var bot: Bot
+    private lateinit var side: Side
 
     override val container = container<State, SideEffect>(State.Loading) {
         viewModelScope.launch {
@@ -57,6 +58,7 @@ class GameScreenViewModel @Inject constructor(
                 }
         }
         bot = state.get<String>("bot")!!.botFromSlug()
+        side = Side.valueOf(state.get<String>("side")!!)
         startGame()
     }
 
@@ -138,7 +140,7 @@ class GameScreenViewModel @Inject constructor(
                     rating = 900,
                     image = PlayerImage.None
                 ),
-                selfSide = Side.values().random(),
+                selfSide = side,
                 opponent = bot
             )
             gameSessionRepository.updateActiveGame(game)

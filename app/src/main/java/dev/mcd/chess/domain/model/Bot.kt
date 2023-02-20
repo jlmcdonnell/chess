@@ -10,18 +10,39 @@ class Bot(
 
 val bots = listOf(
     Bot(
-        slug = "bad-bot",
-        name = "Bad Bot",
+        slug = "level-1",
+        name = "Bot (1)",
+        image = PlayerImage.None,
+        depth = 1,
+        level = 0,
+    ),
+    Bot(
+        slug = "level-2",
+        name = "Bot (2)",
         image = PlayerImage.None,
         depth = 2,
         level = 0,
     ),
     Bot(
-        slug = "good-bot",
-        name = "Good Bot",
+        slug = "level-3",
+        name = "Bot (3)",
         image = PlayerImage.None,
         depth = 2,
-        level = 1,
+        level = 3,
+    ),
+    Bot(
+        slug = "level-4",
+        name = "Bot (4)",
+        image = PlayerImage.None,
+        depth = 5,
+        level = 20,
+    ),
+    Bot(
+        slug = "level-5",
+        name = "Bot (5)",
+        image = PlayerImage.None,
+        depth = 15,
+        level = 20,
     ),
 )
 

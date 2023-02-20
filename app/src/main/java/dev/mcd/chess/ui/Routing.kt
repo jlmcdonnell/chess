@@ -14,9 +14,16 @@ fun Routing() {
     val navController = rememberNavController()
     NavHost(navController, "/selectbot") {
         composable("/selectbot") {
-            SelectBotScreen { bot -> navController.navigate("/game/bot/$bot") }
+            SelectBotScreen { bot, side -> navController.navigate("/game/bot/$bot/$side") }
         }
-        composable("/game/bot/{bot}", listOf(navArgument("bot") { type = NavType.StringType })) {
+        composable(
+            "/game/bot/{bot}/{side}",
+            listOf(
+                navArgument("bot") { type = NavType.StringType },
+                navArgument("side") { type = NavType.StringType }
+            )
+
+        ) {
             GameScreen {
                 navController.popBackStack()
             }
