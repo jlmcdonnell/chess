@@ -107,7 +107,8 @@ class GameScreenViewModel @Inject constructor(
         if (!board.isMated && !board.isDraw) {
             println("Moving for stockfish")
             val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
-            val stockfishMoveSan = stockfish.getMove(board.fen, level = bot.level, depth = bot.depth)
+            val stockfishMoveSan =
+                stockfish.getMove(board.fen, level = bot.level, depth = bot.depth)
             val stockfishMove = Move(stockfishMoveSan, board.sideToMove)
             val delay = delayedMoveTime - System.currentTimeMillis()
             if (delay > 0) {
@@ -128,9 +129,10 @@ class GameScreenViewModel @Inject constructor(
         intent {
             val board = Board().apply {
                 clear()
-                loadFromFen(Constants.startStandardFENPosition)
+//                loadFromFen(Constants.startStandardFENPosition)
 //                 loadFromFen("8/8/8/8/2k3p1/8/7p/2K5 w - - 0 1") // Promotion
 //                loadFromFen("r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 1 1") // Castling
+                loadFromFen("rnbqkbnr/ppp1pppp/8/8/3pP3/P6P/1PPP1PP1/RNBQKBNR b KQkq e3 0 3") // En Passant
             }
             val game = GameSession(
                 id = UUID.randomUUID().toString(),

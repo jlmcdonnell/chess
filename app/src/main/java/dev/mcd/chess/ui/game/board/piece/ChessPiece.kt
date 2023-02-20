@@ -3,7 +3,6 @@ import androidx.compose.animation.core.VisibilityThreshold
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.spring
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.calculatePan
@@ -35,7 +34,6 @@ import dev.mcd.chess.ui.game.board.LocalGameSession
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
-import kotlinx.coroutines.launch
 
 private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
 
@@ -60,27 +58,35 @@ fun ChessPiece(
     var dragging by remember { mutableStateOf(false) }
 
     LaunchedEffect(square) {
-        launch {
-            gameManager
-                .moveUpdates()
-                .mapNotNull { gameManager.lastMove() }
-                .filter { square in listOf(it.move.from, it.move.to, it.rookCastleMove?.from) }
-                .collectLatest { backup ->
-                    val move = backup.move
-                    if (move.from == square) {
-                        square = move.to
-                        squareOffset = move.to.topLeft(perspective, size)
-                        if (move.promotion != Piece.NONE) {
-                            piece = move.promotion
-                        }
-                    } else if (piece == backup.capturedPiece && square == backup.capturedSquare) {
-                        captured = true
-                    } else if (backup.rookCastleMove?.from == square) {
-                        square = backup.rookCastleMove.to
-                        squareOffset = square.topLeft(perspective, size)
+        gameManager
+            .moveUpdates()
+            .mapNotNull { gameManager.lastMove() }
+            .filter {
+                square in listOf(
+                    it.move.from,
+                    it.move.to,
+                    it.rookCastleMove?.from,
+                    it.enPassantTarget
+                )
+            }
+            .collectLatest { backup ->
+                val move = backup.move
+                if (move.from == square) {
+                    square = move.to
+                    squareOffset = move.to.topLeft(perspective, size)
+                    if (move.promotion != Piece.NONE) {
+                        piece = move.promotion
                     }
+                } else if (piece == backup.capturedPiece && square == backup.capturedSquare) {
+                    captured = true
+                } else if (backup.rookCastleMove?.from == square) {
+                    square = backup.rookCastleMove.to
+                    squareOffset = square.topLeft(perspective, size)
+                } else if (backup.enPassantTarget == square) {
+                    square = backup.enPassantTarget
+                    squareOffset = square.topLeft(perspective, size)
                 }
-        }
+            }
     }
 
     val animatedSize by animateDpAsState(currentSize.toDp())
