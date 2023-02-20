@@ -1,13 +1,13 @@
-Simple chess app using Jetpack Compose
+This is a simple Chess app using Jetpack Compose
 
+## Features
 - Entirely compose driven board UI with drag & drop interaction
-- Stockfish 15 embedded
+- Stockfish 15 embedded to enable play against bots 
 - https://github.com/bhlangonijr/chesslib used for movement & game rules
-- Pieces taken from chess.com, sounds taken from lichess.org
+- Pieces taken from https://chess.com, sounds taken from https://lichess.org
 
 ## TODO
 
-- Animate opponent pieces into position instead of teleporting
 - Game archive and variants viewer
 - Historic moves
 - Everything else
