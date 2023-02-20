@@ -2,29 +2,28 @@ package dev.mcd.chess.data.stockfish
 
 import dev.mcd.chess.jni.StockfishJni
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlin.coroutines.CoroutineContext
 
 interface StockfishAdapter {
-    fun start(context: CoroutineContext): Job
+    suspend fun start()
     suspend fun getMove(fen: String, level: Int, depth: Int): String
     suspend fun quit()
 }
 
 class StockfishAdapterImpl(
     private val bridge: StockfishJni,
+    private val dispatcher: CoroutineDispatcher,
 ) : StockfishAdapter {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
-    override fun start(context: CoroutineContext): Job {
-        return CoroutineScope(context).launch(Dispatchers.IO) {
+    override suspend fun start() {
+        withContext(dispatcher) {
             val bridge = StockfishJni()
             val readyCompletable = CompletableDeferred<Unit>()
             bridge.init()
@@ -41,7 +40,8 @@ class StockfishAdapterImpl(
                     if (output.startsWith("Stockfish")) {
                         readyCompletable.complete(Unit)
                     } else if (output.startsWith("bestmove")) {
-                        val move = output.split(" ")[1].trim() // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
+                        val move =
+                            output.split(" ")[1].trim() // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
                         assertStateOrNull<State.Moving>()?.completable?.complete(move)
                     } else if (output.startsWith("quitok")) {
                         assertStateOrNull<State.Quitting>()?.completable?.complete(Unit)
@@ -77,6 +77,7 @@ class StockfishAdapterImpl(
                     state.completable.await()
                     return@withContext
                 }
+
                 is State.Moving,
                 is State.Ready -> Unit
             }
@@ -93,7 +94,8 @@ class StockfishAdapterImpl(
     }
 
     private inline fun <reified T : State> assertState(): T {
-        return stateFlow.value as? T ?: throw Exception("Expected ${T::class.simpleName} but was ${stateFlow.value::class.simpleName}")
+        return stateFlow.value as? T
+            ?: throw Exception("Expected ${T::class.simpleName} but was ${stateFlow.value::class.simpleName}")
     }
 
     private sealed interface State {

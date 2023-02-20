@@ -19,8 +19,8 @@ class App : Application() {
         super.onCreate()
         Timber.plant(Timber.DebugTree())
 
-        CoroutineScope(Dispatchers.IO).launch {
-            stockfishAdapter.start(coroutineContext)
+        CoroutineScope(Dispatchers.Default).launch {
+            stockfishAdapter.start()
         }
     }
 }

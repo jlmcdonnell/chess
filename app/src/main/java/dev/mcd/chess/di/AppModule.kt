@@ -12,6 +12,7 @@ import dev.mcd.chess.data.stockfish.StockfishAdapterImpl
 import dev.mcd.chess.domain.GameSessionRepository
 import dev.mcd.chess.domain.GameSessionRepositoryImpl
 import dev.mcd.chess.jni.StockfishJni
+import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
 @Module
@@ -34,7 +35,10 @@ abstract class AppModule {
         @Provides
         @Singleton
         fun stockfishAdapter(stockfishJni: StockfishJni): StockfishAdapter {
-            return StockfishAdapterImpl(stockfishJni)
+            return StockfishAdapterImpl(
+                bridge = stockfishJni,
+                dispatcher = Dispatchers.IO,
+            )
         }
     }
 }
