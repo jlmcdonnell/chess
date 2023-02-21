@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class)
-
 package dev.mcd.chess.data
 
 import android.content.Context
@@ -9,19 +7,14 @@ import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
+import dev.mcd.chess.domain.BoardSounds
 import dev.mcd.chess.domain.GameSession
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-interface BoardSounds {
-    suspend fun notify()
-    suspend fun awaitMoves(session: GameSession)
-
-}
 
 class BoardSoundsImpl @Inject constructor(
     @ApplicationContext

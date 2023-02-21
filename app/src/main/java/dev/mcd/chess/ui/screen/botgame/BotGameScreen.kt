@@ -1,4 +1,4 @@
-package dev.mcd.chess.ui.screen
+package dev.mcd.chess.ui.screen.botgame
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
@@ -15,17 +15,17 @@ import dev.mcd.chess.domain.model.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.ResignationDialog
-import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.AnnounceTermination
-import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.ConfirmResignation
-import dev.mcd.chess.ui.screen.GameScreenViewModel.SideEffect.NavigateBack
-import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Game
-import dev.mcd.chess.ui.screen.GameScreenViewModel.State.Loading
+import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.AnnounceTermination
+import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.ConfirmResignation
+import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.NavigateBack
+import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.State.Game
+import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.State.Loading
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
-fun GameScreen(
-    viewModel: GameScreenViewModel = hiltViewModel(),
+fun BotGameScreen(
+    viewModel: BotGameViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
 ) {
     Scaffold { padding ->

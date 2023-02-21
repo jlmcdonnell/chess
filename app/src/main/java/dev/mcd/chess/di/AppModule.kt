@@ -5,13 +5,14 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dev.mcd.chess.data.BoardSounds
 import dev.mcd.chess.data.BoardSoundsImpl
 import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.data.stockfish.StockfishAdapterImpl
+import dev.mcd.chess.data.stockfish.StockfishJni
+import dev.mcd.chess.domain.BoardSounds
 import dev.mcd.chess.domain.GameSessionRepository
 import dev.mcd.chess.domain.GameSessionRepositoryImpl
-import dev.mcd.chess.jni.StockfishJni
+import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton
 
@@ -37,7 +38,7 @@ abstract class AppModule {
         fun stockfishAdapter(stockfishJni: StockfishJni): StockfishAdapter {
             return StockfishAdapterImpl(
                 bridge = stockfishJni,
-                dispatcher = Dispatchers.IO,
+                coroutineContext = CoroutineName("Stockfish") + Dispatchers.IO,
             )
         }
     }

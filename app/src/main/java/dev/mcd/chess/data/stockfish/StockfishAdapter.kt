@@ -1,14 +1,13 @@
 package dev.mcd.chess.data.stockfish
 
-import dev.mcd.chess.jni.StockfishJni
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
 interface StockfishAdapter {
     suspend fun start()
@@ -17,13 +16,13 @@ interface StockfishAdapter {
 
 class StockfishAdapterImpl(
     private val bridge: StockfishJni,
-    private val dispatcher: CoroutineDispatcher,
+    private val coroutineContext: CoroutineContext,
 ) : StockfishAdapter {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
     override suspend fun start() {
-        withContext(dispatcher) {
+        withContext(coroutineContext) {
             val bridge = StockfishJni()
             val readyCompletable = CompletableDeferred<Unit>()
             bridge.init()
@@ -48,7 +47,6 @@ class StockfishAdapterImpl(
             }
             readyCompletable.await()
             stateFlow.emit(State.Ready)
-            println("JOOIN")
         }
     }
 

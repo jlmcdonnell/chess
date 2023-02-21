@@ -6,8 +6,8 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.mcd.chess.ui.botselection.SelectBotScreen
-import dev.mcd.chess.ui.screen.GameScreen
+import dev.mcd.chess.ui.screen.botselection.SelectBotScreen
+import dev.mcd.chess.ui.screen.botgame.BotGameScreen
 
 @Composable
 fun Routing() {
@@ -24,7 +24,7 @@ fun Routing() {
             )
 
         ) {
-            GameScreen {
+            BotGameScreen {
                 navController.popBackStack()
             }
         }

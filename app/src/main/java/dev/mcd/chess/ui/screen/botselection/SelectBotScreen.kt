@@ -1,4 +1,4 @@
-package dev.mcd.chess.ui.botselection
+package dev.mcd.chess.ui.screen.botselection
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background

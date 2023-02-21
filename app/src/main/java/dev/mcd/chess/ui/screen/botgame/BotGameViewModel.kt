@@ -1,4 +1,4 @@
-package dev.mcd.chess.ui.screen
+package dev.mcd.chess.ui.screen.botgame
 
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
@@ -33,11 +33,11 @@ import javax.inject.Inject
 import kotlin.coroutines.resume
 
 @HiltViewModel
-class GameScreenViewModel @Inject constructor(
+class BotGameViewModel @Inject constructor(
     private val stockfish: StockfishAdapter,
     private val gameSessionRepository: GameSessionRepository,
     private val state: SavedStateHandle,
-) : ViewModel(), ContainerHost<GameScreenViewModel.State, GameScreenViewModel.SideEffect> {
+) : ViewModel(), ContainerHost<BotGameViewModel.State, BotGameViewModel.SideEffect> {
 
     private lateinit var bot: Bot
     private lateinit var side: Side

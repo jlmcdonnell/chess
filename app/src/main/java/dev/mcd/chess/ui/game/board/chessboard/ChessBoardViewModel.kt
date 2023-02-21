@@ -3,7 +3,7 @@ package dev.mcd.chess.ui.game.board.chessboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.data.BoardSounds
+import dev.mcd.chess.domain.BoardSounds
 import dev.mcd.chess.domain.GameSessionRepository
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -26,7 +26,6 @@ class ChessBoardViewModel @Inject constructor(
                     boardSounds.notify()
                     boardSounds.awaitMoves(it)
                 }
-
         }
     }
 

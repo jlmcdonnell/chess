@@ -12,8 +12,8 @@ class GameSession(
     val id: String,
     val board: Board,
     val self: Player,
-    val opponent: Player,
     val selfSide: Side,
+    val opponent: Player,
 ) {
     private val _pieceUpdates = MutableStateFlow(board.boardToArray().toList())
     private val _moves = MutableStateFlow<Move?>(null)
