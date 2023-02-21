@@ -1,4 +1,4 @@
-package dev.mcd.chess.domain.model
+package dev.mcd.chess.domain.game
 
 import com.github.bhlangonijr.chesslib.Side
 

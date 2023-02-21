@@ -1,4 +1,4 @@
-package dev.mcd.chess.domain
+package dev.mcd.chess.domain.game
 
 interface BoardSounds {
     suspend fun notify()

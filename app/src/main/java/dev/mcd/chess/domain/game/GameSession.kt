@@ -1,11 +1,11 @@
-package dev.mcd.chess.domain
+package dev.mcd.chess.domain.game
 
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.BoardEventType
 import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.domain.model.Player
+import dev.mcd.chess.domain.player.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 
 class GameSession(

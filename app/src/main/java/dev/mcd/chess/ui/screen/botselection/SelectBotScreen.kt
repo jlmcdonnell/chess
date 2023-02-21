@@ -32,8 +32,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.domain.model.Bot
-import dev.mcd.chess.domain.model.bots
+import dev.mcd.chess.domain.bot.Bot
+import dev.mcd.chess.domain.bot.bots
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
 

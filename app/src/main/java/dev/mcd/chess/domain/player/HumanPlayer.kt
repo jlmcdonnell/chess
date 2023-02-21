@@ -1,4 +1,4 @@
-package dev.mcd.chess.domain.model
+package dev.mcd.chess.domain.player
 
 data class HumanPlayer(
     override val name: String,

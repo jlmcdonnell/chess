@@ -14,10 +14,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import dev.mcd.chess.domain.model.PlayerImage
-import dev.mcd.chess.domain.model.PlayerImage.Local
-import dev.mcd.chess.domain.model.PlayerImage.None
-import dev.mcd.chess.domain.model.PlayerImage.Url
+import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.domain.player.PlayerImage.Local
+import dev.mcd.chess.domain.player.PlayerImage.None
+import dev.mcd.chess.domain.player.PlayerImage.Url
 
 @Composable
 fun PlayerImageView(image: PlayerImage) {
