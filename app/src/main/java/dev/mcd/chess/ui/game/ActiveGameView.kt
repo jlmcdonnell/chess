@@ -21,6 +21,7 @@ import dev.mcd.chess.ui.game.board.BoardInteraction
 import dev.mcd.chess.ui.game.board.LocalBoardInteraction
 import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
+import timber.log.Timber
 
 @Composable
 fun ActiveGameView(
@@ -37,7 +38,7 @@ fun ActiveGameView(
     }
 
     LaunchedEffect(game) {
-        println("Game ID: ${game.id}")
+        Timber.d("Game ID: ${game.id}")
         sessionManager.sessionUpdates.value = game
         boardInteraction.setPerspective(game.selfSide)
     }

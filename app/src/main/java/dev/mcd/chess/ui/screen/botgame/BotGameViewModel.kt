@@ -95,7 +95,7 @@ class BotGameViewModel @Inject constructor(
             val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
             val board = game.board
             if (board.sideToMove == game.selfSide && move in board.legalMoves()) {
-                println("Moving for player")
+                Timber.d("Moving for player")
                 board.doMove(move)
                 tryMoveBot(game)
             }
@@ -105,7 +105,7 @@ class BotGameViewModel @Inject constructor(
     private suspend fun tryMoveBot(game: GameSession) {
         val board = game.board
         if (!board.isMated && !board.isDraw) {
-            println("Moving for stockfish")
+            Timber.d("Moving for stockfish")
             val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
             val stockfishMoveSan =
                 stockfish.getMove(board.fen, level = bot.level, depth = bot.depth)
