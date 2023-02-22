@@ -8,12 +8,19 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dev.mcd.chess.ui.screen.botgame.BotGameScreen
 import dev.mcd.chess.ui.screen.botselection.SelectBotScreen
+import dev.mcd.chess.ui.screen.choosemode.ChooseModeScreen
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameScreen
 
 @Composable
 fun Routing() {
     val navController = rememberNavController()
-    NavHost(navController, "/game/online") {
+    NavHost(navController, "/choosemode") {
+        composable("/choosemode") {
+            ChooseModeScreen(
+                onPlayOnline = { navController.navigate("/game/online") },
+                onPlayBot = { navController.navigate("/selectbot") },
+            )
+        }
         composable("/selectbot") {
             SelectBotScreen { bot, side -> navController.navigate("/game/bot/$bot/$side") }
         }

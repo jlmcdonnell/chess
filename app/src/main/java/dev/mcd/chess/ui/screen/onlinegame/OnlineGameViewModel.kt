@@ -19,6 +19,7 @@ import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
