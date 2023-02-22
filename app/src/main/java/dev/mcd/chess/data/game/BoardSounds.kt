@@ -8,7 +8,7 @@ import com.github.bhlangonijr.chesslib.Piece
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
 import dev.mcd.chess.domain.game.BoardSounds
-import dev.mcd.chess.domain.game.GameSession
+import dev.mcd.chess.domain.game.LocalGameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -37,7 +37,7 @@ class BoardSoundsImpl @Inject constructor(
     }
 
     override suspend fun awaitMoves(
-        session: GameSession,
+        session: LocalGameSession,
     ) {
         withContext(Dispatchers.IO) {
             session.moves.mapNotNull {

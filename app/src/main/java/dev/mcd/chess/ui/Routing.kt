@@ -6,13 +6,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import dev.mcd.chess.ui.screen.botselection.SelectBotScreen
 import dev.mcd.chess.ui.screen.botgame.BotGameScreen
+import dev.mcd.chess.ui.screen.botselection.SelectBotScreen
+import dev.mcd.chess.ui.screen.onlinegame.OnlineGameScreen
 
 @Composable
 fun Routing() {
     val navController = rememberNavController()
-    NavHost(navController, "/selectbot") {
+    NavHost(navController, "/game/online") {
         composable("/selectbot") {
             SelectBotScreen { bot, side -> navController.navigate("/game/bot/$bot/$side") }
         }
@@ -25,6 +26,11 @@ fun Routing() {
 
         ) {
             BotGameScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("/game/online") {
+            OnlineGameScreen {
                 navController.popBackStack()
             }
         }

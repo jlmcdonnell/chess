@@ -41,6 +41,7 @@ private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
 fun ChessPiece(
     size: Float,
     perspective: Side,
+    side: Side,
     initialPiece: Piece,
     initialSquare: Square,
 ) {
@@ -139,18 +140,22 @@ fun ChessPiece(
                             boardInteraction.updateDragPosition(dragPosition)
                         } while (event.changes.none { it.changedToUp() })
 
-                        val target = boardInteraction.target
-                        val move = Move(square, target)
-                        val promotions = gameManager.promotions(move)
+                        if (side == piece.pieceSide) {
+                            val target = boardInteraction.target
+                            val move = Move(square, target)
+                            val promotions = gameManager.promotions(move)
 
-                        if (move in gameManager.moves()) {
-                            if (boardInteraction.placePieceFrom(square)) {
-                                square = target
-                                squareOffset = square.topLeft(perspective, size)
+                            if (move in gameManager.moves()) {
+                                if (boardInteraction.placePieceFrom(square)) {
+                                    square = target
+                                    squareOffset = square.topLeft(perspective, size)
+                                }
+                                boardInteraction.releaseTarget()
+                            } else if (promotions.isNotEmpty()) {
+                                boardInteraction.selectPromotion(promotions)
+                            } else {
+                                boardInteraction.releaseTarget()
                             }
-                            boardInteraction.releaseTarget()
-                        } else if (promotions.isNotEmpty()) {
-                            boardInteraction.selectPromotion(promotions)
                         } else {
                             boardInteraction.releaseTarget()
                         }

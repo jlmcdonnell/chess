@@ -36,7 +36,11 @@ abstract class AppModule {
     companion object {
         @Provides
         @Singleton
-        fun environment(): Environment = Environment.Debug(host = "http://192.168.1.159:8080/")
+        fun environment(): Environment = Environment.Debug(
+            apiHost = "192.168.1.159",
+            apiPort = 8080,
+            apiScheme = "http",
+        )
 
         @Provides
         @Singleton
@@ -58,7 +62,9 @@ abstract class AppModule {
             environment: Environment,
         ): ChessApi = ChessApiImpl(
             context = context,
-            apiHost = environment.host,
+            apiHost = environment.apiHost,
+            apiScheme = environment.apiScheme,
+            apiPort = environment.apiPort,
         )
     }
 }

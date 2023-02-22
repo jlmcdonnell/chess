@@ -11,7 +11,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.domain.bot.Bot
 import dev.mcd.chess.domain.bot.botFromSlug
-import dev.mcd.chess.domain.game.GameSession
+import dev.mcd.chess.domain.game.LocalGameSession
 import dev.mcd.chess.domain.game.GameSessionRepository
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.player.HumanPlayer
@@ -102,7 +102,7 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
-    private suspend fun tryMoveBot(game: GameSession) {
+    private suspend fun tryMoveBot(game: LocalGameSession) {
         val board = game.board
         if (!board.isMated && !board.isDraw) {
             Timber.d("Moving for stockfish")
@@ -138,7 +138,7 @@ class BotGameViewModel @Inject constructor(
                 */
                 loadFromFen(Constants.startStandardFENPosition)
             }
-            val game = GameSession(
+            val game = LocalGameSession(
                 id = UUID.randomUUID().toString(),
                 board = board,
                 self = HumanPlayer(
@@ -157,7 +157,7 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
-    private fun endGame(game: GameSession) {
+    private fun endGame(game: LocalGameSession) {
         intent {
             val board = game.board
             gameSessionRepository.updateActiveGame(null)
@@ -183,7 +183,7 @@ class BotGameViewModel @Inject constructor(
         object Loading : State
 
         data class Game(
-            val game: GameSession,
+            val game: LocalGameSession,
             val terminated: Boolean = false,
         ) : State
     }

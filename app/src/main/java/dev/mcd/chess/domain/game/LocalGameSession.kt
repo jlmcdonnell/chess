@@ -8,7 +8,7 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.domain.player.Player
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class GameSession(
+class LocalGameSession(
     val id: String,
     val board: Board,
     val self: Player,

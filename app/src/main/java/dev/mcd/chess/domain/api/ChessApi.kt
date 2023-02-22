@@ -6,9 +6,11 @@ import dev.mcd.chess.domain.player.UserId
 import kotlinx.coroutines.channels.ReceiveChannel
 
 interface ChessApi {
+    suspend fun storeToken(token: String)
     suspend fun userId(): UserId?
     suspend fun generateId(): UserId
-    suspend fun findGame(): SessionId
+    suspend fun findGame(): SessionInfo
+    suspend fun session(id: SessionId): SessionInfo
     suspend fun joinGame(id: SessionId, block: suspend ActiveGame.() -> Unit)
 }
 

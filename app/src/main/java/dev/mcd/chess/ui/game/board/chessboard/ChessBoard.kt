@@ -172,6 +172,7 @@ private fun Pieces(
     }
 
     ReusableContent(game?.id ?: "") {
+        val side = game?.selfSide ?: return
         pieces.forEachIndexed { index, piece ->
             if (piece != Piece.NONE) {
                 ChessPiece(
@@ -179,6 +180,7 @@ private fun Pieces(
                     initialPiece = piece,
                     perspective = perspective,
                     size = squareSize,
+                    side = side
                 )
             }
         }

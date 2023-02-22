@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.domain.game.GameSession
+import dev.mcd.chess.domain.game.LocalGameSession
 import dev.mcd.chess.ui.game.board.BoardInteraction
 import dev.mcd.chess.ui.game.board.LocalBoardInteraction
 import dev.mcd.chess.ui.game.board.LocalGameSession
@@ -25,7 +25,7 @@ import timber.log.Timber
 
 @Composable
 fun ActiveGameView(
-    game: GameSession,
+    game: LocalGameSession,
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
     terminated: Boolean,
