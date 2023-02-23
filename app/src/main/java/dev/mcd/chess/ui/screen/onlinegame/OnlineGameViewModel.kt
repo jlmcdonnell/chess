@@ -3,23 +3,31 @@ package dev.mcd.chess.ui.screen.onlinegame
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.domain.api.ChessApi
+import dev.mcd.chess.domain.api.SessionInfo
 import dev.mcd.chess.domain.api.opponent
 import dev.mcd.chess.domain.api.sideForUser
 import dev.mcd.chess.domain.game.BoardState
-import dev.mcd.chess.domain.game.GameMessage.BoardStateMessage
 import dev.mcd.chess.domain.game.GameMessage.ErrorNotUsersMove
-import dev.mcd.chess.domain.game.GameMessage.GameTermination
+import dev.mcd.chess.domain.game.GameMessage.SessionInfoMessage
 import dev.mcd.chess.domain.game.GameSessionRepository
 import dev.mcd.chess.domain.game.LocalGameSession
+import dev.mcd.chess.domain.game.State
+import dev.mcd.chess.domain.game.State.BLACK_CHECKMATED
+import dev.mcd.chess.domain.game.State.BLACK_RESIGNED
+import dev.mcd.chess.domain.game.State.DRAW
+import dev.mcd.chess.domain.game.State.STARTED
+import dev.mcd.chess.domain.game.State.WHITE_CHECKMATED
+import dev.mcd.chess.domain.game.State.WHITE_RESIGNED
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -41,10 +49,10 @@ class OnlineGameViewModel @Inject constructor(
     private val chessApi: ChessApi,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
-    private lateinit var moveChannel: SendChannel<String>
+    private lateinit var commandChannel: SendChannel<String>
 
     override val container = container<State, SideEffect>(
-        initialState = State.Loading,
+        initialState = State.FindingGame(),
     ) {
         viewModelScope.launch {
             gameSessionRepository.activeGame()
@@ -69,7 +77,6 @@ class OnlineGameViewModel @Inject constructor(
 
     fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
             runCatching {
                 suspendCancellableCoroutine { continuation ->
                     intent {
@@ -81,7 +88,8 @@ class OnlineGameViewModel @Inject constructor(
                         )
                     }
                 }
-                endGame(game, endedByRemote = false)
+                println("Resigning")
+                commandChannel.send("resign")
                 if (andNavigateBack) {
                     postSideEffect(SideEffect.NavigateBack)
                 }
@@ -96,9 +104,9 @@ class OnlineGameViewModel @Inject constructor(
             val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
             val board = game.board
             if (board.sideToMove == game.selfSide && move in board.legalMoves()) {
-                Timber.d("Moving for player")
+                Timber.d("Moving for player: $move")
                 board.doMove(move)
-                moveChannel.send(move.toString())
+                commandChannel.send(move.toString())
             }
         }
     }
@@ -106,12 +114,16 @@ class OnlineGameViewModel @Inject constructor(
     private fun startGame() {
         intent {
             runCatching {
-//                val userId = chessApi.userId() ?: chessApi.generateId()
-//                val remoteSession = chessApi.findGame()
+                val userId = chessApi.userId() ?: chessApi.generateId()
+                reduce { State.FindingGame(userId) }
 
-                chessApi.storeToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJZb3UuIiwiaXNzIjoiY2hlc3MubWNkLmRldiIsImp0aSI6InVzZXIxIn0.Ii62vyWQIhAxsDQSdc0pAAnPed6PuKQJ5SI-ae9ClvBgTWG2ZfHMwGms8jxVVxBySekh9r3rirR_Npvv4vMKyA")
-                val userId = "user1"
-                val remoteSession = chessApi.session("debug")
+                Timber.d("Authenticated as $userId")
+
+                val remoteSession = chessApi.findGame()
+
+//                chessApi.storeToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJZb3UuIiwiaXNzIjoiY2hlc3MubWNkLmRldiIsImp0aSI6InVzZXIxIn0.Ii62vyWQIhAxsDQSdc0pAAnPed6PuKQJ5SI-ae9ClvBgTWG2ZfHMwGms8jxVVxBySekh9r3rirR_Npvv4vMKyA")
+//                val userId = "user1"
+//                val remoteSession = chessApi.session("debug")
 
                 val board = Board().apply {
                     loadFromFen(remoteSession.board.fen)
@@ -138,24 +150,22 @@ class OnlineGameViewModel @Inject constructor(
 
                 chessApi.joinGame(remoteSession.sessionId) {
                     println("In Game!")
-                    val moveChan = Channel<String>(1)
-                    moveChannel = moveChan
+                    val commandChan = Channel<String>(1)
+                    commandChannel = commandChan
 
                     for (message in incoming) {
                         println("Received message: ${message::class}")
                         when (message) {
-                            is BoardStateMessage -> {
-                                updateBoardState(session, message.state)
+                            is SessionInfoMessage -> {
+                                handleSessionState(session, message.sessionInfo)
                             }
 
                             is ErrorNotUsersMove -> Timber.e("ErrorNotUsersMove")
-                            is GameTermination -> endGame(session, endedByRemote = true)
                         }
 
-
-                        if (message is BoardStateMessage && board.sideToMove == session.selfSide) {
+                        if (message is SessionInfoMessage && board.sideToMove == session.selfSide) {
                             println("Waiting move")
-                            send(moveChan.receive())
+                            send(commandChan.receive())
                             println("Sent move")
                         }
                     }
@@ -173,11 +183,29 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
+    private fun handleSessionState(session: LocalGameSession, sessionInfo: SessionInfo) {
+        intent {
+            when (sessionInfo.state) {
+                STARTED -> Unit
+                DRAW -> postSideEffect(AnnounceTermination(TerminationReason(draw = true)))
+                WHITE_RESIGNED -> postSideEffect(AnnounceTermination(TerminationReason(resignation = Side.WHITE)))
+                BLACK_RESIGNED -> postSideEffect(AnnounceTermination(TerminationReason(resignation = Side.BLACK)))
+                WHITE_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.WHITE)))
+                BLACK_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.BLACK)))
+            }
+            reduce { (state as? State.Game)?.copy(terminated = sessionInfo.state != STARTED) ?: state }
+
+            updateBoardState(session, sessionInfo.board)
+        }
+    }
+
     private fun updateBoardState(session: LocalGameSession, boardState: BoardState) {
         val localBoard = session.board
         val moveDiff = abs(boardState.moveCount - localBoard.moveCounter)
-        if (moveDiff == 0 && localBoard.fen == boardState.fen) {
-            println("Nothing to update")
+        val sideDiff = localBoard.sideToMove == boardState.lastMoveSide
+        // If we're on the same move count, check if it's someone else's turn from the last move made
+        if ((moveDiff == 0 || sideDiff) && localBoard.fen == boardState.fen) {
+            println("(${session.selfSide}) Nothing to update")
         } else if (moveDiff < 2) {
             val lastMoveSan = boardState.lastMoveSan
             val lastMoveSide = boardState.lastMoveSide
@@ -193,35 +221,14 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
-    private fun endGame(game: LocalGameSession, endedByRemote: Boolean) {
-        intent {
-            val board = game.board
-            gameSessionRepository.updateActiveGame(null)
-
-            val mated = board.sideToMove.takeIf { board.isMated }
-            val draw = board.isDraw
-            val resignation =
-                if (!endedByRemote && mated == null && !draw) board.sideToMove else null
-
-            reduce {
-                (state as? State.Game)?.copy(terminated = true) ?: state
-            }
-
-            val reason = TerminationReason(
-                sideMated = mated,
-                draw = draw,
-                resignation = resignation,
-            )
-            postSideEffect(SideEffect.AnnounceTermination(reason))
-        }
-    }
-
     sealed interface State {
-        object Loading : State
-
         data class Game(
             val game: LocalGameSession,
             val terminated: Boolean = false,
+        ) : State
+
+        data class FindingGame(
+            val username: String? = null,
         ) : State
 
         data class FatalError(

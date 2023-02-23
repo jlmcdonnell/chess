@@ -7,8 +7,8 @@ import androidx.datastore.preferences.preferencesDataStore
 import dev.mcd.chess.data.api.serializer.GameMessageSerializer
 import dev.mcd.chess.data.api.serializer.MessageType
 import dev.mcd.chess.data.api.serializer.SessionInfoSerializer
-import dev.mcd.chess.data.api.serializer.asBoardState
-import dev.mcd.chess.data.api.serializer.toSessionInfo
+import dev.mcd.chess.data.api.serializer.asSessionInfo
+import dev.mcd.chess.data.api.serializer.domain
 import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.api.SessionInfo
@@ -18,10 +18,12 @@ import dev.mcd.chess.domain.player.UserId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.cio.CIO
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
+import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
@@ -36,6 +38,7 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
+import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
 
@@ -62,6 +65,7 @@ class ChessApiImpl @Inject constructor(
         install(ContentNegotiation) {
             json()
         }
+        install(HttpTimeout)
     }
 
     override suspend fun generateId(): UserId {
@@ -82,18 +86,18 @@ class ChessApiImpl @Inject constructor(
                 timeout {
                     requestTimeoutMillis = Duration.ofMinutes(5).toMillis()
                 }
-            }.body<SessionInfoSerializer>().toSessionInfo()
+                withBearerToken()
+
+            }.body<SessionInfoSerializer>().domain()
         }
     }
 
     override suspend fun session(id: SessionId): SessionInfo {
-        val token = requireNotNull(token()) { "No auth token" }
-
         return withContext(Dispatchers.IO) {
             client.get {
                 url("$apiUrl/game/session/$id")
-                bearerAuth(token)
-            }.body<SessionInfoSerializer>().toSessionInfo()
+                withBearerToken()
+            }.body<SessionInfoSerializer>().domain()
         }
     }
 
@@ -114,8 +118,9 @@ class ChessApiImpl @Inject constructor(
                         object : ActiveGame {
                             override val incoming = messageChannel
 
-                            override suspend fun send(move: String) {
-                                send(Frame.Text(move))
+                            override suspend fun send(command: String) {
+                                println("Sending $command")
+                                send(Frame.Text(command))
                             }
                         }
                     )
@@ -125,15 +130,18 @@ class ChessApiImpl @Inject constructor(
                 for (frame in incoming) {
                     if (frame !is Frame.Text) continue
 
-                    val data = DefaultJson.decodeFromString<GameMessageSerializer>(frame.readText())
+                    runCatching {
+                        val data = DefaultJson.decodeFromString<GameMessageSerializer>(frame.readText())
 
-                    val message = when (data.message) {
-                        MessageType.BoardState -> data.asBoardState()
-                        MessageType.ErrorNotUsersMove -> GameMessage.ErrorNotUsersMove
-                        MessageType.GameTermination -> GameMessage.GameTermination
+                        val message = when (data.message) {
+                            MessageType.SessionInfo -> data.asSessionInfo()
+                            MessageType.ErrorNotUsersMove -> GameMessage.ErrorNotUsersMove
+                        }
+
+                        messageChannel.send(message)
+                    }.onFailure {
+                        Timber.e(it, "Handling frame")
                     }
-
-                    messageChannel.send(message)
                 }
             }
         }
@@ -145,6 +153,11 @@ class ChessApiImpl @Inject constructor(
 
     override suspend fun userId(): UserId? {
         return store.data.first()[userKey]
+    }
+
+    private suspend fun HttpRequestBuilder.withBearerToken() {
+        val token = requireNotNull(token()) { "No auth token" }
+        bearerAuth(token)
     }
 
     private suspend fun token(): String? {

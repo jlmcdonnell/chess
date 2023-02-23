@@ -36,9 +36,8 @@ abstract class AppModule {
     companion object {
         @Provides
         @Singleton
-        fun environment(): Environment = Environment.Debug(
-            apiUrl = "http://10.0.0.2"
-        )
+//        fun environment(): Environment = Environment.Production
+        fun environment(): Environment = Environment.Debug(apiUrl = "http://10.0.2.2:8080")
 
         @Provides
         @Singleton

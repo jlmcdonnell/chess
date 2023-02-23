@@ -95,7 +95,7 @@ class BotGameViewModel @Inject constructor(
             val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
             val board = game.board
             if (board.sideToMove == game.selfSide && move in board.legalMoves()) {
-                Timber.d("Moving for player")
+                Timber.d("Moving for player: $move")
                 board.doMove(move)
                 tryMoveBot(game)
             }

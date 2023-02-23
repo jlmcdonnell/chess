@@ -1,8 +1,6 @@
 package dev.mcd.chess.data.api.serializer
 
 import androidx.annotation.Keep
-import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.domain.game.BoardState
 import dev.mcd.chess.domain.game.GameMessage
 import io.ktor.serialization.kotlinx.json.DefaultJson
 import kotlinx.serialization.Serializable
@@ -15,25 +13,19 @@ data class GameMessageSerializer(
     val content: String? = null,
 )
 
-fun GameMessageSerializer.asBoardState(): GameMessage.BoardStateMessage {
-    require(message == MessageType.BoardState)
+fun GameMessageSerializer.asSessionInfo(): GameMessage.SessionInfoMessage {
+    require(message == MessageType.SessionInfo)
     val contentJson = content!!.replace("\\", "")
-    val stateSerializer = DefaultJson.decodeFromString<BoardStateSerializer>(contentJson)
+    val sessionInfoSerializer = DefaultJson.decodeFromString<SessionInfoSerializer>(contentJson)
 
-    return GameMessage.BoardStateMessage(
-        state = BoardState(
-            fen = stateSerializer.fen,
-            lastMoveSan = stateSerializer.lastMoveSan,
-            lastMoveSide = stateSerializer.lastMoveSide?.let(Side::valueOf),
-            moveCount = stateSerializer.moveCount,
-        )
+    return GameMessage.SessionInfoMessage(
+        sessionInfo = sessionInfoSerializer.domain(),
     )
 }
 
 @Serializable
 @Keep
 enum class MessageType {
-    BoardState,
+    SessionInfo,
     ErrorNotUsersMove,
-    GameTermination,
 }

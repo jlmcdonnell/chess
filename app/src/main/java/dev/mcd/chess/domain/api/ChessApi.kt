@@ -16,5 +16,5 @@ interface ChessApi {
 
 interface ActiveGame {
     val incoming: ReceiveChannel<GameMessage>
-    suspend fun send(move: String)
+    suspend fun send(command: String)
 }
