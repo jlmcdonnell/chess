@@ -43,16 +43,19 @@ private val Context.dataStore by preferencesDataStore(name = "api-prefs")
 
 class ChessApiImpl @Inject constructor(
     context: Context,
-    apiScheme: String,
-    apiHost: String,
-    apiPort: Int,
+    private val apiUrl: String,
 ) : ChessApi {
 
     private val store = context.dataStore
     private val tokenKey = stringPreferencesKey("token")
     private val userKey = stringPreferencesKey("user")
-    private val baseHttpUrl = "$apiScheme://$apiHost:$apiPort"
-    private val baseWebsocketUrl = "${if (apiScheme == "http") "ws" else "wss"}://$apiHost:$apiPort"
+    private val websocketUrl = apiUrl.let {
+        if (it.contains("https")) {
+            it.replace("https", "wss")
+        } else {
+            it.replace("http", "ws")
+        }
+    }
 
     private val client = HttpClient(CIO) {
         install(WebSockets)
@@ -64,7 +67,7 @@ class ChessApiImpl @Inject constructor(
     override suspend fun generateId(): UserId {
         return withContext(Dispatchers.IO) {
             client.post {
-                url("$baseHttpUrl/generate_id")
+                url("$apiUrl/generate_id")
             }.body<AuthResponse>().let { response ->
                 storeToken(response.token)
                 response.userId
@@ -75,7 +78,7 @@ class ChessApiImpl @Inject constructor(
     override suspend fun findGame(): SessionInfo {
         return withContext(Dispatchers.IO) {
             client.post {
-                url("$baseHttpUrl/game/find")
+                url("$apiUrl/game/find")
                 timeout {
                     requestTimeoutMillis = Duration.ofMinutes(5).toMillis()
                 }
@@ -88,7 +91,7 @@ class ChessApiImpl @Inject constructor(
 
         return withContext(Dispatchers.IO) {
             client.get {
-                url("$baseHttpUrl/game/session/$id")
+                url("$apiUrl/game/session/$id")
                 bearerAuth(token)
             }.body<SessionInfoSerializer>().toSessionInfo()
         }
@@ -99,7 +102,7 @@ class ChessApiImpl @Inject constructor(
             val token = requireNotNull(token()) { "No auth token" }
 
             client.webSocket(
-                urlString = "$baseWebsocketUrl/game/join/$id",
+                urlString = "$websocketUrl/game/join/$id",
                 request = {
                     bearerAuth(token)
                 }
