@@ -38,10 +38,15 @@ import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
 
 @Composable
-fun SelectBotScreen(onBotSelected: (slug: String, side: String) -> Unit) {
+fun BotSelectionScreen(
+    onBotSelected: (slug: String, side: String) -> Unit,
+
+    ) {
     Scaffold(
         topBar = {
-            TopAppBar(title = { Text(text = "Play Computer") })
+            TopAppBar(
+                title = { Text(text = "Play Computer") },
+            )
         }
     ) { padding ->
         var selectedSide by remember { mutableStateOf(Side.WHITE) }

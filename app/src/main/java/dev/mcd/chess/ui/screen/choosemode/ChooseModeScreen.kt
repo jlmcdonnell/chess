@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
@@ -20,6 +21,7 @@ import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.PersonSearch
+import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -27,9 +29,23 @@ import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun ChooseModeScreen(onPlayOnline: () -> Unit, onPlayBot: () -> Unit) {
+fun ChooseModeScreen(
+    onPlayOnline: () -> Unit,
+    onPlayBot: () -> Unit,
+    onNavigateSettings: () -> Unit,
+) {
     Scaffold(topBar = {
-        TopAppBar(title = { Text(text = "Choose Mode") })
+        TopAppBar(
+            title = { Text(text = "Choose Mode") },
+            actions = {
+                IconButton(onClick = { onNavigateSettings() }) {
+                    Icon(
+                        painter = rememberVectorPainter(image = Icons.Rounded.Settings),
+                        contentDescription = "Settings"
+                    )
+                }
+            }
+        )
     }) {
         Column(
             modifier = Modifier
@@ -43,10 +59,15 @@ fun ChooseModeScreen(onPlayOnline: () -> Unit, onPlayBot: () -> Unit) {
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Card(modifier = Modifier
-                    .weight(1f)
-                    .clickable { onPlayOnline() }) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clickable { onPlayOnline() }
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
                             text = "Play Online",
                             style = MaterialTheme.typography.subtitle1,
@@ -60,10 +81,16 @@ fun ChooseModeScreen(onPlayOnline: () -> Unit, onPlayBot: () -> Unit) {
                     }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
-                Card(modifier = Modifier
-                    .weight(1f)
-                    .clickable { onPlayBot() }) {
-                    Column(modifier = Modifier.padding(24.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                Card(
+                    modifier = Modifier
+                        .weight(1f)
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .clickable { onPlayBot() }
+                            .padding(24.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
                         Text(
                             text = "Play Computer",
                             style = MaterialTheme.typography.subtitle1,

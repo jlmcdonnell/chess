@@ -26,7 +26,6 @@ import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -41,7 +40,6 @@ import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.math.abs
 
 @HiltViewModel
 class OnlineGameViewModel @Inject constructor(
@@ -150,23 +148,13 @@ class OnlineGameViewModel @Inject constructor(
 
                 chessApi.joinGame(remoteSession.sessionId) {
                     println("In Game!")
-                    val commandChan = Channel<String>(1)
-                    commandChannel = commandChan
+                    commandChannel = outgoing
 
                     for (message in incoming) {
                         println("Received message: ${message::class}")
                         when (message) {
-                            is SessionInfoMessage -> {
-                                handleSessionState(session, message.sessionInfo)
-                            }
-
+                            is SessionInfoMessage -> handleSessionState(session, message.sessionInfo)
                             is ErrorNotUsersMove -> Timber.e("ErrorNotUsersMove")
-                        }
-
-                        if (message is SessionInfoMessage && board.sideToMove == session.selfSide) {
-                            println("Waiting move")
-                            send(commandChan.receive())
-                            println("Sent move")
                         }
                     }
                 }
@@ -201,23 +189,16 @@ class OnlineGameViewModel @Inject constructor(
 
     private fun updateBoardState(session: LocalGameSession, boardState: BoardState) {
         val localBoard = session.board
-        val moveDiff = abs(boardState.moveCount - localBoard.moveCounter)
-        val sideDiff = localBoard.sideToMove == boardState.lastMoveSide
-        // If we're on the same move count, check if it's someone else's turn from the last move made
-        if ((moveDiff == 0 || sideDiff) && localBoard.fen == boardState.fen) {
-            println("(${session.selfSide}) Nothing to update")
-        } else if (moveDiff < 2) {
-            val lastMoveSan = boardState.lastMoveSan
-            val lastMoveSide = boardState.lastMoveSide
-
-            if (lastMoveSan != null && lastMoveSide != null) {
-                val move = Move(lastMoveSan, lastMoveSide)
+        if (localBoard.fen == boardState.fen) {
+            Timber.d("FEN equals remote FEN (last move=${boardState.lastMoveSan} fen=${boardState.fen})")
+        } else if (boardState.lastMoveSide != null && boardState.lastMoveSan != null) {
+            Timber.d("Our FEN:\n\t${localBoard.fen}\nTheir FEN:\n\t${boardState.fen}")
+            val move = Move(boardState.lastMoveSan, boardState.lastMoveSide)
+            if (move in localBoard.legalMoves()) {
                 localBoard.doMove(move)
             } else {
-                fatalError("Illegal board state: lastMoveSan: $lastMoveSan lastMoveSide: $lastMoveSide")
+                Timber.e("Cannot make move ($move)")
             }
-        } else {
-            fatalError("Illegal board state:\nMove Diff $moveDiff\nOur FEN:\n\t${localBoard.fen}\nTheir FEN:\n\t${boardState.fen}")
         }
     }
 

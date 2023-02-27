@@ -17,7 +17,7 @@ import dev.mcd.chess.domain.game.SessionId
 import dev.mcd.chess.domain.player.UserId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.engine.cio.CIO
+import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.timeout
@@ -33,6 +33,7 @@ import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
@@ -60,8 +61,10 @@ class ChessApiImpl @Inject constructor(
         }
     }
 
-    private val client = HttpClient(CIO) {
-        install(WebSockets)
+    private val client = HttpClient(OkHttp) {
+        install(WebSockets) {
+            pingInterval = 1500
+        }
         install(ContentNegotiation) {
             json()
         }
@@ -111,36 +114,41 @@ class ChessApiImpl @Inject constructor(
                     bearerAuth(token)
                 }
             ) {
-                val messageChannel = Channel<GameMessage>(capacity = 1)
+                val incoming = Channel<GameMessage>(
+                    capacity = 1,
+                    onBufferOverflow = BufferOverflow.DROP_OLDEST
+                )
+
+                val outgoing = Channel<String>(
+                    capacity = 1,
+                    onBufferOverflow = BufferOverflow.DROP_OLDEST
+                )
 
                 launch {
-                    block(
-                        object : ActiveGame {
-                            override val incoming = messageChannel
-
-                            override suspend fun send(command: String) {
-                                println("Sending $command")
-                                send(Frame.Text(command))
-                            }
-                        }
-                    )
+                    block(ActiveGame(incoming = incoming, outgoing = outgoing))
                 }
 
+                launch {
+                    for (command in outgoing) {
+                        println("Sending $command")
+                        send(Frame.Text(command))
+                    }
+                }
 
-                for (frame in incoming) {
+                for (frame in this.incoming) {
                     if (frame !is Frame.Text) continue
-
-                    runCatching {
-                        val data = DefaultJson.decodeFromString<GameMessageSerializer>(frame.readText())
+                    try {
+                        val frameText = frame.readText()
+                        val data = DefaultJson.decodeFromString<GameMessageSerializer>(frameText)
 
                         val message = when (data.message) {
                             MessageType.SessionInfo -> data.asSessionInfo()
                             MessageType.ErrorNotUsersMove -> GameMessage.ErrorNotUsersMove
                         }
 
-                        messageChannel.send(message)
-                    }.onFailure {
-                        Timber.e(it, "Handling frame")
+                        incoming.send(message)
+                    } catch (e: Exception) {
+                        Timber.e(e, "Handling frame")
                     }
                 }
             }

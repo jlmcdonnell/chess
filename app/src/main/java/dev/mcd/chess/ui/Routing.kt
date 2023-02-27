@@ -7,9 +7,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dev.mcd.chess.ui.screen.botgame.BotGameScreen
-import dev.mcd.chess.ui.screen.botselection.SelectBotScreen
+import dev.mcd.chess.ui.screen.botselection.BotSelectionScreen
 import dev.mcd.chess.ui.screen.choosemode.ChooseModeScreen
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameScreen
+import dev.mcd.chess.ui.screen.settings.SettingsScreen
 
 @Composable
 fun Routing() {
@@ -19,10 +20,13 @@ fun Routing() {
             ChooseModeScreen(
                 onPlayOnline = { navController.navigate("/game/online") },
                 onPlayBot = { navController.navigate("/selectbot") },
+                onNavigateSettings = { navController.navigate("/settings") }
             )
         }
         composable("/selectbot") {
-            SelectBotScreen { bot, side -> navController.navigate("/game/bot/$bot/$side") }
+            BotSelectionScreen(
+                onBotSelected = { bot, side -> navController.navigate("/game/bot/$bot/$side") },
+            )
         }
         composable(
             "/game/bot/{bot}/{side}",
@@ -38,6 +42,11 @@ fun Routing() {
         }
         composable("/game/online") {
             OnlineGameScreen {
+                navController.popBackStack()
+            }
+        }
+        composable("/settings") {
+            SettingsScreen {
                 navController.popBackStack()
             }
         }

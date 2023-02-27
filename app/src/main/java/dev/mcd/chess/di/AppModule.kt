@@ -9,16 +9,19 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.data.BoardSoundsImpl
 import dev.mcd.chess.data.api.ChessApiImpl
+import dev.mcd.chess.data.api.DebugHostStoreImpl
 import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.data.stockfish.StockfishAdapterImpl
 import dev.mcd.chess.data.stockfish.StockfishJni
 import dev.mcd.chess.domain.Environment
 import dev.mcd.chess.domain.api.ChessApi
+import dev.mcd.chess.domain.api.DebugHostStore
 import dev.mcd.chess.domain.game.BoardSounds
 import dev.mcd.chess.domain.game.GameSessionRepository
 import dev.mcd.chess.domain.game.GameSessionRepositoryImpl
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
 @Module
@@ -31,13 +34,21 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun boardSounds(impL: BoardSoundsImpl): BoardSounds
+    abstract fun boardSounds(impl: BoardSoundsImpl): BoardSounds
+
+    @Binds
+    @Singleton
+    abstract fun debugHostStore(impl: DebugHostStoreImpl): DebugHostStore
 
     companion object {
         @Provides
         @Singleton
-//        fun environment(): Environment = Environment.Production
-        fun environment(): Environment = Environment.Debug(apiUrl = "http://10.0.2.2:8080")
+        fun environment(debugHostStore: DebugHostStore): Environment {
+            //        fun environment(): Environment = Environment.Production
+            return runBlocking {
+                Environment.Debug(apiUrl = debugHostStore.host())
+            }
+        }
 
         @Provides
         @Singleton
