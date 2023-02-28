@@ -8,6 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.data.BoardSoundsImpl
+import dev.mcd.chess.data.api.ActiveGameImpl
 import dev.mcd.chess.data.api.ChessApiImpl
 import dev.mcd.chess.data.api.DebugHostStoreImpl
 import dev.mcd.chess.data.stockfish.StockfishAdapter
@@ -71,6 +72,7 @@ abstract class AppModule {
         ): ChessApi = ChessApiImpl(
             context = context,
             apiUrl = environment.apiUrl,
+            activeGameFactory = { outgoing, incoming -> ActiveGameImpl(incoming, outgoing) }
         )
     }
 }

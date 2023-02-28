@@ -12,7 +12,6 @@ data class SessionInfoSerializer(
     val whiteUserId: String,
     val blackUserId: String,
     val state: State,
-    val board: BoardStateSerializer,
 )
 
 fun SessionInfoSerializer.domain() = SessionInfo(
@@ -20,5 +19,4 @@ fun SessionInfoSerializer.domain() = SessionInfo(
     whiteUserId = whiteUserId,
     blackUserId = blackUserId,
     state = state.domain(),
-    board = board.toBoardState(),
 )

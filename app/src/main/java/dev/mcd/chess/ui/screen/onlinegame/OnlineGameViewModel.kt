@@ -6,29 +6,29 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.api.SessionInfo
+import dev.mcd.chess.domain.api.MoveHistory
 import dev.mcd.chess.domain.api.opponent
 import dev.mcd.chess.domain.api.sideForUser
-import dev.mcd.chess.domain.game.BoardState
-import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.GameMessage.ErrorGameTerminated
 import dev.mcd.chess.domain.game.GameMessage.ErrorNotUsersMove
+import dev.mcd.chess.domain.game.GameMessage.MoveHistoryMessage
+import dev.mcd.chess.domain.game.GameMessage.MoveMessage
 import dev.mcd.chess.domain.game.GameMessage.SessionInfoMessage
 import dev.mcd.chess.domain.game.GameSessionRepository
+import dev.mcd.chess.domain.game.GameState
+import dev.mcd.chess.domain.game.GameState.BLACK_CHECKMATED
+import dev.mcd.chess.domain.game.GameState.BLACK_RESIGNED
+import dev.mcd.chess.domain.game.GameState.DRAW
+import dev.mcd.chess.domain.game.GameState.STARTED
+import dev.mcd.chess.domain.game.GameState.WHITE_CHECKMATED
+import dev.mcd.chess.domain.game.GameState.WHITE_RESIGNED
 import dev.mcd.chess.domain.game.LocalGameSession
-import dev.mcd.chess.domain.game.State
-import dev.mcd.chess.domain.game.State.BLACK_CHECKMATED
-import dev.mcd.chess.domain.game.State.BLACK_RESIGNED
-import dev.mcd.chess.domain.game.State.DRAW
-import dev.mcd.chess.domain.game.State.STARTED
-import dev.mcd.chess.domain.game.State.WHITE_CHECKMATED
-import dev.mcd.chess.domain.game.State.WHITE_RESIGNED
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
-import kotlinx.coroutines.channels.SendChannel
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -49,7 +49,7 @@ class OnlineGameViewModel @Inject constructor(
     private val chessApi: ChessApi,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
-    private lateinit var commandChannel: SendChannel<String>
+    private var activeGame: ActiveGame? = null
 
     override val container = container<State, SideEffect>(
         initialState = State.FindingGame(),
@@ -88,13 +88,13 @@ class OnlineGameViewModel @Inject constructor(
                         )
                     }
                 }
-                println("Resigning")
-                commandChannel.send("resign")
+
+                activeGame?.resign()
                 if (andNavigateBack) {
                     postSideEffect(SideEffect.NavigateBack)
                 }
             }.onFailure {
-                Timber.d("Will not resign")
+                Timber.e("onResign", it)
             }
         }
     }
@@ -108,7 +108,7 @@ class OnlineGameViewModel @Inject constructor(
             if (!terminated && board.sideToMove == game.selfSide && move in board.legalMoves()) {
                 Timber.d("Moving for player: $move")
                 board.doMove(move)
-                commandChannel.send(move.toString())
+                activeGame?.move(move)
             }
         }
     }
@@ -127,14 +127,12 @@ class OnlineGameViewModel @Inject constructor(
 //                val userId = "user1"
 //                val remoteSession = chessApi.session("debug")
 
-                val board = Board().apply {
-                    loadFromFen(remoteSession.board.fen)
-                    moveCounter = remoteSession.board.moveCount
-                }
 
+                val board = Board()
                 val session = LocalGameSession(
                     id = remoteSession.sessionId,
                     board = board,
+                    initialBitboard = board.bitboard,
                     self = HumanPlayer(
                         name = userId,
                         image = PlayerImage.None,
@@ -149,15 +147,18 @@ class OnlineGameViewModel @Inject constructor(
                 )
                 gameSessionRepository.updateActiveGame(session)
 
-
                 chessApi.joinGame(remoteSession.sessionId) {
-                    println("In Game!")
-                    commandChannel = outgoing
+                    activeGame = this
+                    Timber.d("Joined game ${session.id}")
+
+                    requestMoveHistory()
 
                     for (message in incoming) {
-                        println("Received message: ${message::class}")
+                        Timber.d("Received message: ${message::class.simpleName}")
                         when (message) {
-                            is SessionInfoMessage -> handleSessionState(session, message.sessionInfo)
+                            is SessionInfoMessage -> handleSessionState(message.sessionInfo.state)
+                            is MoveHistoryMessage -> resetBoard(session, message.moveHistory)
+                            is MoveMessage -> addRemoteMove(session, message.move)
                             is ErrorNotUsersMove -> Timber.e("ErrorNotUsersMove")
                             is ErrorGameTerminated -> Timber.e("ErrorGameTerminated")
                         }
@@ -176,9 +177,19 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
-    private fun handleSessionState(session: LocalGameSession, sessionInfo: SessionInfo) {
+    private suspend fun resetBoard(session: LocalGameSession, moveHistory: MoveHistory) {
+        val board = Board()
+        moveHistory.moveList.forEach { board.doMove(it) }
+        gameSessionRepository.updateActiveGame(
+            game = session.copy(
+                board = board,
+            )
+        )
+    }
+
+    private fun handleSessionState(gameState: GameState) {
         intent {
-            when (sessionInfo.state) {
+            when (gameState) {
                 STARTED -> Unit
                 DRAW -> postSideEffect(AnnounceTermination(TerminationReason(draw = true)))
                 WHITE_RESIGNED -> postSideEffect(AnnounceTermination(TerminationReason(resignation = Side.WHITE)))
@@ -186,23 +197,17 @@ class OnlineGameViewModel @Inject constructor(
                 WHITE_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.WHITE)))
                 BLACK_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.BLACK)))
             }
-            reduce { (state as? State.Game)?.copy(terminated = sessionInfo.state != STARTED) ?: state }
-
-            updateBoardState(session, sessionInfo.board)
+            reduce { (state as? State.Game)?.copy(terminated = gameState != STARTED) ?: state }
         }
     }
 
-    private fun updateBoardState(session: LocalGameSession, boardState: BoardState) {
-        val localBoard = session.board
-        if (localBoard.fen == boardState.fen) {
-            Timber.d("FEN equals remote FEN (last move=${boardState.lastMoveSan} fen=${boardState.fen})")
-        } else if (boardState.lastMoveSide != null && boardState.lastMoveSan != null) {
-            Timber.d("Our FEN:\n\t${localBoard.fen}\nTheir FEN:\n\t${boardState.fen}")
-            val move = Move(boardState.lastMoveSan, boardState.lastMoveSide)
-            if (move in localBoard.legalMoves()) {
-                localBoard.doMove(move)
-            } else {
-                Timber.e("Cannot make move ($move)")
+    private fun addRemoteMove(session: LocalGameSession, move: String) {
+        val fen = session.board.fen
+        val success = runCatching { session.board.doMove(move) }.getOrElse { false }
+        if (!success) {
+            Timber.e("Board is out of sync: $fen\nUnable to make move $move")
+            intent {
+                activeGame?.requestMoveHistory()
             }
         }
     }

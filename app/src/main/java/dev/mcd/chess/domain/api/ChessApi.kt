@@ -1,10 +1,10 @@
 package dev.mcd.chess.domain.api
 
+import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.SessionId
 import dev.mcd.chess.domain.player.UserId
 import kotlinx.coroutines.channels.ReceiveChannel
-import kotlinx.coroutines.channels.SendChannel
 
 interface ChessApi {
     suspend fun storeToken(token: String)
@@ -15,7 +15,10 @@ interface ChessApi {
     suspend fun joinGame(id: SessionId, block: suspend ActiveGame.() -> Unit)
 }
 
-class ActiveGame(
-    val incoming: ReceiveChannel<GameMessage>,
-    val outgoing: SendChannel<String>,
-)
+interface ActiveGame {
+    val incoming: ReceiveChannel<GameMessage>
+
+    suspend fun requestMoveHistory()
+    suspend fun resign()
+    suspend fun move(move: Move)
+}

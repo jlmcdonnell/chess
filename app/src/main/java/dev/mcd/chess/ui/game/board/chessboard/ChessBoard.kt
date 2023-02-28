@@ -167,7 +167,7 @@ private fun Pieces(
     var pieces by remember { mutableStateOf(emptyList<Piece>()) }
     val game by LocalGameSession.current.sessionUpdates.collectAsState()
 
-    LaunchedEffect(game?.id) {
+    LaunchedEffect(game?.initialBitboard) {
         pieces = game?.board?.boardToArray()?.toList() ?: emptyList()
     }
 

@@ -4,10 +4,8 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dev.mcd.chess.data.api.serializer.GameMessageSerializer
-import dev.mcd.chess.data.api.serializer.MessageType
+import dev.mcd.chess.data.api.serializer.ActiveGameFactory
 import dev.mcd.chess.data.api.serializer.SessionInfoSerializer
-import dev.mcd.chess.data.api.serializer.asSessionInfo
 import dev.mcd.chess.data.api.serializer.domain
 import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
@@ -28,17 +26,14 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.post
 import io.ktor.client.request.url
-import io.ktor.serialization.kotlinx.json.DefaultJson
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
-import io.ktor.websocket.readText
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import timber.log.Timber
 import java.time.Duration
 import javax.inject.Inject
@@ -48,6 +43,7 @@ private val Context.dataStore by preferencesDataStore(name = "api-prefs")
 class ChessApiImpl @Inject constructor(
     context: Context,
     private val apiUrl: String,
+    private val activeGameFactory: ActiveGameFactory,
 ) : ChessApi {
 
     private val store = context.dataStore
@@ -114,40 +110,24 @@ class ChessApiImpl @Inject constructor(
                     bearerAuth(token)
                 }
             ) {
-                val incoming = Channel<GameMessage>(
-                    capacity = 1,
-                    onBufferOverflow = BufferOverflow.DROP_OLDEST
-                )
-
-                val outgoing = Channel<String>(
-                    capacity = 1,
-                    onBufferOverflow = BufferOverflow.DROP_OLDEST
-                )
+                val incomingMessages = Channel<GameMessage>(1, BufferOverflow.DROP_OLDEST)
+                val outgoing = Channel<String>(1, BufferOverflow.DROP_OLDEST)
 
                 launch {
-                    block(ActiveGame(incoming = incoming, outgoing = outgoing))
+                    block(activeGameFactory(outgoing, incomingMessages))
                 }
 
                 launch {
                     for (command in outgoing) {
-                        println("Sending $command")
+                        Timber.d("Sending $command")
                         send(Frame.Text(command))
                     }
                 }
 
-                for (frame in this.incoming) {
+                for (frame in incoming) {
                     if (frame !is Frame.Text) continue
                     try {
-                        val frameText = frame.readText()
-                        val data = DefaultJson.decodeFromString<GameMessageSerializer>(frameText)
-
-                        val message = when (data.message) {
-                            MessageType.SessionInfo -> data.asSessionInfo()
-                            MessageType.ErrorNotUsersMove -> GameMessage.ErrorNotUsersMove
-                            MessageType.ErrorGameTerminated -> GameMessage.ErrorGameTerminated
-                        }
-
-                        incoming.send(message)
+                        incomingMessages.send(frame.gameMessage())
                     } catch (e: Exception) {
                         Timber.e(e, "Handling frame")
                     }

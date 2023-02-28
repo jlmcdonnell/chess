@@ -1,7 +1,7 @@
 package dev.mcd.chess.data.api.serializer
 
 import kotlinx.serialization.Serializable
-import dev.mcd.chess.domain.game.State as DomainState
+import dev.mcd.chess.domain.game.GameState as DomainState
 
 @Serializable
 enum class State {

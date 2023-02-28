@@ -1,6 +1,6 @@
 package dev.mcd.chess.domain.game
 
-enum class State {
+enum class GameState {
     STARTED,
     DRAW,
     WHITE_RESIGNED,

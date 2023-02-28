@@ -141,13 +141,14 @@ class BotGameViewModel @Inject constructor(
             val game = LocalGameSession(
                 id = UUID.randomUUID().toString(),
                 board = board,
+                initialBitboard = board.bitboard,
                 self = HumanPlayer(
                     name = "You",
                     rating = 900,
                     image = PlayerImage.None
                 ),
                 selfSide = side,
-                opponent = bot
+                opponent = bot,
             )
             gameSessionRepository.updateActiveGame(game)
 
