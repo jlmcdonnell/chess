@@ -144,6 +144,7 @@ class ChessApiImpl @Inject constructor(
                         val message = when (data.message) {
                             MessageType.SessionInfo -> data.asSessionInfo()
                             MessageType.ErrorNotUsersMove -> GameMessage.ErrorNotUsersMove
+                            MessageType.ErrorGameTerminated -> GameMessage.ErrorGameTerminated
                         }
 
                         incoming.send(message)

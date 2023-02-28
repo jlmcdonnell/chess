@@ -9,4 +9,5 @@ sealed interface GameMessage {
     ) : GameMessage
 
     object ErrorNotUsersMove : GameMessage
+    object ErrorGameTerminated : GameMessage
 }

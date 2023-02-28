@@ -1,7 +1,12 @@
+@file:OptIn(ExperimentalMaterialApi::class)
+
 package dev.mcd.chess.ui.screen.settings
 
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.Chip
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
@@ -59,13 +64,19 @@ fun SettingsScreen(
         }
 
         if (BuildConfig.DEBUG) {
-            Column(Modifier.padding(padding), horizontalAlignment = CenterHorizontally) {
+            Column(Modifier.padding(padding).fillMaxWidth()) {
                 OutlinedTextField(
                     modifier = Modifier.padding(24.dp),
                     value = debugApiHost,
                     onValueChange = { debugApiHost = it },
-                    label = { Text(text = "API Host") }
+                    label = { Text(text = "API Host") },
                 )
+                Chip(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    onClick = { debugApiHost = debugApiHost.copy(text = "https://chess.mcd.dev") },
+                ) {
+                    Text(text = "https://chess.mcd.dev")
+                }
             }
         }
     }

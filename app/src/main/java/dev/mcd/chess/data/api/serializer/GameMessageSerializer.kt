@@ -28,4 +28,5 @@ fun GameMessageSerializer.asSessionInfo(): GameMessage.SessionInfoMessage {
 enum class MessageType {
     SessionInfo,
     ErrorNotUsersMove,
+    ErrorGameTerminated,
 }

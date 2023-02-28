@@ -11,6 +11,8 @@ import dev.mcd.chess.domain.api.SessionInfo
 import dev.mcd.chess.domain.api.opponent
 import dev.mcd.chess.domain.api.sideForUser
 import dev.mcd.chess.domain.game.BoardState
+import dev.mcd.chess.domain.game.GameMessage
+import dev.mcd.chess.domain.game.GameMessage.ErrorGameTerminated
 import dev.mcd.chess.domain.game.GameMessage.ErrorNotUsersMove
 import dev.mcd.chess.domain.game.GameMessage.SessionInfoMessage
 import dev.mcd.chess.domain.game.GameSessionRepository
@@ -100,8 +102,10 @@ class OnlineGameViewModel @Inject constructor(
     fun onPlayerMove(move: Move) {
         intent {
             val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
+
             val board = game.board
-            if (board.sideToMove == game.selfSide && move in board.legalMoves()) {
+            val terminated = state is State.Game && (state as? State.Game)?.terminated == true
+            if (!terminated && board.sideToMove == game.selfSide && move in board.legalMoves()) {
                 Timber.d("Moving for player: $move")
                 board.doMove(move)
                 commandChannel.send(move.toString())
@@ -155,6 +159,7 @@ class OnlineGameViewModel @Inject constructor(
                         when (message) {
                             is SessionInfoMessage -> handleSessionState(session, message.sessionInfo)
                             is ErrorNotUsersMove -> Timber.e("ErrorNotUsersMove")
+                            is ErrorGameTerminated -> Timber.e("ErrorGameTerminated")
                         }
                     }
                 }
