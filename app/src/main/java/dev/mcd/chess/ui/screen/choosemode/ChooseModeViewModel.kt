@@ -27,7 +27,7 @@ class ChooseModeViewModel @Inject constructor(
                     }.onFailure {
                         Timber.e(it, "Getting lobby info")
                     }
-                    delay(5000)
+                    delay(2000)
                 }
             }
         }

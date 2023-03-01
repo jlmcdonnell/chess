@@ -75,6 +75,7 @@ class ChessApiImpl @Inject constructor(
                 url("$apiUrl/generate_id")
             }.body<AuthResponse>().let { response ->
                 storeToken(response.token)
+                store.edit { it[userKey] = response.userId }
                 response.userId
             }
         }
@@ -173,6 +174,10 @@ class ChessApiImpl @Inject constructor(
         return store.data.first()[userKey]
     }
 
+    override suspend fun clear() {
+        store.edit { it.clear() }
+    }
+
     private suspend fun HttpRequestBuilder.withBearerToken() {
         val token = requireNotNull(token()) { "No auth token" }
         bearerAuth(token)
@@ -181,9 +186,4 @@ class ChessApiImpl @Inject constructor(
     private suspend fun token(): String? {
         return store.data.first()[tokenKey]
     }
-
-    private suspend fun user(): String? {
-        return store.data.first()[userKey]
-    }
-
 }

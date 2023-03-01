@@ -2,8 +2,11 @@
 
 package dev.mcd.chess.ui.screen.settings
 
+import android.content.Intent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
@@ -12,31 +15,27 @@ import androidx.compose.material.IconButton
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.BuildConfig
-import dev.mcd.chess.domain.api.DebugHostStore
-import kotlinx.coroutines.launch
-import javax.inject.Inject
+import dev.mcd.chess.MainActivity
+import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun SettingsScreen(
+    viewModel: SettingsViewModel = hiltViewModel(),
     onDismiss: () -> Unit,
 ) {
     Scaffold(
@@ -51,46 +50,80 @@ fun SettingsScreen(
             )
         },
     ) { padding ->
-        var debugApiHost by remember { mutableStateOf(TextFieldValue()) }
-        val viewModel = hiltViewModel<SettingsViewModel>()
 
-        LaunchedEffect(debugApiHost) {
-            if (debugApiHost.text.isNotEmpty()) {
-                viewModel.updateHost(debugApiHost.text)
-            } else {
-                val host = viewModel.currentHost()
-                debugApiHost = debugApiHost.copy(text = host)
-            }
-        }
+        val state by viewModel.collectAsState()
 
-        if (BuildConfig.DEBUG) {
-            Column(Modifier.padding(padding).fillMaxWidth()) {
-                OutlinedTextField(
-                    modifier = Modifier.padding(24.dp),
-                    value = debugApiHost,
-                    onValueChange = { debugApiHost = it },
-                    label = { Text(text = "API Host") },
+        Column(
+            Modifier
+                .padding(padding)
+                .fillMaxWidth()
+        ) {
+
+            if (state.showDebug) {
+                DebugSettings(
+                    productionUrl = state.productionUrl,
+                    currentHost = state.host,
+                    onUpdateHost = { viewModel.updateHost(it) },
+                    onClearAuth = { viewModel.clearAuthData() },
                 )
-                Chip(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    onClick = { debugApiHost = debugApiHost.copy(text = "https://chess.mcd.dev") },
-                ) {
-                    Text(text = "https://chess.mcd.dev")
-                }
             }
         }
     }
 }
 
-@HiltViewModel
-private class SettingsViewModel @Inject constructor(private val debugHostStore: DebugHostStore) : ViewModel() {
-
-    suspend fun currentHost(): String = debugHostStore.host()
-
-    fun updateHost(host: String) {
-        viewModelScope.launch {
-            debugHostStore.setHost(host)
-        }
+@Composable
+fun DebugSettings(
+    productionUrl: String,
+    currentHost: String,
+    onUpdateHost: (String) -> Unit,
+    onClearAuth: () -> Unit,
+) {
+    var debugApiHost by remember {
+        mutableStateOf(TextFieldValue(text = currentHost))
     }
 
+    val context = LocalContext.current
+
+    val restart = {
+        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)!!
+        intent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        context.startActivity(intent)
+    }
+
+    OutlinedTextField(
+        modifier = Modifier.padding(24.dp),
+        value = debugApiHost,
+        onValueChange = {
+            onUpdateHost(it.text)
+            debugApiHost = it
+        },
+        label = { Text(text = "API Host") },
+    )
+    Chip(
+        modifier = Modifier.padding(horizontal = 24.dp),
+        onClick = {
+            debugApiHost = TextFieldValue(text = productionUrl)
+            onUpdateHost(productionUrl)
+        },
+    ) {
+        Text(text = productionUrl)
+    }
+    Spacer(modifier = Modifier.height(24.dp))
+    TextButton(
+        modifier = Modifier.padding(horizontal = 24.dp),
+        onClick = { onClearAuth() },
+    ) {
+        Text(text = "Clear Auth Data")
+    }
+    TextButton(
+        modifier = Modifier.padding(horizontal = 24.dp),
+        onClick = {
+            restart()
+        },
+    ) {
+        Text(text = "Restart")
+    }
 }
+
+

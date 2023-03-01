@@ -123,11 +123,6 @@ class OnlineGameViewModel @Inject constructor(
 
                 val remoteSession = chessApi.findGame()
 
-//                chessApi.storeToken("eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzUxMiJ9.eyJhdWQiOiJZb3UuIiwiaXNzIjoiY2hlc3MubWNkLmRldiIsImp0aSI6InVzZXIxIn0.Ii62vyWQIhAxsDQSdc0pAAnPed6PuKQJ5SI-ae9ClvBgTWG2ZfHMwGms8jxVVxBySekh9r3rirR_Npvv4vMKyA")
-//                val userId = "user1"
-//                val remoteSession = chessApi.session("debug")
-
-
                 val board = Board()
                 val session = LocalGameSession(
                     id = remoteSession.sessionId,

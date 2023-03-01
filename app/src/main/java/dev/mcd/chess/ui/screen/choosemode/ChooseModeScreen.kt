@@ -28,10 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.Lifecycle
 import dev.mcd.chess.ui.theme.LocalAppColors
 import org.orbitmvi.orbit.compose.collectAsState
 
@@ -46,7 +44,7 @@ fun ChooseModeScreen(
 
     Scaffold(topBar = {
         TopAppBar(
-            title = { Text(text = "Choose Mode") },
+            title = { Text(text = "Chess") },
             actions = {
                 IconButton(onClick = { onNavigateSettings() }) {
                     Icon(
@@ -54,7 +52,7 @@ fun ChooseModeScreen(
                         contentDescription = "Settings"
                     )
                 }
-            }
+            },
         )
     }) {
         Column(
@@ -84,7 +82,7 @@ fun ChooseModeScreen(
                         )
                         val inLobby = state.inLobby
                         if (inLobby != null) {
-                            val color = if (inLobby  > 0) {
+                            val color = if (inLobby > 0) {
                                 LocalAppColors.current.green
                             } else {
                                 Color.Unspecified

@@ -15,10 +15,14 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -27,7 +31,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
@@ -36,16 +40,22 @@ import dev.mcd.chess.domain.bot.Bot
 import dev.mcd.chess.domain.bot.bots
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
+import dev.mcd.chess.ui.theme.LocalAppColors
 
 @Composable
 fun BotSelectionScreen(
     onBotSelected: (slug: String, side: String) -> Unit,
-
-    ) {
+    onDismiss: () -> Unit,
+) {
     Scaffold(
         topBar = {
             TopAppBar(
                 title = { Text(text = "Play Computer") },
+                navigationIcon = {
+                    IconButton(onClick = { onDismiss() }) {
+                        Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = "Back")
+                    }
+                }
             )
         }
     ) { padding ->
@@ -58,7 +68,7 @@ fun BotSelectionScreen(
                         val piece = if (side == Side.WHITE) Piece.WHITE_KING else Piece.BLACK_KING
                         Image(
                             modifier = Modifier
-                                .background(Color(0xFF302D2D))
+                                .background(LocalAppColors.current.neutralPieceBackground)
                                 .clickable { selectedSide = side }
                                 .let {
                                     if (selectedSide == side) {

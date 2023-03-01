@@ -9,10 +9,14 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.LocalTextStyle
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,7 +25,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
@@ -63,14 +69,6 @@ fun OnlineGameScreen(
                 }
             }
 
-            showTerminationReason?.let { reason ->
-                GameTermination(
-                    reason = reason,
-                    onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null }
-                )
-            }
-
             showResignation?.let { effect ->
                 ResignationDialog(
                     onConfirm = {
@@ -92,7 +90,7 @@ fun OnlineGameScreen(
                     terminated = s.terminated,
                 )
 
-                is FindingGame -> FindingGameView(s.username)
+                is FindingGame -> FindingGameView(s.username, navigateBack)
                 is FatalError -> Text(
                     text = """
                         A VERY BAD HAPPENED
@@ -102,12 +100,24 @@ fun OnlineGameScreen(
                     color = Color.Red
                 )
             }
+
+            showTerminationReason?.let { reason ->
+                Spacer(modifier = Modifier.height(24.dp))
+                GameTermination(
+                    reason = reason,
+                    onRestart = { viewModel.onRestart() },
+                    onDismiss = { showTerminationReason = null }
+                )
+            }
         }
     }
 }
 
 @Composable
-private fun FindingGameView(username: String? = null) {
+private fun FindingGameView(
+    username: String? = null,
+    onCancel: () -> Unit,
+) {
     Card(
         modifier = Modifier
             .padding(24.dp)
@@ -118,12 +128,24 @@ private fun FindingGameView(username: String? = null) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             if (username != null) {
-                Text(text = "Authenticated as $username")
+                Text(
+                    text = "Playing as $username",
+                )
                 Spacer(modifier = Modifier.height(24.dp))
-                Row {
-                    Text(text = "Finding Game")
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Text(
+                        text = "Finding Game",
+                    )
                     Spacer(modifier = Modifier.width(12.dp))
-                    CircularProgressIndicator(modifier = Modifier.size(18.dp))
+                    CircularProgressIndicator(
+                        modifier = Modifier.size(18.dp),
+                        strokeWidth = 2.dp
+                    )
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+                TextButton(onClick = { onCancel() }) {
+                    Text(text = "Cancel")
                 }
             } else {
                 Text(text = "Authenticating")

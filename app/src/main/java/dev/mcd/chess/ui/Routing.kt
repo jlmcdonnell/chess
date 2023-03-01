@@ -20,12 +20,13 @@ fun Routing() {
             ChooseModeScreen(
                 onPlayOnline = { navController.navigate("/game/online") },
                 onPlayBot = { navController.navigate("/selectbot") },
-                onNavigateSettings = { navController.navigate("/settings") }
+                onNavigateSettings = { navController.navigate("/settings") },
             )
         }
         composable("/selectbot") {
             BotSelectionScreen(
                 onBotSelected = { bot, side -> navController.navigate("/game/bot/$bot/$side") },
+                onDismiss = { navController.popBackStack() },
             )
         }
         composable(

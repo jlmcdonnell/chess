@@ -7,18 +7,22 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
 
-class AppColors(val green: Color = Color.Transparent)
+class AppColors(
+    val green: Color = Color.Transparent,
+    val neutralPieceBackground: Color = Color.Transparent
+)
 
 val LocalAppColors = compositionLocalOf { AppColors() }
 
 private val DarkColorPalette = darkColors(
-    primary = Purple200,
-    primaryVariant = Purple700,
-    secondary = Teal200
+    primary = Color(0xFF00E9A6),
+    primaryVariant = Color(0xFF008F66),
+    secondary = Color(0xFF03DAC5)
 )
 
 private val DefaultAppColors = AppColors(
-    green = Color(0xFF00FF37)
+    green = Color(0xFF00FF37),
+    neutralPieceBackground = Color(0xFF26324B),
 )
 
 @Composable

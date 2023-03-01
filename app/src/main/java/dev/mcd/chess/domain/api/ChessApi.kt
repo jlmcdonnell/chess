@@ -14,6 +14,7 @@ interface ChessApi {
     suspend fun game(id: SessionId): SessionInfo
     suspend fun joinGame(id: SessionId, block: suspend ActiveGame.() -> Unit)
     suspend fun lobbyInfo(): LobbyInfo
+    suspend fun clear()
 }
 
 interface ActiveGame {

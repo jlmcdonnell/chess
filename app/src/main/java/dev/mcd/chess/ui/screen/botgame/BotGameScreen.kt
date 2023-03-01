@@ -48,14 +48,6 @@ fun BotGameScreen(
                 }
             }
 
-            showTerminationReason?.let { reason ->
-                GameTermination(
-                    reason = reason,
-                    onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null }
-                )
-            }
-
             showResignation?.let { effect ->
                 ResignationDialog(
                     onConfirm = {
@@ -77,6 +69,14 @@ fun BotGameScreen(
                     terminated = s.terminated,
                 )
                 is Loading -> Unit
+            }
+
+            showTerminationReason?.let { reason ->
+                GameTermination(
+                    reason = reason,
+                    onRestart = { viewModel.onRestart() },
+                    onDismiss = { showTerminationReason = null }
+                )
             }
         }
     }
