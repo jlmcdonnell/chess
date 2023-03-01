@@ -23,17 +23,27 @@ import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import dev.mcd.chess.ui.theme.LocalAppColors
+import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun ChooseModeScreen(
     onPlayOnline: () -> Unit,
     onPlayBot: () -> Unit,
     onNavigateSettings: () -> Unit,
+    viewModel: ChooseModeViewModel = hiltViewModel(),
 ) {
+    val state by viewModel.collectAsState()
+
     Scaffold(topBar = {
         TopAppBar(
             title = { Text(text = "Choose Mode") },
@@ -72,7 +82,24 @@ fun ChooseModeScreen(
                             text = "Play Online",
                             style = MaterialTheme.typography.subtitle1,
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        val inLobby = state.inLobby
+                        if (inLobby != null) {
+                            val color = if (inLobby  > 0) {
+                                LocalAppColors.current.green
+                            } else {
+                                Color.Unspecified
+                            }
+                            Text(
+                                modifier = Modifier.height(24.dp),
+                                text = "${state.inLobby} waiting",
+                                style = MaterialTheme.typography.subtitle1,
+                                color = color,
+                            )
+                            Spacer(modifier = Modifier.height(12.dp))
+                        } else {
+                            Spacer(modifier = Modifier.height(36.dp))
+                        }
+
                         Icon(
                             modifier = Modifier.size(32.dp),
                             painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
@@ -95,7 +122,7 @@ fun ChooseModeScreen(
                             text = "Play Computer",
                             style = MaterialTheme.typography.subtitle1,
                         )
-                        Spacer(modifier = Modifier.height(12.dp))
+                        Spacer(modifier = Modifier.height(36.dp))
                         Icon(
                             modifier = Modifier.size(32.dp),
                             painter = rememberVectorPainter(image = Icons.Rounded.Computer),

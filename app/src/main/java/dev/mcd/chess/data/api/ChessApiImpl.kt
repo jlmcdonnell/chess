@@ -5,10 +5,12 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dev.mcd.chess.data.api.serializer.ActiveGameFactory
+import dev.mcd.chess.data.api.serializer.LobbyInfoSerializer
 import dev.mcd.chess.data.api.serializer.SessionInfoSerializer
 import dev.mcd.chess.data.api.serializer.domain
 import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
+import dev.mcd.chess.domain.api.LobbyInfo
 import dev.mcd.chess.domain.api.SessionInfo
 import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.SessionId
@@ -18,7 +20,6 @@ import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.timeout
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.HttpRequestBuilder
@@ -28,6 +29,8 @@ import io.ktor.client.request.post
 import io.ktor.client.request.url
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.websocket.Frame
+import io.ktor.websocket.close
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +38,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.time.Duration
 import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore(name = "api-prefs")
@@ -80,21 +82,40 @@ class ChessApiImpl @Inject constructor(
 
     override suspend fun findGame(): SessionInfo {
         return withContext(Dispatchers.IO) {
-            client.post {
-                url("$apiUrl/game/find")
-                timeout {
-                    requestTimeoutMillis = Duration.ofMinutes(5).toMillis()
-                }
-                withBearerToken()
+            val sessionCompletable = CompletableDeferred<SessionInfo>()
+            val token = requireNotNull(token()) { "No auth token" }
 
-            }.body<SessionInfoSerializer>().domain()
+            client.webSocket(
+                urlString = "$websocketUrl/game/find",
+                request = {
+                    bearerAuth(token)
+                }
+            ) {
+                for (frame in incoming) {
+                    if (frame is Frame.Text) {
+                        val message = frame.gameMessage()
+                        if (message is GameMessage.SessionInfoMessage) {
+                            sessionCompletable.complete(message.sessionInfo)
+                            close()
+                        } else {
+                            Timber.w("Unhandled message: ${message::class}")
+                        }
+                    }
+                }
+                val reason = closeReason.await()
+                if (!sessionCompletable.isCompleted) {
+                    Timber.d("No game joined: $reason")
+                    sessionCompletable.cancel()
+                }
+            }
+            sessionCompletable.await()
         }
     }
 
-    override suspend fun session(id: SessionId): SessionInfo {
+    override suspend fun game(id: SessionId): SessionInfo {
         return withContext(Dispatchers.IO) {
             client.get {
-                url("$apiUrl/game/session/$id")
+                url("$apiUrl/game/id/$id")
                 withBearerToken()
             }.body<SessionInfoSerializer>().domain()
         }
@@ -133,6 +154,14 @@ class ChessApiImpl @Inject constructor(
                     }
                 }
             }
+        }
+    }
+
+    override suspend fun lobbyInfo(): LobbyInfo {
+        return withContext(Dispatchers.IO) {
+            client.get {
+                url("$apiUrl/game/lobby")
+            }.body<LobbyInfoSerializer>().domain()
         }
     }
 
