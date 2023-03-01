@@ -19,6 +19,7 @@ import androidx.compose.material.TextButton
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -30,7 +31,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.mcd.chess.MainActivity
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -92,13 +92,21 @@ fun DebugSettings(
     }
 
     OutlinedTextField(
-        modifier = Modifier.padding(24.dp),
+        modifier = Modifier.padding(24.dp).fillMaxWidth(),
         value = debugApiHost,
         onValueChange = {
             onUpdateHost(it.text)
             debugApiHost = it
         },
         label = { Text(text = "API Host") },
+        trailingIcon = {
+            IconButton(onClick = { debugApiHost = debugApiHost.copy(text = "") }) {
+                Icon(
+                    painter = rememberVectorPainter(image = Icons.Rounded.Clear),
+                    contentDescription = "Clear"
+                )
+            }
+        }
     )
     Chip(
         modifier = Modifier.padding(horizontal = 24.dp),

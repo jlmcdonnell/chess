@@ -30,17 +30,28 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.mcd.chess.domain.game.SessionId
+import dev.mcd.chess.ui.screen.choosemode.ChooseModeViewModel.*
+import dev.mcd.chess.ui.screen.choosemode.ChooseModeViewModel.SideEffect.*
 import dev.mcd.chess.ui.theme.LocalAppColors
 import org.orbitmvi.orbit.compose.collectAsState
+import org.orbitmvi.orbit.compose.collectSideEffect
 
 @Composable
 fun ChooseModeScreen(
     onPlayOnline: () -> Unit,
     onPlayBot: () -> Unit,
     onNavigateSettings: () -> Unit,
+    onNavigateExistingGame: (SessionId) -> Unit,
     viewModel: ChooseModeViewModel = hiltViewModel(),
 ) {
     val state by viewModel.collectAsState()
+
+    viewModel.collectSideEffect {
+        when (it) {
+            is NavigateToExistingGame -> onNavigateExistingGame(it.id)
+        }
+    }
 
     Scaffold(topBar = {
         TopAppBar(

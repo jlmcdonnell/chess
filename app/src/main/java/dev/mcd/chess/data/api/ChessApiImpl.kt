@@ -122,6 +122,15 @@ class ChessApiImpl @Inject constructor(
         }
     }
 
+    override suspend fun gameForUser(): List<SessionInfo> {
+        return withContext(Dispatchers.IO) {
+            client.get {
+                url("$apiUrl/game/user")
+                withBearerToken()
+            }.body<List<SessionInfoSerializer>>().map { it.domain() }
+        }
+    }
+
     override suspend fun joinGame(id: SessionId, block: suspend ActiveGame.() -> Unit) {
         withContext(Dispatchers.IO) {
             val token = requireNotNull(token()) { "No auth token" }

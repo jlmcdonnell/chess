@@ -30,8 +30,6 @@ class SettingsViewModel @Inject constructor(
         }
     }
 
-    suspend fun currentHost(): String = debugHostStore.host()
-
     fun updateHost(host: String) {
         intent {
             debugHostStore.setHost(host)

@@ -1,14 +1,17 @@
 package dev.mcd.chess.ui.screen.onlinegame
 
+import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.api.MoveHistory
+import dev.mcd.chess.domain.api.SessionInfo
 import dev.mcd.chess.domain.api.opponent
 import dev.mcd.chess.domain.api.sideForUser
 import dev.mcd.chess.domain.game.GameMessage.ErrorGameTerminated
@@ -47,6 +50,7 @@ import kotlin.coroutines.resume
 class OnlineGameViewModel @Inject constructor(
     private val gameSessionRepository: GameSessionRepository,
     private val chessApi: ChessApi,
+    private val stateHandle: SavedStateHandle,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
     private var activeGame: ActiveGame? = null
@@ -68,11 +72,25 @@ class OnlineGameViewModel @Inject constructor(
                     }
                 }
         }
-        startGame()
+        val gameId = stateHandle.get<String>("gameId")
+        Timber.d("existingGame: $gameId")
+        if (gameId != null) {
+            intent {
+                runCatching {
+                    val sessionInfo = chessApi.game(gameId)
+                    startGame(sessionInfo)
+                }.onFailure {
+                    Timber.e(it, "Retrieving game $gameId")
+                    fatalError("Unable to retrieve existing game")
+                }
+            }
+        } else {
+            findGame()
+        }
     }
 
     fun onRestart() {
-        startGame()
+        findGame()
     }
 
     fun onResign(andNavigateBack: Boolean = false) {
@@ -113,7 +131,19 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
-    private fun startGame() {
+    private fun findGame() {
+        intent {
+            val userId = chessApi.userId() ?: chessApi.generateId()
+            reduce { State.FindingGame(userId) }
+
+            Timber.d("Authenticated as $userId")
+
+            val remoteSession = chessApi.findGame()
+            startGame(remoteSession)
+        }
+    }
+
+    private fun startGame(remoteSession: SessionInfo) {
         intent {
             runCatching {
                 val userId = chessApi.userId() ?: chessApi.generateId()
@@ -121,7 +151,6 @@ class OnlineGameViewModel @Inject constructor(
 
                 Timber.d("Authenticated as $userId")
 
-                val remoteSession = chessApi.findGame()
 
                 val board = Board()
                 val session = LocalGameSession(
@@ -172,14 +201,16 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
-    private suspend fun resetBoard(session: LocalGameSession, moveHistory: MoveHistory) {
-        val board = Board()
-        moveHistory.moveList.forEach { board.doMove(it) }
-        gameSessionRepository.updateActiveGame(
-            game = session.copy(
-                board = board,
-            )
-        )
+    private fun resetBoard(session: LocalGameSession, moveHistory: MoveHistory) {
+        Timber.d("Resetting board: $moveHistory")
+        intent {
+            val board = session.board
+            board.clear()
+            board.loadFromFen(Constants.startStandardFENPosition)
+            moveHistory.moveList.all {
+                board.doMove(Move(it, board.sideToMove), false)
+            }
+        }
     }
 
     private fun handleSessionState(gameState: GameState) {

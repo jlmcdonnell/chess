@@ -21,6 +21,7 @@ fun Routing() {
                 onPlayOnline = { navController.navigate("/game/online") },
                 onPlayBot = { navController.navigate("/selectbot") },
                 onNavigateSettings = { navController.navigate("/settings") },
+                onNavigateExistingGame = { navController.navigate("/game/online?gameId=$it") }
             )
         }
         composable("/selectbot") {
@@ -41,7 +42,15 @@ fun Routing() {
                 navController.popBackStack()
             }
         }
-        composable("/game/online") {
+        composable(
+            "/game/online?gameId={gameId}",
+            listOf(
+                navArgument("gameId") {
+                    type = NavType.StringType
+                    nullable = true
+                }
+            )
+        ) {
             OnlineGameScreen {
                 navController.popBackStack()
             }

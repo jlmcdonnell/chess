@@ -1,10 +1,11 @@
-package dev.mcd.chess.data
+package dev.mcd.chess.data.game
 
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
+import com.github.bhlangonijr.chesslib.game.Game
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
 import dev.mcd.chess.domain.game.BoardSounds
