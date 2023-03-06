@@ -142,6 +142,7 @@ class BotGameViewModel @Inject constructor(
                 opponent = bot,
                 channel = BotRemoteGameChannel()
             )
+            game.setBoard(Board())
             gameSessionRepository.updateActiveGame(game)
 
             if (board.sideToMove != game.selfSide) {

@@ -8,16 +8,15 @@ import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
+import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.game.online.GameSession
 import dev.mcd.chess.domain.game.online.JoinOnlineGame
-import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.game.online.opponent
 import dev.mcd.chess.domain.game.online.sideForUser
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
 import dev.mcd.chess.domain.player.UserId
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.flow
 import timber.log.Timber
 import javax.inject.Inject
 
@@ -33,6 +32,7 @@ class JoinOnlineGameImpl @Inject constructor(
         chessApi.joinGame(session.id) {
             Timber.d("Joined game ${session.id}")
             val clientSession = createClientSession(userId, session, channel = this)
+            clientSession.setBoard(session.game.board)
             gameSessionRepository.updateActiveGame(clientSession)
 
             requestGameState()
@@ -83,9 +83,9 @@ class JoinOnlineGameImpl @Inject constructor(
         )
     }
 
-    private fun syncWithRemote(onlineSession: GameSession, localSession: ClientGameSession): JoinOnlineGame.Event? {
+    private suspend fun syncWithRemote(onlineSession: GameSession, localSession: ClientGameSession): JoinOnlineGame.Event? {
         val board = onlineSession.game.board.clone()
-        localSession.updateBoard(board)
+        localSession.setBoard(board)
 
         val matedOrDraw = board.let { it.isDraw || it.isMated }
 

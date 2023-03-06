@@ -22,15 +22,13 @@ open class ClientGameSession(
 ) {
     private lateinit var board: Board
 
-    private val _pieceUpdates by lazy { MutableStateFlow(board.boardToArray().toList()) }
+    private val pieceUpdates = MutableStateFlow<List<Piece>>(emptyList())
     private val moves = MutableStateFlow<MoveBackup?>(null)
 
-    init {
-        updateBoard(Board())
-    }
-
-    fun updateBoard(board: Board) {
+    suspend fun setBoard(board: Board) {
         this.board = board
+        board.backup.lastOrNull()?.let { moves.emit(it) }
+        pieceUpdates.emit(board.boardToArray().toList())
     }
 
     suspend fun doMove(move: String, requireMoveCount: Int? = null): Boolean {
@@ -81,5 +79,5 @@ open class ClientGameSession(
 
     fun fen() = board.fen
 
-    fun pieceUpdates() = _pieceUpdates
+    fun pieceUpdates() = pieceUpdates
 }
