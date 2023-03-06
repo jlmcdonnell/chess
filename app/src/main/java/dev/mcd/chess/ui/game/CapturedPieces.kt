@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalCoroutinesApi::class, ExperimentalCoroutinesApi::class, ExperimentalCoroutinesApi::class)
-
 package dev.mcd.chess.ui.game
 
 import androidx.compose.foundation.Image
@@ -9,7 +7,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,10 +20,7 @@ import com.github.bhlangonijr.chesslib.PieceType
 import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
 import dev.mcd.chess.ui.game.board.LocalGameSession
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.flatMapLatest
 
 @Composable
 fun CapturedPieces(
@@ -34,18 +28,12 @@ fun CapturedPieces(
     side: Side,
 ) {
     val sessionManager = LocalGameSession.current
-    val game by sessionManager.sessionUpdates.collectAsState()
     var capturedPieces by remember { mutableStateOf<List<Piece>>(emptyList()) }
 
     LaunchedEffect(Unit) {
-        sessionManager.sessionUpdates
-            .filterNotNull()
-            .flatMapLatest { it.pieceUpdates }
-            .collectLatest {
-                capturedPieces = game?.board?.backup?.map { backup ->
-                    backup.capturedPiece
-                } ?: emptyList()
-            }
+        sessionManager.captures().collectLatest {
+            capturedPieces = it
+        }
     }
     Row(
         modifier = modifier

@@ -3,7 +3,7 @@ package dev.mcd.chess.ui.screen.choosemode
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.game.SessionId
+import dev.mcd.chess.domain.game.GameId
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -23,7 +23,7 @@ class ChooseModeViewModel @Inject constructor(
         intent {
             repeatOnSubscription {
                 runCatching {
-                    val existingGame = chessApi.gameForUser().map { it.sessionId }.firstOrNull()
+                    val existingGame = chessApi.gameForUser().map { it.id }.firstOrNull()
                     if (existingGame != null) {
                         postSideEffect(SideEffect.NavigateToExistingGame(existingGame))
                     }
@@ -47,6 +47,6 @@ class ChooseModeViewModel @Inject constructor(
     data class State(val inLobby: Int? = null)
 
     sealed interface SideEffect {
-        data class NavigateToExistingGame(val id: SessionId) : SideEffect
+        data class NavigateToExistingGame(val id: GameId) : SideEffect
     }
 }

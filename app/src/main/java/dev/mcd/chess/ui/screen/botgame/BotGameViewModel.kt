@@ -11,9 +11,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.domain.bot.Bot
 import dev.mcd.chess.domain.bot.botFromSlug
-import dev.mcd.chess.domain.game.LocalGameSession
-import dev.mcd.chess.domain.game.GameSessionRepository
 import dev.mcd.chess.domain.game.TerminationReason
+import dev.mcd.chess.domain.game.bot.BotRemoteGameChannel
+import dev.mcd.chess.domain.game.local.ClientGameSession
+import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
 import kotlinx.coroutines.delay
@@ -93,34 +94,26 @@ class BotGameViewModel @Inject constructor(
     fun onPlayerMove(move: Move) {
         intent {
             val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
-            val board = game.board
-            if (board.sideToMove == game.selfSide && move in board.legalMoves()) {
-                Timber.d("Moving for player: $move")
-                board.doMove(move)
+            if (game.doMove(move.toString())) {
                 tryMoveBot(game)
+            } else {
+                endGame(game)
             }
         }
     }
 
-    private suspend fun tryMoveBot(game: LocalGameSession) {
-        val board = game.board
-        if (!board.isMated && !board.isDraw) {
-            Timber.d("Moving for stockfish")
-            val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
-            val stockfishMoveSan =
-                stockfish.getMove(board.fen, level = bot.level, depth = bot.depth)
-            val stockfishMove = Move(stockfishMoveSan, board.sideToMove)
-            val delay = delayedMoveTime - System.currentTimeMillis()
-            if (delay > 0) {
-                delay(delay)
-            }
+    private suspend fun tryMoveBot(game: ClientGameSession) {
+        Timber.d("Moving for stockfish")
+        val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
+        val stockfishMoveSan = stockfish.getMove(game.fen(), level = bot.level, depth = bot.depth)
+        val delay = delayedMoveTime - System.currentTimeMillis()
+        if (delay > 0) {
+            delay(delay)
+        }
 
-            board.doMove(stockfishMove)
+        game.doMove(stockfishMoveSan)
 
-            if (board.isMated || board.isDraw) {
-                endGame(game)
-            }
-        } else {
+        if (game.termination() != null) {
             endGame(game)
         }
     }
@@ -138,10 +131,8 @@ class BotGameViewModel @Inject constructor(
                 */
                 loadFromFen(Constants.startStandardFENPosition)
             }
-            val game = LocalGameSession(
+            val game = ClientGameSession(
                 id = UUID.randomUUID().toString(),
-                board = board,
-                initialBitboard = board.bitboard,
                 self = HumanPlayer(
                     name = "You",
                     rating = 900,
@@ -149,6 +140,7 @@ class BotGameViewModel @Inject constructor(
                 ),
                 selfSide = side,
                 opponent = bot,
+                channel = BotRemoteGameChannel()
             )
             gameSessionRepository.updateActiveGame(game)
 
@@ -158,25 +150,17 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
-    private fun endGame(game: LocalGameSession) {
+    private fun endGame(game: ClientGameSession) {
         intent {
-            val board = game.board
             gameSessionRepository.updateActiveGame(null)
-
-            val mated = board.sideToMove.takeIf { board.isMated }
-            val draw = board.isDraw
-            val resignation = if (mated == null && !draw) board.sideToMove else null
 
             reduce {
                 (state as? State.Game)?.copy(terminated = true) ?: state
             }
 
-            val reason = TerminationReason(
-                sideMated = mated,
-                draw = draw,
-                resignation = resignation,
-            )
-            postSideEffect(SideEffect.AnnounceTermination(reason))
+            val termination = game.termination() ?: TerminationReason(resignation = side)
+
+            postSideEffect(SideEffect.AnnounceTermination(termination))
         }
     }
 
@@ -184,7 +168,7 @@ class BotGameViewModel @Inject constructor(
         object Loading : State
 
         data class Game(
-            val game: LocalGameSession,
+            val game: ClientGameSession,
             val terminated: Boolean = false,
         ) : State
     }

@@ -42,7 +42,6 @@ fun LegalMoves(
     var highlightMoves by remember { mutableStateOf<List<Pair<Square, Boolean>>>(emptyList()) }
 
     LaunchedEffect(highlightMovesFrom) {
-        val board = gameManager.board()
         val occupiedSquares = pieces.mapIndexed { index, piece ->
             if (piece == Piece.NONE) {
                 Square.NONE
@@ -51,8 +50,8 @@ fun LegalMoves(
             }
         }.filter { it != Square.NONE }
 
-        highlightMoves = if (board != null && highlightMovesFrom != Square.NONE) {
-            board.legalMoves()
+        highlightMoves = if (highlightMovesFrom != Square.NONE) {
+            gameManager.legalMoves()
                 .filter { it.from == highlightMovesFrom }
                 .map { it.to to (it.to in occupiedSquares) }
                 .distinct()

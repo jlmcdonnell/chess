@@ -145,7 +145,7 @@ fun ChessPiece(
                             val move = Move(square, target)
                             val promotions = gameManager.promotions(move)
 
-                            if (move in gameManager.moves()) {
+                            if (move in gameManager.legalMoves()) {
                                 if (boardInteraction.placePieceFrom(square)) {
                                     square = target
                                     squareOffset = square.topLeft(perspective, size)

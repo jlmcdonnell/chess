@@ -16,36 +16,29 @@ data class GameMessageSerializer(
 inline fun <reified T> GameMessageSerializer.decodeContent(): T =
     DefaultJson.decodeFromString(content!!.replace("\\", ""))
 
-fun GameMessageSerializer.asSessionInfo(): GameMessage.SessionInfoMessage {
-    require(message == MessageType.SessionInfo)
-    val serializer = decodeContent<SessionInfoSerializer>()
-    return GameMessage.SessionInfoMessage(
-        sessionInfo = serializer.domain(),
-    )
-}
-
-fun GameMessageSerializer.asMoveHistory(): GameMessage.MoveHistoryMessage {
-    require(message == MessageType.MoveHistory)
-    val serializer = decodeContent<MoveHistorySerializer>()
-    return GameMessage.MoveHistoryMessage(
-        moveHistory = serializer.domain(),
+fun GameMessageSerializer.asGameState(): GameMessage.GameState {
+    require(message == MessageType.GameState)
+    val serializer = decodeContent<GameStateMessageSerializer>()
+    return GameMessage.GameState(
+        session = serializer.domain(),
     )
 }
 
 fun GameMessageSerializer.asMove(): GameMessage.MoveMessage {
     require(message == MessageType.Move)
-    val serializer = decodeContent<MoveSerializer>()
+    val serializer = decodeContent<MoveMessageSerializer>()
     return GameMessage.MoveMessage(
-        move = serializer.move
+        move = serializer.move,
+        count = serializer.count,
     )
 }
 
 @Serializable
 @Keep
 enum class MessageType {
-    SessionInfo,
-    MoveHistory,
+    GameState,
     Move,
     ErrorNotUsersMove,
     ErrorGameTerminated,
+    ErrorInvalidMove,
 }

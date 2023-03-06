@@ -102,7 +102,7 @@ private fun SquareHighlight(
     val lastMove by LocalGameSession.current.moveUpdates().collectAsState(null)
     val squareSizePx = squareSize.toPx()
 
-    lastMove?.let { move ->
+    lastMove?.move?.let { move ->
         val moveFromOffset = move.from.topLeft(perspective, squareSizePx)
         val moveToOffset = move.to.topLeft(perspective, squareSizePx)
         Box(
@@ -164,14 +164,11 @@ private fun Pieces(
     perspective: Side,
     squareSize: Float,
 ) {
-    var pieces by remember { mutableStateOf(emptyList<Piece>()) }
-    val game by LocalGameSession.current.sessionUpdates.collectAsState()
-
-    LaunchedEffect(game?.initialBitboard) {
-        pieces = game?.board?.boardToArray()?.toList() ?: emptyList()
-    }
+    val session = LocalGameSession.current
+    val game by session.sessionUpdates.collectAsState()
 
     ReusableContent(game?.id ?: "") {
+        val pieces by session.pieceUpdates().collectAsState(emptyList())
         val side = game?.selfSide ?: return
         pieces.forEachIndexed { index, piece ->
             if (piece != Piece.NONE) {

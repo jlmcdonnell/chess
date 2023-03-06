@@ -5,14 +5,12 @@ import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.game.Game
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
 import dev.mcd.chess.domain.game.BoardSounds
-import dev.mcd.chess.domain.game.LocalGameSession
+import dev.mcd.chess.domain.game.local.ClientGameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
@@ -38,13 +36,11 @@ class BoardSoundsImpl @Inject constructor(
     }
 
     override suspend fun awaitMoves(
-        session: LocalGameSession,
+        session: ClientGameSession,
     ) {
         withContext(Dispatchers.IO) {
-            session.moves.mapNotNull {
-                session.board.backup.lastOrNull()
-            }.collectLatest { move ->
-                if (session.board.isDraw || session.board.isMated) {
+            session.moves().collectLatest { move ->
+                if (session.termination() != null) {
                     notifyPlayer.seekTo(0)
                     notifyPlayer.start()
                 } else if (move.capturedPiece != Piece.NONE) {

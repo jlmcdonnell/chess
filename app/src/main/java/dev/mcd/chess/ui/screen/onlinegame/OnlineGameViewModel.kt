@@ -3,38 +3,18 @@ package dev.mcd.chess.ui.screen.onlinegame
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.Constants
-import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.api.MoveHistory
-import dev.mcd.chess.domain.api.SessionInfo
-import dev.mcd.chess.domain.api.opponent
-import dev.mcd.chess.domain.api.sideForUser
-import dev.mcd.chess.domain.game.GameMessage.ErrorGameTerminated
-import dev.mcd.chess.domain.game.GameMessage.ErrorNotUsersMove
-import dev.mcd.chess.domain.game.GameMessage.MoveHistoryMessage
-import dev.mcd.chess.domain.game.GameMessage.MoveMessage
-import dev.mcd.chess.domain.game.GameMessage.SessionInfoMessage
-import dev.mcd.chess.domain.game.GameSessionRepository
-import dev.mcd.chess.domain.game.GameState
-import dev.mcd.chess.domain.game.GameState.BLACK_CHECKMATED
-import dev.mcd.chess.domain.game.GameState.BLACK_RESIGNED
-import dev.mcd.chess.domain.game.GameState.DRAW
-import dev.mcd.chess.domain.game.GameState.STARTED
-import dev.mcd.chess.domain.game.GameState.WHITE_CHECKMATED
-import dev.mcd.chess.domain.game.GameState.WHITE_RESIGNED
-import dev.mcd.chess.domain.game.LocalGameSession
+import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.player.HumanPlayer
-import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.domain.game.local.ClientGameSession
+import dev.mcd.chess.domain.game.local.GameSessionRepository
+import dev.mcd.chess.domain.game.online.JoinOnlineGame
+import dev.mcd.chess.domain.game.online.JoinOnlineGame.Event
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
-import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
@@ -51,9 +31,8 @@ class OnlineGameViewModel @Inject constructor(
     private val gameSessionRepository: GameSessionRepository,
     private val chessApi: ChessApi,
     private val stateHandle: SavedStateHandle,
+    private val joinOnlineGame: JoinOnlineGame,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
-
-    private var activeGame: ActiveGame? = null
 
     override val container = container<State, SideEffect>(
         initialState = State.FindingGame(),
@@ -64,8 +43,8 @@ class OnlineGameViewModel @Inject constructor(
                 .collectLatest { session ->
                     intent {
                         reduce {
-                            State.Game(
-                                game = session,
+                            State.InGame(
+                                session = session,
                                 terminated = false,
                             )
                         }
@@ -73,12 +52,11 @@ class OnlineGameViewModel @Inject constructor(
                 }
         }
         val gameId = stateHandle.get<String>("gameId")
-        Timber.d("existingGame: $gameId")
         if (gameId != null) {
             intent {
                 runCatching {
                     val sessionInfo = chessApi.game(gameId)
-                    startGame(sessionInfo)
+                    startGame(sessionInfo.id)
                 }.onFailure {
                     Timber.e(it, "Retrieving game $gameId")
                     fatalError("Unable to retrieve existing game")
@@ -107,7 +85,8 @@ class OnlineGameViewModel @Inject constructor(
                     }
                 }
 
-                activeGame?.resign()
+                clientSession()?.channel?.resign()
+
                 if (andNavigateBack) {
                     postSideEffect(SideEffect.NavigateBack)
                 }
@@ -119,31 +98,18 @@ class OnlineGameViewModel @Inject constructor(
 
     fun onPlayerMove(move: Move) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
+            val session = clientSession() ?: return@intent
 
-            val board = game.board
-            val terminated = state is State.Game && (state as? State.Game)?.terminated == true
-            if (!terminated && board.sideToMove == game.selfSide && move in board.legalMoves()) {
+            val terminated = state is State.InGame && (state as? State.InGame)?.terminated == true
+            if (!terminated) {
                 Timber.d("Moving for player: $move")
-                board.doMove(move)
-                activeGame?.move(move)
+                session.doMove(move.toString())
+                session.channel?.move(move)
             }
         }
     }
 
     private fun findGame() {
-        intent {
-            val userId = chessApi.userId() ?: chessApi.generateId()
-            reduce { State.FindingGame(userId) }
-
-            Timber.d("Authenticated as $userId")
-
-            val remoteSession = chessApi.findGame()
-            startGame(remoteSession)
-        }
-    }
-
-    private fun startGame(remoteSession: SessionInfo) {
         intent {
             runCatching {
                 val userId = chessApi.userId() ?: chessApi.generateId()
@@ -151,45 +117,30 @@ class OnlineGameViewModel @Inject constructor(
 
                 Timber.d("Authenticated as $userId")
 
+                val remoteSession = chessApi.findGame()
+                startGame(remoteSession.id)
+            }.onFailure {
+                Timber.e(it, "findingGame")
+            }
+        }
+    }
 
-                val board = Board()
-                val session = LocalGameSession(
-                    id = remoteSession.sessionId,
-                    board = board,
-                    initialBitboard = board.bitboard,
-                    self = HumanPlayer(
-                        name = userId,
-                        image = PlayerImage.None,
-                        rating = 0,
-                    ),
-                    opponent = HumanPlayer(
-                        name = remoteSession.opponent(userId),
-                        image = PlayerImage.None,
-                        rating = 0,
-                    ),
-                    selfSide = remoteSession.sideForUser(userId)
-                )
-                gameSessionRepository.updateActiveGame(session)
-
-                chessApi.joinGame(remoteSession.sessionId) {
-                    activeGame = this
-                    Timber.d("Joined game ${session.id}")
-
-                    requestMoveHistory()
-
-                    for (message in incoming) {
-                        Timber.d("Received message: ${message::class.simpleName}")
-                        when (message) {
-                            is SessionInfoMessage -> handleSessionState(message.sessionInfo.state)
-                            is MoveHistoryMessage -> resetBoard(session, message.moveHistory)
-                            is MoveMessage -> addRemoteMove(session, message.move)
-                            is ErrorNotUsersMove -> Timber.e("ErrorNotUsersMove")
-                            is ErrorGameTerminated -> Timber.e("ErrorGameTerminated")
+    private fun startGame(id: GameId) {
+        intent {
+            runCatching {
+                joinOnlineGame(id).collectLatest { message ->
+                    when (message) {
+                        is Event.FatalError -> fatalError(message.message)
+                        is Event.Termination -> {
+                            reduce {
+                                (state as? State.InGame)?.copy(terminated = true) ?: state
+                            }
+                            postSideEffect(AnnounceTermination(message.reason))
                         }
                     }
                 }
             }.onFailure {
-                fatalError("starting game: $it", it)
+                fatalError("joining game", it)
             }
         }
     }
@@ -201,46 +152,11 @@ class OnlineGameViewModel @Inject constructor(
         }
     }
 
-    private fun resetBoard(session: LocalGameSession, moveHistory: MoveHistory) {
-        Timber.d("Resetting board: $moveHistory")
-        intent {
-            val board = session.board
-            board.clear()
-            board.loadFromFen(Constants.startStandardFENPosition)
-            moveHistory.moveList.all {
-                board.doMove(Move(it, board.sideToMove), false)
-            }
-        }
-    }
-
-    private fun handleSessionState(gameState: GameState) {
-        intent {
-            when (gameState) {
-                STARTED -> Unit
-                DRAW -> postSideEffect(AnnounceTermination(TerminationReason(draw = true)))
-                WHITE_RESIGNED -> postSideEffect(AnnounceTermination(TerminationReason(resignation = Side.WHITE)))
-                BLACK_RESIGNED -> postSideEffect(AnnounceTermination(TerminationReason(resignation = Side.BLACK)))
-                WHITE_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.WHITE)))
-                BLACK_CHECKMATED -> postSideEffect(AnnounceTermination(TerminationReason(sideMated = Side.BLACK)))
-            }
-            reduce { (state as? State.Game)?.copy(terminated = gameState != STARTED) ?: state }
-        }
-    }
-
-    private fun addRemoteMove(session: LocalGameSession, move: String) {
-        val fen = session.board.fen
-        val success = runCatching { session.board.doMove(move) }.getOrElse { false }
-        if (!success) {
-            Timber.e("Board is out of sync: $fen\nUnable to make move $move")
-            intent {
-                activeGame?.requestMoveHistory()
-            }
-        }
-    }
+    private fun clientSession() = (container.stateFlow.value as? State.InGame)?.session
 
     sealed interface State {
-        data class Game(
-            val game: LocalGameSession,
+        data class InGame(
+            val session: ClientGameSession,
             val terminated: Boolean = false,
         ) : State
 

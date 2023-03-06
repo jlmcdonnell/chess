@@ -1,19 +1,19 @@
 package dev.mcd.chess.data.api
 
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.domain.api.ActiveGame
+import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.game.GameMessage
 import kotlinx.coroutines.channels.ReceiveChannel
 import kotlinx.coroutines.channels.SendChannel
 import timber.log.Timber
 
-class ActiveGameImpl(
+class OnlineGameChannel(
     override val incoming: ReceiveChannel<GameMessage>,
     private val outgoing: SendChannel<String>,
-) : ActiveGame {
-    override suspend fun requestMoveHistory() {
-        Timber.d("OUTGOING: history")
-        outgoing.send("history")
+) : GameChannel {
+    override suspend fun requestGameState() {
+        Timber.d("OUTGOING: state")
+        outgoing.send("state")
     }
 
     override suspend fun resign() {

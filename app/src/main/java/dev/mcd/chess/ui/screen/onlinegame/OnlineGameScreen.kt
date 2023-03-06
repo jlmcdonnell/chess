@@ -9,11 +9,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.LocalTextStyle
-import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -25,9 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
@@ -38,7 +33,7 @@ import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.Confirm
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.NavigateBack
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.FatalError
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.FindingGame
-import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.Game
+import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.InGame
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
 import timber.log.Timber
@@ -54,7 +49,7 @@ fun OnlineGameScreen(
             var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
-            if (state is Game && (state as? Game)?.terminated == false) {
+            if (state is InGame && (state as? InGame)?.terminated == false) {
                 BackHandler {
                     Timber.d("Back pressed")
                     viewModel.onResign(andNavigateBack = true)
@@ -83,8 +78,8 @@ fun OnlineGameScreen(
             }
 
             when (val s = state) {
-                is Game -> ActiveGameView(
-                    game = s.game,
+                is InGame -> ActiveGameView(
+                    game = s.session,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,
                     terminated = s.terminated,

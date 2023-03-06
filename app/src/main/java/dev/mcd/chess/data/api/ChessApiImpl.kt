@@ -5,21 +5,24 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dev.mcd.chess.data.api.serializer.ActiveGameFactory
+import dev.mcd.chess.data.api.serializer.GameStateMessageSerializer
 import dev.mcd.chess.data.api.serializer.LobbyInfoSerializer
-import dev.mcd.chess.data.api.serializer.SessionInfoSerializer
 import dev.mcd.chess.data.api.serializer.domain
-import dev.mcd.chess.domain.api.ActiveGame
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.api.LobbyInfo
-import dev.mcd.chess.domain.api.SessionInfo
+import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.GameMessage
-import dev.mcd.chess.domain.game.SessionId
+import dev.mcd.chess.domain.game.online.GameSession
+import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.player.UserId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
+import io.ktor.client.plugins.logging.LogLevel
+import io.ktor.client.plugins.logging.Logger
+import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
 import io.ktor.client.plugins.websocket.webSocket
 import io.ktor.client.request.HttpRequestBuilder
@@ -46,6 +49,7 @@ class ChessApiImpl @Inject constructor(
     context: Context,
     private val apiUrl: String,
     private val activeGameFactory: ActiveGameFactory,
+    private val logger: Logger,
 ) : ChessApi {
 
     private val store = context.dataStore
@@ -67,6 +71,10 @@ class ChessApiImpl @Inject constructor(
             json()
         }
         install(HttpTimeout)
+        install(Logging) {
+            logger = this@ChessApiImpl.logger
+            level = LogLevel.BODY
+        }
     }
 
     override suspend fun generateId(): UserId {
@@ -81,9 +89,9 @@ class ChessApiImpl @Inject constructor(
         }
     }
 
-    override suspend fun findGame(): SessionInfo {
+    override suspend fun findGame(): GameSession {
         return withContext(Dispatchers.IO) {
-            val sessionCompletable = CompletableDeferred<SessionInfo>()
+            val sessionCompletable = CompletableDeferred<GameSession>()
             val token = requireNotNull(token()) { "No auth token" }
 
             client.webSocket(
@@ -95,8 +103,8 @@ class ChessApiImpl @Inject constructor(
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
                         val message = frame.gameMessage()
-                        if (message is GameMessage.SessionInfoMessage) {
-                            sessionCompletable.complete(message.sessionInfo)
+                        if (message is GameMessage.GameState) {
+                            sessionCompletable.complete(message.session)
                             close()
                         } else {
                             Timber.w("Unhandled message: ${message::class}")
@@ -113,25 +121,25 @@ class ChessApiImpl @Inject constructor(
         }
     }
 
-    override suspend fun game(id: SessionId): SessionInfo {
+    override suspend fun game(id: GameId): GameSession {
         return withContext(Dispatchers.IO) {
             client.get {
                 url("$apiUrl/game/id/$id")
                 withBearerToken()
-            }.body<SessionInfoSerializer>().domain()
+            }.body<GameStateMessageSerializer>().domain()
         }
     }
 
-    override suspend fun gameForUser(): List<SessionInfo> {
+    override suspend fun gameForUser(): List<GameSession> {
         return withContext(Dispatchers.IO) {
             client.get {
                 url("$apiUrl/game/user")
                 withBearerToken()
-            }.body<List<SessionInfoSerializer>>().map { it.domain() }
+            }.body<List<GameStateMessageSerializer>>().map { it.domain() }
         }
     }
 
-    override suspend fun joinGame(id: SessionId, block: suspend ActiveGame.() -> Unit) {
+    override suspend fun joinGame(id: GameId, block: suspend GameChannel.() -> Unit) {
         withContext(Dispatchers.IO) {
             val token = requireNotNull(token()) { "No auth token" }
 
@@ -141,28 +149,34 @@ class ChessApiImpl @Inject constructor(
                     bearerAuth(token)
                 }
             ) {
-                val incomingMessages = Channel<GameMessage>(1, BufferOverflow.DROP_OLDEST)
-                val outgoing = Channel<String>(1, BufferOverflow.DROP_OLDEST)
+                runCatching {
+                    val incomingMessages = Channel<GameMessage>(1, BufferOverflow.DROP_OLDEST)
+                    val outgoing = Channel<String>(1, BufferOverflow.DROP_OLDEST)
 
-                launch {
-                    block(activeGameFactory(outgoing, incomingMessages))
-                }
-
-                launch {
-                    for (command in outgoing) {
-                        Timber.d("Sending $command")
-                        send(Frame.Text(command))
+                    launch {
+                        runCatching {
+                            block(activeGameFactory(outgoing, incomingMessages))
+                        }.onFailure { Timber.e(it) }
                     }
-                }
 
-                for (frame in incoming) {
-                    if (frame !is Frame.Text) continue
-                    try {
-                        incomingMessages.send(frame.gameMessage())
-                    } catch (e: Exception) {
-                        Timber.e(e, "Handling frame")
+                    launch {
+                        runCatching {
+                            for (command in outgoing) {
+                                Timber.d("Sending $command")
+                                send(Frame.Text(command))
+                            }
+                        }.onFailure { Timber.e(it) }
                     }
-                }
+
+                    for (frame in incoming) {
+                        if (frame !is Frame.Text) continue
+                        try {
+                            incomingMessages.send(frame.gameMessage())
+                        } catch (e: Exception) {
+                            Timber.e(e, "Handling frame")
+                        }
+                    }
+                }.onFailure { Timber.e(it) }
             }
         }
     }

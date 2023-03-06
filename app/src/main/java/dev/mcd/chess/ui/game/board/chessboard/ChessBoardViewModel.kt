@@ -4,7 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.domain.game.BoardSounds
-import dev.mcd.chess.domain.game.GameSessionRepository
+import dev.mcd.chess.domain.game.local.GameSessionRepository
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch

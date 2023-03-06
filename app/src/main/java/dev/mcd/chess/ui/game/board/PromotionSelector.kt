@@ -15,7 +15,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.ui.extension.drawableResource
-import dev.mcd.chess.ui.game.board.chessboard.LocalBoardTheme
 
 @Composable
 fun PromotionSelector(modifier: Modifier) {
