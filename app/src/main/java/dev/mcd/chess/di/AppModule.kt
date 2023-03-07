@@ -7,6 +7,7 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.mcd.chess.BuildConfig
 import dev.mcd.chess.data.api.ChessApiImpl
 import dev.mcd.chess.data.game.BoardSoundsImpl
 import dev.mcd.chess.data.game.online.JoinOnlineGameImpl
@@ -49,7 +50,11 @@ abstract class AppModule {
         @Singleton
         fun environment(appPreferences: AppPreferences): Environment {
             return runBlocking {
-                Environment.Debug(apiUrl = appPreferences.host())
+                if (BuildConfig.DEBUG) {
+                    Environment.Debug(apiUrl = appPreferences.host())
+                } else {
+                    Environment.Production
+                }
             }
         }
 

@@ -64,8 +64,14 @@ fun SettingsScreen(
                     productionUrl = state.productionUrl,
                     currentHost = state.host,
                     onUpdateHost = { viewModel.updateHost(it) },
-                    onClearAuth = { viewModel.clearAuthData() },
                 )
+            }
+            Spacer(modifier = Modifier.height(24.dp))
+            TextButton(
+                modifier = Modifier.padding(horizontal = 24.dp),
+                onClick = { viewModel.clearAuthData() },
+            ) {
+                Text(text = "Clear Auth Data")
             }
         }
     }
@@ -76,7 +82,6 @@ fun DebugSettings(
     productionUrl: String,
     currentHost: String,
     onUpdateHost: (String) -> Unit,
-    onClearAuth: () -> Unit,
 ) {
     var debugApiHost by remember {
         mutableStateOf(TextFieldValue(text = currentHost))
@@ -92,7 +97,9 @@ fun DebugSettings(
     }
 
     OutlinedTextField(
-        modifier = Modifier.padding(24.dp).fillMaxWidth(),
+        modifier = Modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
         value = debugApiHost,
         onValueChange = {
             onUpdateHost(it.text)
@@ -118,12 +125,6 @@ fun DebugSettings(
         Text(text = productionUrl)
     }
     Spacer(modifier = Modifier.height(24.dp))
-    TextButton(
-        modifier = Modifier.padding(horizontal = 24.dp),
-        onClick = { onClearAuth() },
-    ) {
-        Text(text = "Clear Auth Data")
-    }
     TextButton(
         modifier = Modifier.padding(horizontal = 24.dp),
         onClick = {
