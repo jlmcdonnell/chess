@@ -8,8 +8,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.data.api.ChessApiImpl
-import dev.mcd.chess.data.api.DebugHostStoreImpl
-import dev.mcd.chess.domain.game.online.OnlineGameChannel
+import dev.mcd.chess.data.prefs.AppPreferencesImpl
 import dev.mcd.chess.data.game.BoardSoundsImpl
 import dev.mcd.chess.data.game.online.JoinOnlineGameImpl
 import dev.mcd.chess.data.stockfish.StockfishAdapter
@@ -17,7 +16,7 @@ import dev.mcd.chess.data.stockfish.StockfishAdapterImpl
 import dev.mcd.chess.data.stockfish.StockfishJni
 import dev.mcd.chess.domain.Environment
 import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.api.DebugHostStore
+import dev.mcd.chess.domain.prefs.AppPreferences
 import dev.mcd.chess.domain.game.BoardSounds
 import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.game.local.GameSessionRepositoryImpl
@@ -43,7 +42,7 @@ abstract class AppModule {
 
     @Binds
     @Singleton
-    abstract fun debugHostStore(impl: DebugHostStoreImpl): DebugHostStore
+    abstract fun debugHostStore(impl: AppPreferencesImpl): AppPreferences
 
     @Binds
     abstract fun joinOnlineGame(impl: JoinOnlineGameImpl): JoinOnlineGame
@@ -51,9 +50,9 @@ abstract class AppModule {
     companion object {
         @Provides
         @Singleton
-        fun environment(debugHostStore: DebugHostStore): Environment {
+        fun environment(appPreferences: AppPreferences): Environment {
             return runBlocking {
-                Environment.Debug(apiUrl = debugHostStore.host())
+                Environment.Debug(apiUrl = appPreferences.host())
             }
         }
 

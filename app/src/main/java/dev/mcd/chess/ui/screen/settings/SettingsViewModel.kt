@@ -5,7 +5,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
 import dev.mcd.chess.domain.Environment
 import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.api.DebugHostStore
+import dev.mcd.chess.domain.prefs.AppPreferences
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -14,13 +14,13 @@ import javax.inject.Inject
 
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
-    private val debugHostStore: DebugHostStore,
+    private val appPreferences: AppPreferences,
     private val chessApi: ChessApi,
 ) : ViewModel(), ContainerHost<SettingsViewModel.State, SettingsViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(State()) {
         intent {
-            val host = debugHostStore.host()
+            val host = appPreferences.host()
             reduce {
                 state.copy(
                     host = host,
@@ -32,7 +32,7 @@ class SettingsViewModel @Inject constructor(
 
     fun updateHost(host: String) {
         intent {
-            debugHostStore.setHost(host)
+            appPreferences.setHost(host)
             reduce { state.copy(host = host) }
         }
     }

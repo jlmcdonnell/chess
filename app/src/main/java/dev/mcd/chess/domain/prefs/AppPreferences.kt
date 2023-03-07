@@ -1,6 +1,6 @@
-package dev.mcd.chess.domain.api
+package dev.mcd.chess.domain.prefs
 
-interface DebugHostStore {
+interface AppPreferences {
     suspend fun host(): String
     suspend fun setHost(host: String)
 }
