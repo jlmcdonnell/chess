@@ -2,6 +2,7 @@ package dev.mcd.chess.data.game.online
 
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.GameResult
+import dev.mcd.chess.data.api.ApiCredentialsStore
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.GameMessage
@@ -24,10 +25,11 @@ import javax.inject.Inject
 class JoinOnlineGameImpl @Inject constructor(
     private val chessApi: ChessApi,
     private val gameSessionRepository: GameSessionRepository,
+    private val apiCredentialsStore: ApiCredentialsStore,
 ) : JoinOnlineGame {
 
     override suspend fun invoke(id: GameId) = channelFlow {
-        val userId = chessApi.userId() ?: throw Exception("No user ID")
+        val userId = apiCredentialsStore.userId() ?: throw Exception("No user ID")
         var session = chessApi.game(id)
 
         chessApi.joinGame(session.id) {

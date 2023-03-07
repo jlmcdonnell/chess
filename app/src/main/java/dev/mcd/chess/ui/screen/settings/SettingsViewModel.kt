@@ -3,6 +3,7 @@ package dev.mcd.chess.ui.screen.settings
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
+import dev.mcd.chess.data.api.ApiCredentialsStore
 import dev.mcd.chess.domain.Environment
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.prefs.AppPreferences
@@ -15,7 +16,7 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
-    private val chessApi: ChessApi,
+    private val apiCredentialsStore: ApiCredentialsStore,
 ) : ViewModel(), ContainerHost<SettingsViewModel.State, SettingsViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(State()) {
@@ -39,7 +40,7 @@ class SettingsViewModel @Inject constructor(
 
     fun clearAuthData() {
         intent {
-            chessApi.clear()
+            apiCredentialsStore.clear()
         }
     }
 

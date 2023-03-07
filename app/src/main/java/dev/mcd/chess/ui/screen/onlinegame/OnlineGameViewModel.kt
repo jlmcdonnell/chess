@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dev.mcd.chess.data.api.ApiCredentialsStore
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.TerminationReason
@@ -32,6 +33,7 @@ class OnlineGameViewModel @Inject constructor(
     private val chessApi: ChessApi,
     private val stateHandle: SavedStateHandle,
     private val joinOnlineGame: JoinOnlineGame,
+    private val apiCredentialsStore: ApiCredentialsStore,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(
@@ -104,7 +106,7 @@ class OnlineGameViewModel @Inject constructor(
             if (!terminated) {
                 Timber.d("Moving for player: $move")
                 session.doMove(move.toString())
-                session.channel?.move(move)
+                session.channel.move(move)
             }
         }
     }
@@ -112,7 +114,7 @@ class OnlineGameViewModel @Inject constructor(
     private fun findGame() {
         intent {
             runCatching {
-                val userId = chessApi.userId() ?: chessApi.generateId()
+                val userId = apiCredentialsStore.userId() ?: chessApi.generateId()
                 reduce { State.FindingGame(userId) }
 
                 Timber.d("Authenticated as $userId")

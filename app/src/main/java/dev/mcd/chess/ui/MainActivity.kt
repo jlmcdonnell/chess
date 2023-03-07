@@ -1,4 +1,4 @@
-package dev.mcd.chess
+package dev.mcd.chess.ui
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
