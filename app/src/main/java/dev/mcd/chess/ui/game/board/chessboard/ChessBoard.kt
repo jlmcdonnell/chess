@@ -43,6 +43,7 @@ import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.PromotionSelector
 import dev.mcd.chess.ui.theme.defaultBoardTheme
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.compose.collectAsState
 
 val LocalBoardTheme = compositionLocalOf { defaultBoardTheme }
@@ -166,9 +167,11 @@ private fun Pieces(
 ) {
     val session = LocalGameSession.current
     val game by session.sessionUpdates.collectAsState()
+    var pieces by remember { mutableStateOf(emptyList<Piece>()) }
 
     ReusableContent(game?.id ?: "") {
-        val pieces by session.pieceUpdates().collectAsState(emptyList())
+        pieces = game?.pieceUpdates()?.value ?: return
+
         val side = game?.selfSide ?: return
         pieces.forEachIndexed { index, piece ->
             if (piece != Piece.NONE) {

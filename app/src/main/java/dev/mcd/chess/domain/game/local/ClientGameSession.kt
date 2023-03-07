@@ -6,7 +6,6 @@ import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.player.Player
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,7 +17,6 @@ open class ClientGameSession(
     val self: Player,
     val selfSide: Side,
     val opponent: Player,
-    val channel: GameChannel?,
 ) {
     private lateinit var board: Board
 
@@ -43,6 +41,7 @@ open class ClientGameSession(
             if (moved) {
                 val moveBackup = board.backup.last
                 moves.emit(moveBackup)
+                pieceUpdates.emit(board.boardToArray().toList())
             }
             moved
         }.onFailure {

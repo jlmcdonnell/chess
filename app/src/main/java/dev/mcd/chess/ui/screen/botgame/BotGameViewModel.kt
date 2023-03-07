@@ -12,7 +12,6 @@ import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.domain.bot.Bot
 import dev.mcd.chess.domain.bot.botFromSlug
 import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.game.bot.BotRemoteGameChannel
 import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.player.HumanPlayer
@@ -140,7 +139,6 @@ class BotGameViewModel @Inject constructor(
                 ),
                 selfSide = side,
                 opponent = bot,
-                channel = BotRemoteGameChannel()
             )
             game.setBoard(Board())
             gameSessionRepository.updateActiveGame(game)

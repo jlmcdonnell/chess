@@ -9,7 +9,7 @@ import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.data.api.ChessApiImpl
 import dev.mcd.chess.data.api.DebugHostStoreImpl
-import dev.mcd.chess.data.api.OnlineGameChannel
+import dev.mcd.chess.domain.game.online.OnlineGameChannel
 import dev.mcd.chess.data.game.BoardSoundsImpl
 import dev.mcd.chess.data.game.online.JoinOnlineGameImpl
 import dev.mcd.chess.data.stockfish.StockfishAdapter
@@ -79,7 +79,6 @@ abstract class AppModule {
         ): ChessApi = ChessApiImpl(
             context = context,
             apiUrl = environment.apiUrl,
-            activeGameFactory = { outgoing, incoming -> OnlineGameChannel(incoming, outgoing) },
             logger = logger,
         )
 

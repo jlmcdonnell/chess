@@ -4,7 +4,6 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dev.mcd.chess.data.api.serializer.ActiveGameFactory
 import dev.mcd.chess.data.api.serializer.GameStateMessageSerializer
 import dev.mcd.chess.data.api.serializer.LobbyInfoSerializer
 import dev.mcd.chess.data.api.serializer.domain
@@ -13,7 +12,7 @@ import dev.mcd.chess.domain.api.LobbyInfo
 import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.online.GameSession
-import dev.mcd.chess.domain.game.online.GameChannel
+import dev.mcd.chess.domain.game.online.OnlineGameChannel
 import dev.mcd.chess.domain.player.UserId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -48,7 +47,6 @@ private val Context.dataStore by preferencesDataStore(name = "api-prefs")
 class ChessApiImpl @Inject constructor(
     context: Context,
     private val apiUrl: String,
-    private val activeGameFactory: ActiveGameFactory,
     private val logger: Logger,
 ) : ChessApi {
 
@@ -139,7 +137,7 @@ class ChessApiImpl @Inject constructor(
         }
     }
 
-    override suspend fun joinGame(id: GameId, block: suspend GameChannel.() -> Unit) {
+    override suspend fun joinGame(id: GameId, block: suspend OnlineGameChannel.() -> Unit) {
         withContext(Dispatchers.IO) {
             val token = requireNotNull(token()) { "No auth token" }
 
@@ -155,7 +153,7 @@ class ChessApiImpl @Inject constructor(
 
                     launch {
                         runCatching {
-                            block(activeGameFactory(outgoing, incomingMessages))
+                            block(OnlineGameChannel(incomingMessages, outgoing))
                         }.onFailure { Timber.e(it) }
                     }
 

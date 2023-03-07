@@ -8,9 +8,10 @@ import dev.mcd.chess.domain.game.GameMessage
 import dev.mcd.chess.domain.game.TerminationReason
 import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
-import dev.mcd.chess.domain.game.online.GameChannel
 import dev.mcd.chess.domain.game.online.GameSession
 import dev.mcd.chess.domain.game.online.JoinOnlineGame
+import dev.mcd.chess.domain.game.online.OnlineClientGameSession
+import dev.mcd.chess.domain.game.online.OnlineGameChannel
 import dev.mcd.chess.domain.game.online.opponent
 import dev.mcd.chess.domain.game.online.sideForUser
 import dev.mcd.chess.domain.player.HumanPlayer
@@ -64,9 +65,9 @@ class JoinOnlineGameImpl @Inject constructor(
     private fun createClientSession(
         userId: UserId,
         session: GameSession,
-        channel: GameChannel,
+        channel: OnlineGameChannel,
     ): ClientGameSession {
-        return ClientGameSession(
+        return OnlineClientGameSession(
             id = session.id,
             self = HumanPlayer(
                 name = userId,

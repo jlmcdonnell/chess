@@ -1,6 +1,7 @@
 package dev.mcd.chess.ui.screen.botselection
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.Indication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -13,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
@@ -23,6 +25,7 @@ import androidx.compose.material.Text
 import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -31,8 +34,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
@@ -62,12 +67,13 @@ fun BotSelectionScreen(
         var selectedSide by remember { mutableStateOf(Side.WHITE) }
 
         Column(Modifier.padding(padding), horizontalAlignment = CenterHorizontally) {
-            Card(modifier = Modifier.padding(16.dp)) {
                 Row {
                     Side.values().forEach { side ->
                         val piece = if (side == Side.WHITE) Piece.WHITE_KING else Piece.BLACK_KING
                         Image(
                             modifier = Modifier
+                                .padding(vertical = 24.dp, horizontal = 16.dp)
+                                .clip(RoundedCornerShape(8.dp))
                                 .background(LocalAppColors.current.neutralPieceBackground)
                                 .clickable { selectedSide = side }
                                 .let {
@@ -85,7 +91,6 @@ fun BotSelectionScreen(
                             contentDescription = side.name
                         )
                     }
-                }
             }
 
             LazyColumn {

@@ -8,13 +8,13 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.game.GameId
 import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.game.online.JoinOnlineGame
 import dev.mcd.chess.domain.game.online.JoinOnlineGame.Event
+import dev.mcd.chess.domain.game.online.OnlineClientGameSession
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
@@ -39,7 +39,7 @@ class OnlineGameViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             gameSessionRepository.activeGame()
-                .filterNotNull()
+                .mapNotNull { it as? OnlineClientGameSession }
                 .collectLatest { session ->
                     intent {
                         reduce {
@@ -156,7 +156,7 @@ class OnlineGameViewModel @Inject constructor(
 
     sealed interface State {
         data class InGame(
-            val session: ClientGameSession,
+            val session: OnlineClientGameSession,
             val terminated: Boolean = false,
         ) : State
 
