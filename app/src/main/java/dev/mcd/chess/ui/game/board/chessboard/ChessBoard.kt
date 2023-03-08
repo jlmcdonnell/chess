@@ -43,7 +43,6 @@ import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.PromotionSelector
 import dev.mcd.chess.ui.theme.defaultBoardTheme
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.first
 import org.orbitmvi.orbit.compose.collectAsState
 
 val LocalBoardTheme = compositionLocalOf { defaultBoardTheme }
@@ -72,7 +71,7 @@ fun ChessBoard(
     LaunchedEffect(perspective, squareSize) {
         val squarePositions =
             Square.values().associateWith { square -> square.center(perspective, squareSize) }
-        boardInteraction.updateSquarePositions(squarePositions)
+        boardInteraction.updateSquareData(squarePositions, squareSize)
     }
 
     Box(

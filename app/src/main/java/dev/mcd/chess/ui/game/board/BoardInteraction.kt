@@ -21,6 +21,7 @@ class BoardInteraction {
     private val targetChanges = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
+    private var squareSize = 0f
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
 
     var target: Square = Square.NONE
@@ -35,8 +36,9 @@ class BoardInteraction {
             highlightMoveChanges.value = field
         }
 
-    fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
+    fun updateSquareData(squarePositions: Map<Square, Offset>, squareSize: Float) {
         this.squarePositions = squarePositions
+        this.squareSize = squareSize
     }
 
     fun placePieceFrom(from: Square): Boolean {
@@ -77,7 +79,7 @@ class BoardInteraction {
             val (x2, y2) = position
             val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
 
-            if (closest == null || distance < closest.second) {
+            if ((closest == null || distance < closest.second) && distance <= squareSize) {
                 closest = sq to distance
             }
         }
