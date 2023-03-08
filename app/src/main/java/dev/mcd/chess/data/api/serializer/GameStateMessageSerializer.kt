@@ -21,6 +21,9 @@ fun GameStateMessageSerializer.domain(): GameSession {
     Timber.d("PGN ============ \n $pgnDecoded")
     val game = PgnIterator(pgnDecoded.lines().iterator()).first()
     game.board = Board()
+    if (game.fen != null) {
+        game.board.loadFromFen(game.fen)
+    }
     game.gotoLast()
     return GameSession(
         id = id,
