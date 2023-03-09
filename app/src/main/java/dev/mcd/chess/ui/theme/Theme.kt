@@ -4,8 +4,8 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.Color
+import dev.mcd.chess.ui.LocalAppColors
 
 class AppColors(
     val green: Color = Color.Transparent,
@@ -13,8 +13,6 @@ class AppColors(
     val profileImageBackground: Color = Color.Transparent,
     val profileImageForeground: Color = Color.Transparent,
 )
-
-val LocalAppColors = compositionLocalOf { AppColors() }
 
 private val DarkColorPalette = darkColors(
     primary = Color(0xFF00E9A6),

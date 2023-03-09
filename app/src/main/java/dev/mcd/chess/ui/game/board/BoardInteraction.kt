@@ -1,6 +1,5 @@
 package dev.mcd.chess.ui.game.board
 
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.geometry.Offset
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
@@ -12,7 +11,6 @@ import kotlinx.coroutines.flow.filter
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-val LocalBoardInteraction = compositionLocalOf { BoardInteraction() }
 
 class BoardInteraction {
 

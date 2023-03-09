@@ -12,8 +12,6 @@ import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.mapNotNull
 
-val LocalGameSession = compositionLocalOf { GameSessionManager() }
-
 class GameSessionManager {
     val sessionUpdates = MutableStateFlow<ClientGameSession?>(null)
     val terminated = MutableStateFlow(false)

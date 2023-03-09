@@ -15,8 +15,8 @@ import androidx.compose.ui.unit.dp
 import dev.mcd.chess.domain.player.PlayerImage
 import dev.mcd.chess.domain.player.PlayerImage.None
 import dev.mcd.chess.domain.player.PlayerImage.Url
+import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.theme.ChessTheme
-import dev.mcd.chess.ui.theme.LocalAppColors
 
 @Composable
 fun PlayerImageView(image: PlayerImage) {

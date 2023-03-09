@@ -14,7 +14,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,19 +32,17 @@ import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.ui.LocalBoardInteraction
+import dev.mcd.chess.ui.LocalBoardTheme
+import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.center
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.toPx
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.LegalMoves
-import dev.mcd.chess.ui.game.board.LocalBoardInteraction
-import dev.mcd.chess.ui.game.board.LocalGameSession
 import dev.mcd.chess.ui.game.board.PromotionSelector
-import dev.mcd.chess.ui.theme.defaultBoardTheme
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.compose.collectAsState
-
-val LocalBoardTheme = compositionLocalOf { defaultBoardTheme }
 
 @Composable
 fun ChessBoard(

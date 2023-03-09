@@ -23,9 +23,11 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
+import dev.mcd.chess.ui.LocalBoardInteraction
+import dev.mcd.chess.ui.LocalBoardTheme
+import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
-import dev.mcd.chess.ui.game.board.chessboard.LocalBoardTheme
 
 @Composable
 fun LegalMoves(
