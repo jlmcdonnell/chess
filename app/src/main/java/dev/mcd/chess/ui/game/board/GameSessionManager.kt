@@ -2,7 +2,6 @@
 
 package dev.mcd.chess.ui.game.board
 
-import androidx.compose.runtime.compositionLocalOf
 import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.domain.game.local.ClientGameSession
@@ -26,8 +25,6 @@ class GameSessionManager {
     fun captures() = moveUpdates().mapNotNull {
         sessionUpdates.value?.captures()
     }
-
-    fun terminated() = terminated
 
     fun legalMoves(): List<Move> {
         return sessionUpdates.value?.legalMoves() ?: emptyList()
