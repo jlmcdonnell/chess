@@ -105,5 +105,6 @@ dependencies {
     implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC"
     implementation "androidx.datastore:datastore-preferences:1.0.0"
 
-    testImplementation('junit:junit:4.13.2')
+    testImplementation "junit:junit:4.13.2"
+    testImplementation "app.cash.turbine:turbine:0.12.1"
 }
