@@ -1,4 +1,4 @@
-package dev.mcd.chess.data.stockfish
+package dev.mcd.chess.engine.data
 
 import timber.log.Timber
 

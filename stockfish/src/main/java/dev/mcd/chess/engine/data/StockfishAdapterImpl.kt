@@ -1,5 +1,5 @@
-package dev.mcd.chess.data.stockfish
-
+package dev.mcd.chess.engine.data
+import dev.mcd.chess.engine.domain.StockfishAdapter
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,12 +9,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
-interface StockfishAdapter {
-    suspend fun start()
-    suspend fun getMove(fen: String, level: Int, depth: Int): String
-}
-
-class StockfishAdapterImpl(
+internal class StockfishAdapterImpl(
     private val bridge: StockfishJni,
     private val coroutineContext: CoroutineContext,
 ) : StockfishAdapter {

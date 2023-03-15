@@ -54,7 +54,7 @@ fun ChessBoard(
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
-    val game by LocalGameSession.current.sessionUpdates.collectAsState()
+    val game by LocalGameSession.current.sessionUpdates().collectAsState(null)
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
 
     viewModel.collectAsState()
@@ -162,7 +162,7 @@ private fun Pieces(
     squareSize: Float,
 ) {
     val session = LocalGameSession.current
-    val game by session.sessionUpdates.collectAsState()
+    val game by session.sessionUpdates().collectAsState(null)
     var pieces by remember { mutableStateOf(emptyList<Piece>()) }
 
     ReusableContent(game?.id ?: "") {

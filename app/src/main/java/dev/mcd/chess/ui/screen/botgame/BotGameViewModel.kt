@@ -8,7 +8,6 @@ import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.data.stockfish.StockfishAdapter
 import dev.mcd.chess.domain.bot.Bot
 import dev.mcd.chess.domain.bot.botFromSlug
 import dev.mcd.chess.domain.game.TerminationReason
@@ -16,6 +15,7 @@ import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.engine.domain.StockfishAdapter
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull

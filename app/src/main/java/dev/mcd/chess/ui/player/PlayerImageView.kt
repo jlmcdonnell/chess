@@ -10,13 +10,11 @@ import androidx.compose.material.icons.rounded.Person
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.domain.player.PlayerImage
 import dev.mcd.chess.domain.player.PlayerImage.None
 import dev.mcd.chess.domain.player.PlayerImage.Url
 import dev.mcd.chess.ui.LocalAppColors
-import dev.mcd.chess.ui.theme.ChessTheme
 
 @Composable
 fun PlayerImageView(image: PlayerImage) {
@@ -35,13 +33,5 @@ fun PlayerImageView(image: PlayerImage) {
                 tint = LocalAppColors.current.profileImageForeground
             )
         }
-    }
-}
-
-@Composable
-@Preview
-private fun Preview() {
-    ChessTheme {
-        PlayerImageView(image = None)
     }
 }

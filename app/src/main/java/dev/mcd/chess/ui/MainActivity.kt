@@ -12,7 +12,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.ui.Modifier
 import dagger.hilt.android.AndroidEntryPoint
-import dev.mcd.chess.ui.Routing
 import dev.mcd.chess.ui.theme.ChessTheme
 
 @AndroidEntryPoint

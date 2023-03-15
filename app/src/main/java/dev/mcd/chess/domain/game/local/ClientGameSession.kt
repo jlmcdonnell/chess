@@ -37,7 +37,7 @@ open class ClientGameSession(
             return true
         }
         return runCatching {
-            val moved = board.doMove(Move(move, board.sideToMove))
+            val moved = board.doMove(move)
             if (moved) {
                 val moveBackup = board.backup.last
                 moves.emit(moveBackup)
@@ -76,7 +76,7 @@ open class ClientGameSession(
         .mapNotNull { it.capturedPiece }
         .filter { it != Piece.NONE }
 
-    fun fen() = board.fen
+    fun fen() = board.fen!!
 
     fun pieceUpdates() = pieceUpdates
 }

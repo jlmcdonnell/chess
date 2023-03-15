@@ -33,13 +33,10 @@ fun ActiveGameView(
     val boardInteraction by remember { mutableStateOf(BoardInteraction()) }
     val sessionManager = LocalGameSession.current
 
-    LaunchedEffect(terminated) {
-        sessionManager.terminated.emit(terminated)
-    }
 
     LaunchedEffect(game) {
         Timber.d("Game ID: ${game.id}")
-        sessionManager.sessionUpdates.value = game
+        sessionManager.updateSession(game)
         boardInteraction.setPerspective(game.selfSide)
     }
     CompositionLocalProvider(
