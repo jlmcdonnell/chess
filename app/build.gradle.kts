@@ -46,7 +46,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.4.2"
+        kotlinCompilerExtensionVersion = Versions.composeCompiler
     }
     packagingOptions {
         resources {
@@ -81,16 +81,16 @@ dependencies {
     /**
      * Ktor
      */
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.3")
-    implementation("io.ktor:ktor-client-core:2.2.3")
-    implementation("io.ktor:ktor-client-okhttp:2.2.3")
-    implementation("io.ktor:ktor-client-content-negotiation:2.2.3")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.3")
-    implementation("io.ktor:ktor-client-logging:2.2.3")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
+    implementation("io.ktor:ktor-client-core:2.2.4")
+    implementation("io.ktor:ktor-client-okhttp:2.2.4")
+    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
+    implementation("io.ktor:ktor-client-logging:2.2.4")
 
-    implementation("org.orbit-mvi:orbit-core:4.5.0")
-    implementation("org.orbit-mvi:orbit-viewmodel:4.5.0")
-    implementation("org.orbit-mvi:orbit-compose:4.5.0")
+    implementation("org.orbit-mvi:orbit-core:4.6.1")
+    implementation("org.orbit-mvi:orbit-viewmodel:4.6.1")
+    implementation("org.orbit-mvi:orbit-compose:4.6.1")
 
     implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
     implementation("com.google.dagger:hilt-android:${Versions.hilt}")
@@ -100,7 +100,7 @@ dependencies {
     implementation("androidx.navigation:navigation-compose:2.5.3")
     implementation("com.github.bhlangonijr:chesslib:1.3.3")
     implementation("com.jakewharton.timber:timber:${Versions.timber}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0-RC")
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
     implementation("androidx.datastore:datastore-preferences:1.0.0")
 
     testImplementation("junit:junit:4.13.2")
