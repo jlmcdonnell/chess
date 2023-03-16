@@ -21,7 +21,7 @@ class GetOrCreateUserImpl @Inject constructor(
             api.generateId().let { response ->
                 credentialsStore.storeUserId(response.userId)
                 credentialsStore.storeToken(response.token)
-                response.token
+                response.userId
             }
         }
     }
