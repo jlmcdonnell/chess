@@ -1,21 +1,22 @@
 package dev.mcd.chess.engine.data
 
-import timber.log.Timber
+interface StockfishJni {
+    fun main()
+    fun readLine(): String
+    fun writeLn(cmd: String)
+}
 
-class StockfishJni {
-    external fun init()
-    external fun main()
-    private external fun write(command: String): Boolean
-    external fun readLine(): String
+class AndroidStockfishJni : StockfishJni {
 
-    fun writeLn(cmd: String) {
-        Timber.d("writeLn: $cmd")
-        write("$cmd\n")
+    init {
+        System.loadLibrary("stockfish")
     }
 
-    companion object {
-        init {
-            System.loadLibrary("stockfish")
-        }
+    external override fun main()
+    external override fun readLine(): String
+    external fun write(command: String): Boolean
+
+    override fun writeLn(cmd: String) {
+        write("$cmd\n")
     }
 }

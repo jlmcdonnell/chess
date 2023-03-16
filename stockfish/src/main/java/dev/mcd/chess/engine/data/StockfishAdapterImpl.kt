@@ -1,35 +1,31 @@
 package dev.mcd.chess.engine.data
+
 import dev.mcd.chess.engine.domain.StockfishAdapter
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 internal class StockfishAdapterImpl(
     private val bridge: StockfishJni,
-    private val coroutineContext: CoroutineContext,
+    private val context: CoroutineContext,
 ) : StockfishAdapter {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
-    override suspend fun start() {
-        withContext(coroutineContext) {
-            val bridge = StockfishJni()
+    override suspend fun startAndWait() {
+        withContext(context) {
             val readyCompletable = CompletableDeferred<Unit>()
-            bridge.init()
 
-            launch {
+            launch(context) {
                 bridge.main()
             }
-            launch {
-                while (isActive) {
-                    val output = bridge.readLine()
 
-                    Timber.d("STOCKFISH: $output")
+            launch(context) {
+                while (true) {
+                    val output = bridge.readLine()
 
                     if (output.startsWith("Stockfish")) {
                         readyCompletable.complete(Unit)
@@ -42,11 +38,12 @@ internal class StockfishAdapterImpl(
             }
             readyCompletable.await()
             stateFlow.emit(State.Ready)
+            awaitCancellation()
         }
     }
 
     override suspend fun getMove(fen: String, level: Int, depth: Int): String {
-        return withContext(Dispatchers.IO) {
+        return withContext(context) {
             assertState<State.Ready>()
             val moveCompletable = CompletableDeferred<String>()
             stateFlow.emit(State.Moving(moveCompletable))

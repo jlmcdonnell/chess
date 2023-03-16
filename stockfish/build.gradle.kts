@@ -30,12 +30,8 @@ android {
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
         }
     }
-    compileOptions {
-        sourceCompatibility(JavaVersion.VERSION_1_8)
-        targetCompatibility(JavaVersion.VERSION_1_8)
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain(BuildSettings.jdkVersion)
     }
     externalNativeBuild {
         cmake {
@@ -46,11 +42,15 @@ android {
 }
 
 dependencies {
-    api("com.jakewharton.timber:timber:${Versions.timber}")
-    api("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
-    api("com.google.dagger:hilt-android:${Versions.hilt}")
-    kapt("com.google.dagger:hilt-compiler:${Versions.hilt}")
+    with (Versions) {
+        api("org.slf4j:slf4j-nop:$slf4j")
+        api("com.jakewharton.timber:timber:$timber")
+        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
+        api("com.google.dagger:hilt-android:$hilt")
+        kapt("com.google.dagger:hilt-compiler:$hilt")
 
-    testImplementation("junit:junit:4.13.2")
-    androidTestImplementation("androidx.test.ext:junit:1.1.5")
+        testImplementation("junit:junit:$junit")
+        testImplementation("io.mockk:mockk:$mockk")
+        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
+    }
 }

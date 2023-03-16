@@ -30,14 +30,10 @@
 int pipes[NUM_PIPES][2];
 char buffer[STRINGS_SIZE + 1];
 
-int stockfish_init() {
+void stockfish_main() {
     pipe(pipes[PARENT_READ_PIPE]);
     pipe(pipes[PARENT_WRITE_PIPE]);
 
-    return 0;
-}
-
-void stockfish_main() {
     dup2(CHILD_READ_FD, STDIN_FILENO);
     dup2(CHILD_WRITE_FD, STDOUT_FILENO);
 
@@ -84,20 +80,14 @@ char *stockfish_stdout_read() {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_mcd_chess_engine_data_StockfishJni_main(JNIEnv *env, jobject thiz) {
+Java_dev_mcd_chess_engine_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
     stockfish_main();
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_dev_mcd_chess_engine_data_StockfishJni_init(JNIEnv *env, jobject thiz) {
-    stockfish_init();
 }
 
 extern "C"
 JNIEXPORT jstring
 JNICALL
-Java_dev_mcd_chess_engine_data_StockfishJni_readLine(JNIEnv *env, jobject thiz) {
+Java_dev_mcd_chess_engine_data_AndroidStockfishJni_readLine(JNIEnv *env, jobject thiz) {
     char *output = stockfish_stdout_read();
     // An error occured
     if (output == nullptr) {
@@ -111,7 +101,7 @@ Java_dev_mcd_chess_engine_data_StockfishJni_readLine(JNIEnv *env, jobject thiz) 
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_dev_mcd_chess_engine_data_StockfishJni_write(JNIEnv *env, jobject /*thisz*/, jstring command) {
+Java_dev_mcd_chess_engine_data_AndroidStockfishJni_write(JNIEnv *env, jobject /*thisz*/, jstring command) {
     ssize_t result;
 
     jboolean isCopy;

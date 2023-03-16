@@ -4,6 +4,7 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
+import dev.mcd.chess.engine.data.AndroidStockfishJni
 import dev.mcd.chess.engine.data.StockfishAdapterImpl
 import dev.mcd.chess.engine.data.StockfishJni
 import dev.mcd.chess.engine.domain.StockfishAdapter
@@ -16,7 +17,7 @@ import javax.inject.Singleton
 class StockfishModule {
     @Provides
     @Singleton
-    fun stockfishJni() = StockfishJni()
+    fun stockfishJni(): StockfishJni = AndroidStockfishJni()
 
     @Provides
     @Singleton

@@ -27,19 +27,17 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
+
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+
             signingConfig = signingConfigs.getByName("debug")
         }
     }
-    compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_1_8
-        targetCompatibility = JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = "1.8"
+    kotlin {
+        jvmToolchain(BuildSettings.jdkVersion)
     }
     buildFeatures {
         compose = true
@@ -60,49 +58,51 @@ kapt {
 }
 
 dependencies {
-    implementation(project(":stockfish"))
+    with(Versions) {
+        // Projects
+        implementation(project(":stockfish"))
 
-    /**
-     * Core
-     */
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:${Versions.coroutines}")
-    implementation("androidx.core:core-ktx:1.9.0")
-    implementation("androidx.lifecycle:lifecycle-runtime-ktx:2.6.0")
+        // Core
+        implementation("org.slf4j:slf4j-nop:$slf4j")
+        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
+        implementation("androidx.core:core-ktx:$coreKtx")
+        implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtx")
 
-    /**
-     * Compose
-     */
-    implementation("androidx.compose.ui:ui:1.4.0-rc01")
-    implementation("androidx.compose.foundation:foundation:1.4.0-rc01")
-    implementation("androidx.compose.material:material:1.4.0-rc01")
-    implementation("androidx.compose.material:material-icons-extended:1.3.1")
-    debugImplementation("androidx.compose.ui:ui-tooling:1.4.0-rc01")
+        // Compose
+        implementation("androidx.compose.ui:ui:$compose")
+        implementation("androidx.compose.foundation:foundation:$compose")
+        implementation("androidx.compose.material:material:$compose")
+        implementation("androidx.compose.material:material-icons-extended:$compose")
+        debugImplementation("androidx.compose.ui:ui-tooling:$compose")
 
-    /**
-     * Ktor
-     */
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
-    implementation("io.ktor:ktor-client-core:2.2.4")
-    implementation("io.ktor:ktor-client-okhttp:2.2.4")
-    implementation("io.ktor:ktor-client-content-negotiation:2.2.4")
-    implementation("io.ktor:ktor-serialization-kotlinx-json:2.2.4")
-    implementation("io.ktor:ktor-client-logging:2.2.4")
+        // Ktor
+        implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+        implementation("io.ktor:ktor-client-core:$ktor")
+        implementation("io.ktor:ktor-client-okhttp:$ktor")
+        implementation("io.ktor:ktor-client-content-negotiation:$ktor")
+        implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
+        implementation("io.ktor:ktor-client-logging:$ktor")
 
-    implementation("org.orbit-mvi:orbit-core:4.6.1")
-    implementation("org.orbit-mvi:orbit-viewmodel:4.6.1")
-    implementation("org.orbit-mvi:orbit-compose:4.6.1")
+        // Orbit
+        implementation("org.orbit-mvi:orbit-core:$orbit")
+        implementation("org.orbit-mvi:orbit-viewmodel:$orbit")
+        implementation("org.orbit-mvi:orbit-compose:$orbit")
 
-    implementation("androidx.hilt:hilt-navigation-compose:1.0.0")
-    implementation("com.google.dagger:hilt-android:${Versions.hilt}")
-    kapt("com.google.dagger:hilt-compiler:${Versions.hilt}")
+        // Hilt
+        implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationCompose")
+        implementation("com.google.dagger:hilt-android:$hilt")
+        kapt("com.google.dagger:hilt-compiler:$hilt")
 
-    implementation("androidx.activity:activity-compose:1.6.1")
-    implementation("androidx.navigation:navigation-compose:2.5.3")
-    implementation("com.github.bhlangonijr:chesslib:1.3.3")
-    implementation("com.jakewharton.timber:timber:${Versions.timber}")
-    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.5.0")
-    implementation("androidx.datastore:datastore-preferences:1.0.0")
+        // Other
+        implementation("androidx.activity:activity-compose:$activityCompose")
+        implementation("androidx.navigation:navigation-compose:$navigationCompose")
+        implementation("com.github.bhlangonijr:chesslib:$chessLib")
+        implementation("com.jakewharton.timber:timber:$timber")
+        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson")
+        implementation("androidx.datastore:datastore-preferences:$datastorePreferences")
 
-    testImplementation("junit:junit:4.13.2")
-    testImplementation("app.cash.turbine:turbine:0.12.1")
+        // Test
+        testImplementation("junit:junit:$junit")
+        testImplementation("app.cash.turbine:turbine:$turbine")
+    }
 }
