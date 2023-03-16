@@ -1,4 +1,4 @@
-package dev.mcd.chess.engine.domain
+package dev.mcd.chess.common.engine
 
 sealed interface EngineCommand {
     fun string(): String

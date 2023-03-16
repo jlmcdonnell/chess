@@ -1,8 +1,8 @@
 package dev.mcd.chess.engine.data
 
-import dev.mcd.chess.engine.domain.EngineCommand.Go
-import dev.mcd.chess.engine.domain.EngineCommand.SetPosition
-import dev.mcd.chess.engine.domain.EngineCommand.SetSkillLevel
+import dev.mcd.chess.common.engine.EngineCommand.Go
+import dev.mcd.chess.common.engine.EngineCommand.SetPosition
+import dev.mcd.chess.common.engine.EngineCommand.SetSkillLevel
 import dev.mcd.chess.engine.stockfish.data.StockfishEngine
 import dev.mcd.chess.engine.stockfish.data.StockfishJni
 import io.mockk.Awaits

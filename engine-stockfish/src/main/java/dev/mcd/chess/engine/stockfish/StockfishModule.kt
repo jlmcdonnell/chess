@@ -7,7 +7,7 @@ import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.engine.stockfish.data.AndroidStockfishJni
 import dev.mcd.chess.engine.stockfish.data.StockfishEngine
 import dev.mcd.chess.engine.stockfish.data.StockfishJni
-import dev.mcd.chess.engine.domain.ChessEngine
+import dev.mcd.chess.common.engine.ChessEngine
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Singleton

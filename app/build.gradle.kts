@@ -60,7 +60,7 @@ kapt {
 dependencies {
     with(Versions) {
         // Projects
-        implementation(project(":stockfish"))
+        implementation(project(":engine-stockfish"))
         implementation(project(":common"))
         implementation(project(":api"))
 

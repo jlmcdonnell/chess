@@ -15,7 +15,7 @@ import dev.mcd.chess.common.game.local.ClientGameSession
 import dev.mcd.chess.common.game.local.GameSessionRepository
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.engine.domain.ChessEngine
+import dev.mcd.chess.common.engine.ChessEngine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull

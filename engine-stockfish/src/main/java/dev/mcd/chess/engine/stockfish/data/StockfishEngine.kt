@@ -1,7 +1,7 @@
 package dev.mcd.chess.engine.stockfish.data
 
-import dev.mcd.chess.engine.domain.ChessEngine
-import dev.mcd.chess.engine.domain.EngineCommand
+import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.common.engine.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
