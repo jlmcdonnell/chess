@@ -61,6 +61,7 @@ dependencies {
     with(Versions) {
         // Projects
         implementation(project(":stockfish"))
+        implementation(project(":engine-common"))
 
         // Core
         implementation("org.slf4j:slf4j-nop:$slf4j")

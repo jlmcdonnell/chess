@@ -15,7 +15,7 @@ import dev.mcd.chess.domain.game.local.ClientGameSession
 import dev.mcd.chess.domain.game.local.GameSessionRepository
 import dev.mcd.chess.domain.player.HumanPlayer
 import dev.mcd.chess.domain.player.PlayerImage
-import dev.mcd.chess.engine.domain.StockfishAdapter
+import dev.mcd.chess.engine.domain.ChessEngine
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -26,6 +26,7 @@ import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
 import org.orbitmvi.orbit.syntax.simple.reduce
+import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import java.util.UUID
@@ -34,7 +35,7 @@ import kotlin.coroutines.resume
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
-    private val stockfish: StockfishAdapter,
+    private val engine: ChessEngine,
     private val gameSessionRepository: GameSessionRepository,
     private val state: SavedStateHandle,
 ) : ViewModel(), ContainerHost<BotGameViewModel.State, BotGameViewModel.SideEffect> {
@@ -43,6 +44,11 @@ class BotGameViewModel @Inject constructor(
     private lateinit var side: Side
 
     override val container = container<State, SideEffect>(State.Loading) {
+        intent {
+            repeatOnSubscription {
+                engine.startAndWait()
+            }
+        }
         viewModelScope.launch {
             gameSessionRepository.activeGame()
                 .filterNotNull()
@@ -104,7 +110,7 @@ class BotGameViewModel @Inject constructor(
     private suspend fun tryMoveBot(game: ClientGameSession) {
         Timber.d("Moving for stockfish")
         val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
-        val stockfishMoveSan = stockfish.getMove(game.fen(), level = bot.level, depth = bot.depth)
+        val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
         val delay = delayedMoveTime - System.currentTimeMillis()
         if (delay > 0) {
             delay(delay)

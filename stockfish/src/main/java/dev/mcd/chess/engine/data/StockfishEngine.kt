@@ -1,6 +1,7 @@
 package dev.mcd.chess.engine.data
 
-import dev.mcd.chess.engine.domain.StockfishAdapter
+import dev.mcd.chess.engine.domain.ChessEngine
+import dev.mcd.chess.engine.domain.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -8,10 +9,10 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
 
-internal class StockfishAdapterImpl(
+internal class StockfishEngine(
     private val bridge: StockfishJni,
     private val context: CoroutineContext,
-) : StockfishAdapter {
+) : ChessEngine {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
@@ -27,9 +28,9 @@ internal class StockfishAdapterImpl(
                 while (true) {
                     val output = bridge.readLine()
 
-                    if (output.startsWith("Stockfish")) {
+                    if (output.startsWith(INIT_TOKEN)) {
                         readyCompletable.complete(Unit)
-                    } else if (output.startsWith("bestmove")) {
+                    } else if (output.startsWith(BEST_MOVE_TOKEN)) {
                         // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
                         val move = output.split(" ")[1].trim()
                         assertStateOrNull<State.Moving>()?.completable?.complete(move)
@@ -48,9 +49,13 @@ internal class StockfishAdapterImpl(
             val moveCompletable = CompletableDeferred<String>()
             stateFlow.emit(State.Moving(moveCompletable))
 
-            bridge.writeLn("setoption name Skill Level value $level")
-            bridge.writeLn("position fen $fen")
-            bridge.writeLn("go depth $depth")
+            listOf(
+                EngineCommand.SetSkillLevel(level),
+                EngineCommand.SetPosition(fen),
+                EngineCommand.Go(depth),
+            ).forEach {
+                bridge.writeLn(it.string())
+            }
 
             moveCompletable.await().also {
                 stateFlow.emit(State.Ready)
@@ -63,8 +68,7 @@ internal class StockfishAdapterImpl(
     }
 
     private inline fun <reified T : State> assertState(): T {
-        return stateFlow.value as? T
-            ?: throw Exception("Expected ${T::class.simpleName} but was ${stateFlow.value::class.simpleName}")
+        return stateFlow.value as? T ?: throw Exception("Expected ${T::class.simpleName} but was ${stateFlow.value::class.simpleName}")
     }
 
     private sealed interface State {
@@ -75,5 +79,10 @@ internal class StockfishAdapterImpl(
         ) : State
 
         object Ready : State
+    }
+
+    companion object {
+        internal const val INIT_TOKEN = "Stockfish"
+        internal const val BEST_MOVE_TOKEN = "bestmove"
     }
 }

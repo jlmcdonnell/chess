@@ -42,7 +42,9 @@ android {
 }
 
 dependencies {
-    with (Versions) {
+    with(Versions) {
+        api(project(":engine-common"))
+
         api("org.slf4j:slf4j-nop:$slf4j")
         api("com.jakewharton.timber:timber:$timber")
         api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")

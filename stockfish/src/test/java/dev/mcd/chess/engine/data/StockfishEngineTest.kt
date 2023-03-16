@@ -1,5 +1,8 @@
 package dev.mcd.chess.engine.data
 
+import dev.mcd.chess.engine.domain.EngineCommand.Go
+import dev.mcd.chess.engine.domain.EngineCommand.SetPosition
+import dev.mcd.chess.engine.domain.EngineCommand.SetSkillLevel
 import io.mockk.Awaits
 import io.mockk.andThenJust
 import io.mockk.every
@@ -13,17 +16,17 @@ import kotlinx.coroutines.runBlocking
 import org.junit.Before
 import org.junit.Test
 
-class StockfishAdapterImplTest {
+class StockfishEngineTest {
 
     private lateinit var bridge: StockfishJni
-    private lateinit var adapter: StockfishAdapterImpl
+    private lateinit var adapter: StockfishEngine
 
     private val coroutineContext = Dispatchers.IO
 
     @Before
     fun setUp() {
         bridge = mockk(relaxUnitFun = true)
-        adapter = StockfishAdapterImpl(bridge, coroutineContext)
+        adapter = StockfishEngine(bridge, coroutineContext)
     }
 
     @Test
@@ -48,14 +51,14 @@ class StockfishAdapterImplTest {
     fun `Get move`(): Unit = runBlocking {
         val move = CompletableDeferred<String>()
 
-        every { bridge.writeLn("position fen TEST") } returns Unit
-        every { bridge.writeLn("setoption name Skill Level value 0") } returns Unit
-        every { bridge.writeLn("go depth 0") } coAnswers {
-            move.complete("bestmove e2e4")
+        every { bridge.writeLn(SetPosition("TEST").string()) } returns Unit
+        every { bridge.writeLn(SetSkillLevel(0).string()) } returns Unit
+        every { bridge.writeLn(Go(0).string()) } coAnswers {
+            move.complete("${StockfishEngine.BEST_MOVE_TOKEN} e2e4")
             Unit
         }
 
-        every { bridge.readLine() } returns "Stockfish" coAndThen {
+        every { bridge.readLine() } returns StockfishEngine.INIT_TOKEN coAndThen {
             move.await()
         }
         every { bridge.main() } returns Unit
