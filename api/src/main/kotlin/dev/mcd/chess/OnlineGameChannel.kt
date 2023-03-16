@@ -10,15 +10,20 @@ class OnlineGameChannel(
     private val outgoing: SendChannel<String>,
 ) {
     suspend fun requestGameState() {
-        outgoing.send("state")
+        outgoing.send(COMMAND_STATE)
     }
 
     suspend fun resign() {
-        outgoing.send("resign")
+        outgoing.send(COMMAND_RESIGN)
     }
 
     suspend fun move(move: Move) {
         val moveCmd = move.toString()
         outgoing.send(moveCmd)
+    }
+
+    companion object {
+        private const val COMMAND_STATE = "state"
+        private const val COMMAND_RESIGN = "resign"
     }
 }

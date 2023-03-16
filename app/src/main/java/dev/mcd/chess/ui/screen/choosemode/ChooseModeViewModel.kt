@@ -2,9 +2,9 @@ package dev.mcd.chess.ui.screen.choosemode
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.ChessApi
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.domain.GetGameForUser
+import dev.mcd.chess.domain.GetLobbyInfo
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -18,7 +18,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ChooseModeViewModel @Inject constructor(
     private val getGameForUser: GetGameForUser,
-    private val chessApi: ChessApi,
+    private val getLobbyInfo: GetLobbyInfo,
 ) : ViewModel(), ContainerHost<ChooseModeViewModel.State, ChooseModeViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(State()) {
@@ -35,7 +35,7 @@ class ChooseModeViewModel @Inject constructor(
 
                 while (true) {
                     runCatching {
-                        val lobbyInfo = chessApi.lobbyInfo()
+                        val lobbyInfo = getLobbyInfo()
                         reduce { state.copy(inLobby = lobbyInfo.inLobby) }
                     }.onFailure {
                         Timber.e(it, "Getting lobby info")

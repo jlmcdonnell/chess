@@ -4,8 +4,8 @@ import dev.mcd.chess.api.domain.LobbyInfo
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class LobbyInfoSerializer(
+internal data class LobbyInfoSerializer(
     val inLobby: Int,
 )
 
-fun LobbyInfoSerializer.domain() = LobbyInfo(inLobby)
+internal fun LobbyInfoSerializer.domain() = LobbyInfo(inLobby)

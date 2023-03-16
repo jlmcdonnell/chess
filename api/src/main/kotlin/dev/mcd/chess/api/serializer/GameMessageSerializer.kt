@@ -6,15 +6,15 @@ import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 
 @Serializable
-data class GameMessageSerializer(
+internal data class GameMessageSerializer(
     val message: MessageType,
     val content: String? = null,
 )
 
-inline fun <reified T> GameMessageSerializer.decodeContent(): T =
+internal inline fun <reified T> GameMessageSerializer.decodeContent(): T =
     DefaultJson.decodeFromString(content!!.replace("\\", ""))
 
-fun GameMessageSerializer.asGameState(): GameMessage.GameState {
+internal fun GameMessageSerializer.asGameState(): GameMessage.GameState {
     require(message == MessageType.GameState)
     val serializer = decodeContent<GameStateMessageSerializer>()
     return GameMessage.GameState(
@@ -22,7 +22,7 @@ fun GameMessageSerializer.asGameState(): GameMessage.GameState {
     )
 }
 
-fun GameMessageSerializer.asMove(): GameMessage.MoveMessage {
+internal fun GameMessageSerializer.asMove(): GameMessage.MoveMessage {
     require(message == MessageType.Move)
     val serializer = decodeContent<MoveMessageSerializer>()
     return GameMessage.MoveMessage(
@@ -32,7 +32,7 @@ fun GameMessageSerializer.asMove(): GameMessage.MoveMessage {
 }
 
 @Serializable
-enum class MessageType {
+internal enum class MessageType {
     GameState,
     Move,
     ErrorNotUsersMove,

@@ -8,12 +8,12 @@ import kotlinx.serialization.Serializable
 import java.util.Base64
 
 @Serializable
-data class GameStateMessageSerializer(
+internal data class GameStateMessageSerializer(
     val id: GameId,
     val pgn: String,
 )
 
-fun GameStateMessageSerializer.domain(): GameSession {
+internal fun GameStateMessageSerializer.domain(): GameSession {
     val pgnDecoded = Base64.getDecoder().decode(pgn).decodeToString()
     val game = PgnIterator(pgnDecoded.lines().iterator()).first()
     game.board = Board()

@@ -10,7 +10,7 @@ import io.ktor.websocket.Frame
 import io.ktor.websocket.readText
 import kotlinx.serialization.decodeFromString
 
-fun Frame.Text.gameMessage(): GameMessage {
+internal fun Frame.Text.gameMessage(): GameMessage {
     val frameText = readText()
     val data = DefaultJson.decodeFromString<GameMessageSerializer>(frameText)
 

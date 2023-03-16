@@ -27,5 +27,7 @@ dependencies {
         api("io.ktor:ktor-client-content-negotiation:$ktor")
         api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
         api("io.ktor:ktor-client-logging:$ktor")
+        testImplementation("io.ktor:ktor-client-cio:$ktor")
+        testImplementation("junit:junit:$junit")
     }
 }

@@ -7,10 +7,12 @@ import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.common.game.online.JoinOnlineGame
 import dev.mcd.chess.data.FindGameImpl
 import dev.mcd.chess.data.GetGameForUserImpl
+import dev.mcd.chess.data.GetLobbyInfoImpl
 import dev.mcd.chess.data.GetOrCreateUserImpl
 import dev.mcd.chess.data.game.online.JoinOnlineGameImpl
 import dev.mcd.chess.domain.FindGame
 import dev.mcd.chess.domain.GetGameForUser
+import dev.mcd.chess.domain.GetLobbyInfo
 import dev.mcd.chess.domain.GetOrCreateUser
 
 @Module
@@ -28,5 +30,8 @@ abstract class UseCaseModule {
 
     @Binds
     abstract fun getGameForUser(impl: GetGameForUserImpl): GetGameForUser
+
+    @Binds
+    abstract fun getLobbyInfo(impl: GetLobbyInfoImpl): GetLobbyInfo
 
 }
