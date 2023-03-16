@@ -1,4 +1,4 @@
-package dev.mcd.chess.engine.data
+package dev.mcd.chess.engine.stockfish.data
 
 import dev.mcd.chess.engine.domain.ChessEngine
 import dev.mcd.chess.engine.domain.EngineCommand

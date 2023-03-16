@@ -1,12 +1,12 @@
-package dev.mcd.chess.engine
+package dev.mcd.chess.engine.stockfish
 
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dev.mcd.chess.engine.data.AndroidStockfishJni
-import dev.mcd.chess.engine.data.StockfishEngine
-import dev.mcd.chess.engine.data.StockfishJni
+import dev.mcd.chess.engine.stockfish.data.AndroidStockfishJni
+import dev.mcd.chess.engine.stockfish.data.StockfishEngine
+import dev.mcd.chess.engine.stockfish.data.StockfishJni
 import dev.mcd.chess.engine.domain.ChessEngine
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.Dispatchers

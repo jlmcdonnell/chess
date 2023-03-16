@@ -1,4 +1,4 @@
-package dev.mcd.chess.engine.data
+package dev.mcd.chess.engine.stockfish.data
 
 interface StockfishJni {
     fun main()

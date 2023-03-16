@@ -80,14 +80,14 @@ char *stockfish_stdout_read() {
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_mcd_chess_engine_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
+Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
     stockfish_main();
 }
 
 extern "C"
 JNIEXPORT jstring
 JNICALL
-Java_dev_mcd_chess_engine_data_AndroidStockfishJni_readLine(JNIEnv *env, jobject thiz) {
+Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_readLine(JNIEnv *env, jobject thiz) {
     char *output = stockfish_stdout_read();
     // An error occured
     if (output == nullptr) {
@@ -101,7 +101,7 @@ Java_dev_mcd_chess_engine_data_AndroidStockfishJni_readLine(JNIEnv *env, jobject
 
 extern "C"
 JNIEXPORT jboolean JNICALL
-Java_dev_mcd_chess_engine_data_AndroidStockfishJni_write(JNIEnv *env, jobject /*thisz*/, jstring command) {
+Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_write(JNIEnv *env, jobject /*thisz*/, jstring command) {
     ssize_t result;
 
     jboolean isCopy;
