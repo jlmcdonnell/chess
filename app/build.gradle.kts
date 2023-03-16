@@ -61,7 +61,8 @@ dependencies {
     with(Versions) {
         // Projects
         implementation(project(":stockfish"))
-        implementation(project(":engine-common"))
+        implementation(project(":common"))
+        implementation(project(":api"))
 
         // Core
         implementation("org.slf4j:slf4j-nop:$slf4j")
@@ -75,14 +76,6 @@ dependencies {
         implementation("androidx.compose.material:material:$compose")
         implementation("androidx.compose.material:material-icons-extended:$compose")
         debugImplementation("androidx.compose.ui:ui-tooling:$compose")
-
-        // Ktor
-        implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-        implementation("io.ktor:ktor-client-core:$ktor")
-        implementation("io.ktor:ktor-client-okhttp:$ktor")
-        implementation("io.ktor:ktor-client-content-negotiation:$ktor")
-        implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-        implementation("io.ktor:ktor-client-logging:$ktor")
 
         // Orbit
         implementation("org.orbit-mvi:orbit-core:$orbit")
@@ -99,7 +92,6 @@ dependencies {
         implementation("androidx.navigation:navigation-compose:$navigationCompose")
         implementation("com.github.bhlangonijr:chesslib:$chessLib")
         implementation("com.jakewharton.timber:timber:$timber")
-        implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson")
         implementation("androidx.datastore:datastore-preferences:$datastorePreferences")
 
         // Test

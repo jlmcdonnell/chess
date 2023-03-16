@@ -5,7 +5,6 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
 import dev.mcd.chess.data.api.ApiCredentialsStore
 import dev.mcd.chess.domain.Environment
-import dev.mcd.chess.domain.api.ChessApi
 import dev.mcd.chess.domain.prefs.AppPreferences
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent

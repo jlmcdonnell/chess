@@ -1,7 +1,7 @@
 package dev.mcd.chess.domain.bot
 
-import dev.mcd.chess.domain.player.Player
-import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.common.player.Player
+import dev.mcd.chess.common.player.PlayerImage
 
 class Bot(
     override val name: String,

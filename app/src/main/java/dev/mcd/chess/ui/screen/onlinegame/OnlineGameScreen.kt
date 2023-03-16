@@ -24,7 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.mcd.chess.domain.game.TerminationReason
+import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.ui.game.ActiveGameView
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.ResignationDialog

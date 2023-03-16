@@ -2,8 +2,9 @@ package dev.mcd.chess.ui.screen.choosemode
 
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.game.GameId
+import dev.mcd.chess.ChessApi
+import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.domain.GetGameForUser
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
@@ -16,6 +17,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class ChooseModeViewModel @Inject constructor(
+    private val getGameForUser: GetGameForUser,
     private val chessApi: ChessApi,
 ) : ViewModel(), ContainerHost<ChooseModeViewModel.State, ChooseModeViewModel.SideEffect> {
 
@@ -23,9 +25,9 @@ class ChooseModeViewModel @Inject constructor(
         intent {
             repeatOnSubscription {
                 runCatching {
-                    val existingGame = chessApi.gameForUser().map { it.id }.firstOrNull()
-                    if (existingGame != null) {
-                        postSideEffect(SideEffect.NavigateToExistingGame(existingGame))
+                    val existingGameId = getGameForUser()
+                    if (existingGameId != null) {
+                        postSideEffect(SideEffect.NavigateToExistingGame(existingGameId))
                     }
                 }.onFailure {
                     Timber.e(it, "Finding existing games")

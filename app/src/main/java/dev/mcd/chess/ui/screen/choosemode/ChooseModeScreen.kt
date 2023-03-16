@@ -30,7 +30,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.mcd.chess.domain.game.GameId
+import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.screen.choosemode.ChooseModeViewModel.SideEffect.NavigateToExistingGame
 import org.orbitmvi.orbit.compose.collectAsState

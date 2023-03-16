@@ -2,24 +2,23 @@ package dev.mcd.chess.data.game.online
 
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.GameResult
+import dev.mcd.chess.ChessApi
+import dev.mcd.chess.OnlineGameChannel
+import dev.mcd.chess.api.domain.GameMessage
+import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.common.game.local.ClientGameSession
+import dev.mcd.chess.common.game.local.GameSessionRepository
+import dev.mcd.chess.common.game.online.GameSession
+import dev.mcd.chess.common.game.online.JoinOnlineGame
+import dev.mcd.chess.common.game.online.OnlineClientGameSession
+import dev.mcd.chess.common.game.online.opponent
+import dev.mcd.chess.common.game.online.sideForUser
+import dev.mcd.chess.common.player.HumanPlayer
+import dev.mcd.chess.common.player.PlayerImage
+import dev.mcd.chess.common.player.UserId
 import dev.mcd.chess.data.api.ApiCredentialsStore
-import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.game.GameId
-import dev.mcd.chess.domain.game.GameMessage
-import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.game.local.ClientGameSession
-import dev.mcd.chess.domain.game.local.GameSessionRepository
-import dev.mcd.chess.domain.game.online.GameSession
-import dev.mcd.chess.domain.game.online.JoinOnlineGame
-import dev.mcd.chess.domain.game.online.OnlineClientGameSession
-import dev.mcd.chess.domain.game.online.OnlineGameChannel
-import dev.mcd.chess.domain.game.online.opponent
-import dev.mcd.chess.domain.game.online.sideForUser
-import dev.mcd.chess.domain.player.HumanPlayer
-import dev.mcd.chess.domain.player.PlayerImage
-import dev.mcd.chess.domain.player.UserId
 import kotlinx.coroutines.flow.channelFlow
-import timber.log.Timber
 import javax.inject.Inject
 
 class JoinOnlineGameImpl @Inject constructor(
@@ -30,10 +29,11 @@ class JoinOnlineGameImpl @Inject constructor(
 
     override suspend fun invoke(id: GameId) = channelFlow {
         val userId = apiCredentialsStore.userId() ?: throw Exception("No user ID")
-        var session = chessApi.game(id)
+        val authToken = apiCredentialsStore.token() ?: throw Exception("No auth token")
 
-        chessApi.joinGame(session.id) {
-            Timber.d("Joined game ${session.id}")
+        var session = chessApi.game(authToken, id)
+
+        chessApi.joinGame(authToken, session.id) {
             val clientSession = createClientSession(userId, session, channel = this)
             clientSession.setBoard(session.game.board)
             gameSessionRepository.updateActiveGame(clientSession)
@@ -41,19 +41,19 @@ class JoinOnlineGameImpl @Inject constructor(
             requestGameState()
 
             for (message in incoming) {
-                Timber.d("Received message: ${message::class.simpleName}")
                 when (message) {
                     is GameMessage.GameState -> {
                         session = message.session
                         val event = syncWithRemote(session, clientSession)
                         event?.let { send(event) }
                     }
+
                     is GameMessage.MoveMessage -> {
                         if (!clientSession.doMove(message.move, requireMoveCount = message.count)) {
-                            Timber.e("Board is out of sync. Unable to make move ${message.move}")
                             requestGameState()
                         }
                     }
+
                     is GameMessage.ErrorNotUsersMove,
                     is GameMessage.ErrorGameTerminated,
                     is GameMessage.ErrorInvalidMove -> {
@@ -102,6 +102,7 @@ class JoinOnlineGameImpl @Inject constructor(
                     TerminationReason(resignation = Side.WHITE)
                 }
             }
+
             GameResult.WHITE_WON -> {
                 if (matedOrDraw) {
                     TerminationReason(sideMated = Side.BLACK)

@@ -6,8 +6,9 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
+import dev.mcd.chess.ChessApi
+import dev.mcd.chess.api.data.ChessApiImpl
 import dev.mcd.chess.domain.Environment
-import dev.mcd.chess.domain.api.ChessApi
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
 import io.ktor.client.plugins.HttpTimeout
@@ -28,12 +29,10 @@ class ApiModule {
     @Singleton
     fun chessApi(
         environment: Environment,
-        apiCredentialsStore: ApiCredentialsStore,
         client: HttpClient,
     ): ChessApi = ChessApiImpl(
         apiUrl = environment.apiUrl,
         client = client,
-        apiCredentialsStore = apiCredentialsStore,
     )
 
     @Provides

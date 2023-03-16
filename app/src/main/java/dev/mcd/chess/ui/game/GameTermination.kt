@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.domain.game.TerminationReason
+import dev.mcd.chess.common.game.TerminationReason
 
 @Composable
 fun GameTermination(

@@ -5,9 +5,9 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.domain.game.local.ClientGameSession
-import dev.mcd.chess.domain.player.HumanPlayer
-import dev.mcd.chess.domain.player.PlayerImage
+import dev.mcd.chess.common.game.local.ClientGameSession
+import dev.mcd.chess.common.player.HumanPlayer
+import dev.mcd.chess.common.player.PlayerImage
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Test

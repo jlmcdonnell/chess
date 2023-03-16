@@ -5,14 +5,14 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.data.api.ApiCredentialsStore
-import dev.mcd.chess.domain.api.ChessApi
-import dev.mcd.chess.domain.game.GameId
-import dev.mcd.chess.domain.game.TerminationReason
-import dev.mcd.chess.domain.game.local.GameSessionRepository
-import dev.mcd.chess.domain.game.online.JoinOnlineGame
-import dev.mcd.chess.domain.game.online.JoinOnlineGame.Event
-import dev.mcd.chess.domain.game.online.OnlineClientGameSession
+import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.common.game.local.GameSessionRepository
+import dev.mcd.chess.common.game.online.JoinOnlineGame
+import dev.mcd.chess.common.game.online.JoinOnlineGame.Event
+import dev.mcd.chess.common.game.online.OnlineClientGameSession
+import dev.mcd.chess.domain.FindGame
+import dev.mcd.chess.domain.GetOrCreateUser
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -30,10 +30,10 @@ import kotlin.coroutines.resume
 @HiltViewModel
 class OnlineGameViewModel @Inject constructor(
     private val gameSessionRepository: GameSessionRepository,
-    private val chessApi: ChessApi,
     private val stateHandle: SavedStateHandle,
     private val joinOnlineGame: JoinOnlineGame,
-    private val apiCredentialsStore: ApiCredentialsStore,
+    private val getOrCreateUser: GetOrCreateUser,
+    private val findGame: FindGame,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(
@@ -57,8 +57,7 @@ class OnlineGameViewModel @Inject constructor(
         if (gameId != null) {
             intent {
                 runCatching {
-                    val sessionInfo = chessApi.game(gameId)
-                    startGame(sessionInfo.id)
+                    startGame(gameId)
                 }.onFailure {
                     Timber.e(it, "Retrieving game $gameId")
                     fatalError("Unable to retrieve existing game")
@@ -114,13 +113,13 @@ class OnlineGameViewModel @Inject constructor(
     private fun findGame() {
         intent {
             runCatching {
-                val userId = apiCredentialsStore.userId() ?: chessApi.generateId()
+                val userId = getOrCreateUser()
                 reduce { State.FindingGame(userId) }
 
                 Timber.d("Authenticated as $userId")
 
-                val remoteSession = chessApi.findGame()
-                startGame(remoteSession.id)
+                val game = findGame.invoke()
+                startGame(game.id)
             }.onFailure {
                 Timber.e(it, "findingGame")
             }

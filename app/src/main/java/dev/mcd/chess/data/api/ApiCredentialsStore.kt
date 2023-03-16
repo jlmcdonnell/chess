@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
-import dev.mcd.chess.domain.player.UserId
+import dev.mcd.chess.common.player.UserId
 import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 

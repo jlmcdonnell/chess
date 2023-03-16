@@ -43,7 +43,7 @@ android {
 
 dependencies {
     with(Versions) {
-        api(project(":engine-common"))
+        api(project(":common"))
 
         api("org.slf4j:slf4j-nop:$slf4j")
         api("com.jakewharton.timber:timber:$timber")

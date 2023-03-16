@@ -7,8 +7,8 @@ import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
-import dev.mcd.chess.domain.game.BoardSounds
-import dev.mcd.chess.domain.game.local.ClientGameSession
+import dev.mcd.chess.common.game.BoardSounds
+import dev.mcd.chess.common.game.local.ClientGameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext

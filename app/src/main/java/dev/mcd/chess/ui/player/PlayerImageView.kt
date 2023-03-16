@@ -11,9 +11,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import dev.mcd.chess.domain.player.PlayerImage
-import dev.mcd.chess.domain.player.PlayerImage.None
-import dev.mcd.chess.domain.player.PlayerImage.Url
+import dev.mcd.chess.common.player.PlayerImage
+import dev.mcd.chess.common.player.PlayerImage.None
+import dev.mcd.chess.common.player.PlayerImage.Url
 import dev.mcd.chess.ui.LocalAppColors
 
 @Composable

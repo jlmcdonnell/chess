@@ -5,7 +5,7 @@ package dev.mcd.chess.ui.game.board
 import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.domain.game.local.ClientGameSession
+import dev.mcd.chess.common.game.local.ClientGameSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
