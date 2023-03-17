@@ -1,20 +1,25 @@
 package dev.mcd.chess.api.domain
 
+import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.Game
+import com.github.bhlangonijr.chesslib.game.GameResult
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.player.UserId
 
 data class GameSession(
     val id: GameId,
-    val game: Game,
+    val whitePlayer: UserId,
+    val blackPlayer: UserId,
+    val board: Board,
+    val result: GameResult,
 )
 
 
 fun GameSession.opponent(id: UserId): UserId {
-    return if (game.whitePlayer.id == id) game.blackPlayer.id else game.whitePlayer.id
+    return if (whitePlayer == id) blackPlayer else whitePlayer
 }
 
 fun GameSession.sideForUser(id: UserId): Side {
-    return if (game.whitePlayer.id == id) Side.WHITE else Side.BLACK
+    return if (whitePlayer == id) Side.WHITE else Side.BLACK
 }

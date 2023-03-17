@@ -35,7 +35,7 @@ class JoinOnlineGameImpl @Inject constructor(
 
         chessApi.joinGame(authToken, session.id) {
             val clientSession = createClientSession(userId, session, channel = this)
-            clientSession.setBoard(session.game.board)
+            clientSession.setBoard(session.board)
             gameSessionRepository.updateActiveGame(clientSession)
 
             requestGameState()
@@ -87,12 +87,12 @@ class JoinOnlineGameImpl @Inject constructor(
     }
 
     private suspend fun syncWithRemote(onlineSession: GameSession, localSession: ClientGameSession): JoinOnlineGame.Event? {
-        val board = onlineSession.game.board.clone()
+        val board = onlineSession.board.clone()
         localSession.setBoard(board)
 
         val matedOrDraw = board.let { it.isDraw || it.isMated }
 
-        val reason: TerminationReason? = when (onlineSession.game.result!!) {
+        val reason: TerminationReason? = when (onlineSession.result) {
             GameResult.ONGOING -> null
             GameResult.DRAW -> TerminationReason(draw = true)
             GameResult.BLACK_WON -> {

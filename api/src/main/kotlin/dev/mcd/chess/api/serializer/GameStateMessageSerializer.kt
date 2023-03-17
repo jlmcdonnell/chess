@@ -23,6 +23,9 @@ internal fun GameStateMessageSerializer.domain(): GameSession {
     game.gotoLast()
     return GameSession(
         id = id,
-        game = game,
+        board = game.board,
+        whitePlayer = game.whitePlayer.id,
+        blackPlayer = game.blackPlayer.id,
+        result = game.result,
     )
 }
