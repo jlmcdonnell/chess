@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalCoroutinesApi::class, FlowPreview::class)
+@file:OptIn(ExperimentalCoroutinesApi::class)
 
 package dev.mcd.chess.ui.game.board
 

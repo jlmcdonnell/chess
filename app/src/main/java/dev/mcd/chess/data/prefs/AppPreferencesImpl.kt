@@ -1,6 +1,7 @@
 package dev.mcd.chess.data.prefs
 
 import android.content.Context
+import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -16,10 +17,19 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Contex
 
     private val store = context.dataStore
     private val hostKey = stringPreferencesKey("debug-host")
+    private val clickToMove = booleanPreferencesKey("click-to-move")
 
     override suspend fun setHost(host: String) {
         store.edit { it[hostKey] = host }
     }
 
     override suspend fun host(): String = store.data.first()[hostKey] ?: ""
+
+    override suspend fun clickToMove(): Boolean {
+        return store.data.first()[clickToMove] ?: false
+    }
+
+    override suspend fun setClickToMove(enabled: Boolean) {
+        store.edit { it[clickToMove] = enabled }
+    }
 }
