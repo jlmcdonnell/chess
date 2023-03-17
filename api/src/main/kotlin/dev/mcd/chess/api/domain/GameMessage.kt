@@ -1,7 +1,5 @@
 package dev.mcd.chess.api.domain
 
-import dev.mcd.chess.common.game.online.GameSession
-
 sealed interface GameMessage {
 
     data class GameState(

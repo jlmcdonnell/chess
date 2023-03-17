@@ -1,7 +1,7 @@
 package dev.mcd.chess.data
 
 import dev.mcd.chess.ChessApi
-import dev.mcd.chess.common.game.online.GameSession
+import dev.mcd.chess.api.domain.GameSession
 import dev.mcd.chess.data.api.ApiCredentialsStore
 import dev.mcd.chess.domain.FindGame
 import javax.inject.Inject

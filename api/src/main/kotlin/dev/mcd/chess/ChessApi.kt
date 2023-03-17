@@ -1,9 +1,9 @@
 package dev.mcd.chess
 
 import dev.mcd.chess.api.domain.AuthResponse
+import dev.mcd.chess.api.domain.GameSession
 import dev.mcd.chess.api.domain.LobbyInfo
 import dev.mcd.chess.common.game.GameId
-import dev.mcd.chess.common.game.online.GameSession
 import dev.mcd.chess.common.player.UserId
 
 interface ChessApi {

@@ -1,4 +1,4 @@
-package dev.mcd.chess.common.game.online
+package dev.mcd.chess.api.domain
 
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.Game

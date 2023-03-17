@@ -4,13 +4,13 @@ import dev.mcd.chess.ChessApi
 import dev.mcd.chess.OnlineGameChannel
 import dev.mcd.chess.api.domain.AuthResponse
 import dev.mcd.chess.api.domain.GameMessage
+import dev.mcd.chess.api.domain.GameSession
 import dev.mcd.chess.api.domain.LobbyInfo
 import dev.mcd.chess.api.serializer.AuthResponseSerializer
 import dev.mcd.chess.api.serializer.GameStateMessageSerializer
 import dev.mcd.chess.api.serializer.LobbyInfoSerializer
 import dev.mcd.chess.api.serializer.domain
 import dev.mcd.chess.common.game.GameId
-import dev.mcd.chess.common.game.online.GameSession
 import dev.mcd.chess.common.player.UserId
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -19,7 +19,6 @@ import io.ktor.client.request.bearerAuth
 import io.ktor.client.request.get
 import io.ktor.client.request.parameter
 import io.ktor.client.request.post
-import io.ktor.client.request.request
 import io.ktor.client.request.url
 import io.ktor.websocket.Frame
 import io.ktor.websocket.close

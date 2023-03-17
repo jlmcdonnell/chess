@@ -2,8 +2,8 @@ package dev.mcd.chess.api.serializer
 
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.pgn.PgnIterator
+import dev.mcd.chess.api.domain.GameSession
 import dev.mcd.chess.common.game.GameId
-import dev.mcd.chess.common.game.online.GameSession
 import kotlinx.serialization.Serializable
 import java.util.Base64
 
