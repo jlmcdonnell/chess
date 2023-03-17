@@ -65,6 +65,10 @@ fun ChessBoard(
         }
     }
 
+    LaunchedEffect(game) {
+        boardInteraction.session = game
+    }
+
     LaunchedEffect(perspective, squareSize) {
         val squarePositions =
             Square.values().associateWith { square -> square.center(perspective, squareSize) }
@@ -168,7 +172,6 @@ private fun Pieces(
     ReusableContent(game?.id ?: "") {
         pieces = game?.pieceUpdates()?.value ?: return
 
-        val side = game?.selfSide ?: return
         pieces.forEachIndexed { index, piece ->
             if (piece != Piece.NONE) {
                 ChessPiece(
@@ -176,7 +179,6 @@ private fun Pieces(
                     initialPiece = piece,
                     perspective = perspective,
                     size = squareSize,
-                    side = side
                 )
             }
         }

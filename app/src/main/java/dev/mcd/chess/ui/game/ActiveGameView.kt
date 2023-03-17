@@ -19,7 +19,7 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.local.ClientGameSession
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
-import dev.mcd.chess.ui.game.board.BoardInteraction
+import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import timber.log.Timber
 

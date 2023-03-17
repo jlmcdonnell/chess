@@ -1,9 +1,13 @@
-package dev.mcd.chess.ui.game.board
+package dev.mcd.chess.ui.game.board.interaction
 
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
+import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.common.game.local.ClientGameSession
+import dev.mcd.chess.ui.extension.topLeft
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -13,6 +17,8 @@ import kotlin.math.sqrt
 
 
 class BoardInteraction {
+
+    var session: ClientGameSession? = null
 
     private val perspective = MutableStateFlow(Side.WHITE)
     private val moves = MutableStateFlow(Move(Square.NONE, Square.NONE))
@@ -54,10 +60,6 @@ class BoardInteraction {
         releaseTarget()
     }
 
-    fun releaseTarget() {
-        target = Square.NONE
-    }
-
     fun selectPromotion(moves: List<Move>) {
         selectPromotion.value = moves
     }
@@ -84,6 +86,33 @@ class BoardInteraction {
         target = closest?.first ?: Square.NONE
     }
 
+    fun dropPiece(piece: Piece, square: Square): DropPieceResult {
+        if (target == Square.NONE) return DropPieceResult.None
+        val session = session ?: return DropPieceResult.None
+
+        var result: DropPieceResult = DropPieceResult.None
+
+        if (session.selfSide == piece.pieceSide) {
+            val target = target
+            val move = Move(square, target)
+            val promotions = session.promotions(move)
+
+            if (move in session.legalMoves()) {
+                if (placePieceFrom(square)) {
+                    result = DropPieceResult.Moved(target)
+                }
+            } else if (promotions.isNotEmpty()) {
+                selectPromotion(promotions)
+                result = DropPieceResult.Promoting
+            }
+        }
+
+        if (result != DropPieceResult.Promoting) {
+            releaseTarget()
+        }
+        return result
+    }
+
     fun moves(): Flow<Move> {
         return moves.filter { it.to != Square.NONE && it.from != Square.NONE }
             .distinctUntilChanged()
@@ -104,4 +133,8 @@ class BoardInteraction {
     }
 
     fun highlightMovesFrom(): Flow<Square> = highlightMoveChanges
+
+    private fun releaseTarget() {
+        target = Square.NONE
+    }
 }

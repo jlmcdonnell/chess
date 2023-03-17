@@ -1,7 +1,7 @@
 package dev.mcd.chess.ui
 
 import androidx.compose.runtime.compositionLocalOf
-import dev.mcd.chess.ui.game.board.BoardInteraction
+import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import dev.mcd.chess.ui.game.board.GameSessionManager
 import dev.mcd.chess.ui.theme.AppColors
 import dev.mcd.chess.ui.theme.defaultBoardTheme

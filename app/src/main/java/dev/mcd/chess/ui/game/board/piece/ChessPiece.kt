@@ -31,6 +31,7 @@ import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
@@ -41,7 +42,6 @@ private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
 fun ChessPiece(
     size: Float,
     perspective: Side,
-    side: Side,
     initialPiece: Piece,
     initialSquare: Square,
 ) {
@@ -140,24 +140,10 @@ fun ChessPiece(
                             boardInteraction.updateDragPosition(dragPosition)
                         } while (event.changes.none { it.changedToUp() })
 
-                        if (side == piece.pieceSide) {
-                            val target = boardInteraction.target
-                            val move = Move(square, target)
-                            val promotions = gameManager.promotions(move)
-
-                            if (move in gameManager.legalMoves()) {
-                                if (boardInteraction.placePieceFrom(square)) {
-                                    square = target
-                                    squareOffset = square.topLeft(perspective, size)
-                                }
-                                boardInteraction.releaseTarget()
-                            } else if (promotions.isNotEmpty()) {
-                                boardInteraction.selectPromotion(promotions)
-                            } else {
-                                boardInteraction.releaseTarget()
-                            }
-                        } else {
-                            boardInteraction.releaseTarget()
+                        val dropResult = boardInteraction.dropPiece(piece, square)
+                        if (dropResult is DropPieceResult.Moved){
+                            square = dropResult.to
+                            squareOffset = square.topLeft(perspective, size)
                         }
 
                         boardInteraction.disableHighlightMoves()
