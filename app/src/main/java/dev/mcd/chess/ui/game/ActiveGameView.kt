@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.game.domain.ClientGameSession
+import dev.mcd.chess.feature.game.domain.ClientGameSession
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction

@@ -11,11 +11,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.game.domain.Bot
-import dev.mcd.chess.game.domain.ClientGameSession
-import dev.mcd.chess.game.domain.DefaultBots
-import dev.mcd.chess.game.domain.GameSessionRepository
-import dev.mcd.chess.game.domain.TerminationReason
+import dev.mcd.chess.common.player.Bot
+import dev.mcd.chess.feature.game.domain.ClientGameSession
+import dev.mcd.chess.feature.game.domain.DefaultBots
+import dev.mcd.chess.feature.game.domain.GameSessionRepository
+import dev.mcd.chess.common.game.TerminationReason
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -33,7 +33,6 @@ import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.math.max
-import kotlin.math.min
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(

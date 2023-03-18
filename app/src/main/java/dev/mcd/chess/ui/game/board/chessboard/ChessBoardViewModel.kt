@@ -3,8 +3,8 @@ package dev.mcd.chess.ui.game.board.chessboard
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.game.domain.BoardSounds
-import dev.mcd.chess.game.domain.GameSessionRepository
+import dev.mcd.chess.feature.game.domain.BoardSounds
+import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.launch
