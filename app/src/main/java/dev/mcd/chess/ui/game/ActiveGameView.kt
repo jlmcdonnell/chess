@@ -19,8 +19,8 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.ClientGameSession
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
-import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
+import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import timber.log.Timber
 
 @Composable
@@ -32,7 +32,6 @@ fun ActiveGameView(
 ) {
     val boardInteraction by remember { mutableStateOf(BoardInteraction()) }
     val sessionManager = LocalGameSession.current
-
 
     LaunchedEffect(game) {
         Timber.d("Game ID: ${game.id}")

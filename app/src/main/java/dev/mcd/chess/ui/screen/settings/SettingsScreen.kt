@@ -134,5 +134,3 @@ fun DebugSettings(
         Text(text = "Restart")
     }
 }
-
-

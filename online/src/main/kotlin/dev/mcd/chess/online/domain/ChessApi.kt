@@ -5,7 +5,6 @@ import dev.mcd.chess.common.player.UserId
 import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.online.domain.entity.GameSession
 import dev.mcd.chess.online.domain.entity.LobbyInfo
-import dev.mcd.chess.online.domain.OnlineGameChannel
 
 interface ChessApi {
     suspend fun generateId(): AuthResponse

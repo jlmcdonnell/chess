@@ -8,11 +8,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
+import dev.mcd.chess.online.domain.OnlineClientGameSession
 import dev.mcd.chess.online.domain.usecase.FindGame
 import dev.mcd.chess.online.domain.usecase.GetOrCreateUser
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame.Event
-import dev.mcd.chess.online.domain.OnlineClientGameSession
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull

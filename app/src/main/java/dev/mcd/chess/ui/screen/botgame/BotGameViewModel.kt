@@ -9,13 +9,13 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.common.game.ClientGameSession
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
-import dev.mcd.chess.common.game.TerminationReason
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull

@@ -1,7 +1,7 @@
 package dev.mcd.chess.online.data.serializer
 
-import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.common.player.UserId
+import dev.mcd.chess.online.domain.entity.AuthResponse
 import kotlinx.serialization.Serializable
 
 @Serializable

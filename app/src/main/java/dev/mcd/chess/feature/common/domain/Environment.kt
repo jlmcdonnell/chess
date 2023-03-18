@@ -11,4 +11,3 @@ sealed interface Environment {
         override val apiUrl: String,
     ) : Environment
 }
-

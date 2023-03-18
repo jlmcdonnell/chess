@@ -14,13 +14,12 @@ import kotlinx.coroutines.flow.filter
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-
 class BoardInteraction {
 
     var session: ClientGameSession? = null
 
     private val perspective = MutableStateFlow(Side.WHITE)
-    private val moves = MutableSharedFlow<Move>(replay=1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
+    private val moves = MutableSharedFlow<Move>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val targetChanges = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
@@ -43,7 +42,6 @@ class BoardInteraction {
         this.squarePositions = squarePositions
         this.squareSize = squareSize
     }
-
 
     fun promote(move: Move) {
         selectPromotion.value = emptyList()

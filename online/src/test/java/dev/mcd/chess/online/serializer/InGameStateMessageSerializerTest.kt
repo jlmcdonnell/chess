@@ -59,5 +59,4 @@ internal class InGameStateMessageSerializerTest {
         val fen = "3k4/8/3K3R/8/8/8/8/8 w - - 0 1"
         Assert.assertEquals(fen, state.session.game.board.fen)
     }
-
 }

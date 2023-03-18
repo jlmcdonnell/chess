@@ -27,4 +27,3 @@ fun Square.center(perspective: Side, squareSize: Float): Offset {
         Offset(x, y)
     }
 }
-

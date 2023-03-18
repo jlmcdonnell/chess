@@ -14,7 +14,6 @@ data class GameSession(
     val result: GameResult,
 )
 
-
 fun GameSession.opponent(id: UserId): UserId {
     return if (whitePlayer == id) blackPlayer else whitePlayer
 }

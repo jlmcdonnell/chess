@@ -7,13 +7,12 @@ import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
-import dev.mcd.chess.feature.game.domain.BoardSounds
 import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.feature.game.domain.BoardSounds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
-
 
 class BoardSoundsImpl @Inject constructor(
     @ApplicationContext

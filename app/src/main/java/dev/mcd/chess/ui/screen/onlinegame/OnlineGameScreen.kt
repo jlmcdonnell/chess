@@ -145,7 +145,6 @@ private fun FindingGameView(
             } else {
                 Text(text = "Authenticating")
             }
-
         }
     }
 }

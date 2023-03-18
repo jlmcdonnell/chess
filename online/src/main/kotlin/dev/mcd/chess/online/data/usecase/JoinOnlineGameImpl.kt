@@ -113,5 +113,4 @@ internal class JoinOnlineGameImpl @Inject constructor(
 
         return reason?.let { JoinOnlineGame.Event.Termination(reason) }
     }
-
 }

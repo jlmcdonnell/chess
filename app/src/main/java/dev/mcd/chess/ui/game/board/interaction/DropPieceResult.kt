@@ -5,5 +5,5 @@ import com.github.bhlangonijr.chesslib.Square
 sealed interface DropPieceResult {
     object None : DropPieceResult
     object Promoting : DropPieceResult
-    data class Moved(val to: Square): DropPieceResult
+    data class Moved(val to: Square) : DropPieceResult
 }

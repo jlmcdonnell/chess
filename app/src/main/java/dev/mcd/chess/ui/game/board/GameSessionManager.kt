@@ -58,5 +58,4 @@ class GameSessionManager {
     }
 
     fun lastMove(): MoveBackup? = sessionUpdates.value?.lastMove()
-
 }
