@@ -3,9 +3,9 @@ package dev.mcd.chess.ui.screen.settings
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
-import dev.mcd.chess.data.api.ApiCredentialsStore
-import dev.mcd.chess.domain.Environment
-import dev.mcd.chess.domain.prefs.AppPreferences
+import dev.mcd.chess.common.domain.ApiCredentialsStore
+import dev.mcd.chess.common.domain.Environment
+import dev.mcd.chess.common.domain.AppPreferences
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce

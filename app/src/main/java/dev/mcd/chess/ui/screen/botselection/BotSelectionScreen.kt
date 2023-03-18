@@ -37,8 +37,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.domain.bot.Bot
-import dev.mcd.chess.domain.bot.bots
+import dev.mcd.chess.game.domain.DefaultBots
+import dev.mcd.chess.game.domain.Bot
 import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
@@ -90,7 +90,7 @@ fun BotSelectionScreen(
             }
 
             LazyColumn {
-                items(bots, { it.slug }) { bot ->
+                items(DefaultBots.bots(), { it.slug }) { bot ->
                     BotItem(bot = bot) {
                         onBotSelected(bot.slug, selectedSide.name)
                     }

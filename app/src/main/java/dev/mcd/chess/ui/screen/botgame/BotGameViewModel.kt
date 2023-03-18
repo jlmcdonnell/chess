@@ -9,13 +9,13 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
-import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.common.game.local.ClientGameSession
-import dev.mcd.chess.common.game.local.GameSessionRepository
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.domain.bot.Bot
-import dev.mcd.chess.domain.bot.botFromSlug
+import dev.mcd.chess.game.domain.Bot
+import dev.mcd.chess.game.domain.ClientGameSession
+import dev.mcd.chess.game.domain.DefaultBots
+import dev.mcd.chess.game.domain.GameSessionRepository
+import dev.mcd.chess.game.domain.TerminationReason
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -32,6 +32,8 @@ import timber.log.Timber
 import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.math.max
+import kotlin.math.min
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
@@ -63,7 +65,7 @@ class BotGameViewModel @Inject constructor(
                     }
                 }
         }
-        bot = state.get<String>("bot")!!.botFromSlug()
+        bot = DefaultBots.fromSlug(state.get<String>("bot")!!)
         side = Side.valueOf(state.get<String>("side")!!)
         startGame()
     }
@@ -112,11 +114,7 @@ class BotGameViewModel @Inject constructor(
     private suspend fun tryMoveBot(game: ClientGameSession) {
         val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
         val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
-        val delay = delayedMoveTime - System.currentTimeMillis()
-        if (delay > 0) {
-            delay(delay)
-        }
-
+        delay(max(0, delayedMoveTime - System.currentTimeMillis()))
         game.move(stockfishMoveSan)
 
         if (game.termination() != null) {
@@ -142,7 +140,7 @@ class BotGameViewModel @Inject constructor(
                 selfSide = side,
                 opponent = bot,
             )
-            game.setBoard(Board())
+            game.setBoard(board)
             gameSessionRepository.updateActiveGame(game)
 
             if (board.sideToMove != game.selfSide) {

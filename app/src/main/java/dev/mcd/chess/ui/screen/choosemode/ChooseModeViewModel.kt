@@ -3,8 +3,8 @@ package dev.mcd.chess.ui.screen.choosemode
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
-import dev.mcd.chess.domain.GetGameForUser
-import dev.mcd.chess.domain.GetLobbyInfo
+import dev.mcd.chess.common.domain.GetGameForUser
+import dev.mcd.chess.common.domain.GetLobbyInfo
 import kotlinx.coroutines.delay
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent

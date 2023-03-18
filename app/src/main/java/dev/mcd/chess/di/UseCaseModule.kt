@@ -4,16 +4,16 @@ import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dev.mcd.chess.common.game.online.JoinOnlineGame
-import dev.mcd.chess.data.FindGameImpl
-import dev.mcd.chess.data.GetGameForUserImpl
-import dev.mcd.chess.data.GetLobbyInfoImpl
-import dev.mcd.chess.data.GetOrCreateUserImpl
-import dev.mcd.chess.data.game.online.JoinOnlineGameImpl
-import dev.mcd.chess.domain.FindGame
-import dev.mcd.chess.domain.GetGameForUser
-import dev.mcd.chess.domain.GetLobbyInfo
-import dev.mcd.chess.domain.GetOrCreateUser
+import dev.mcd.chess.game.domain.JoinOnlineGame
+import dev.mcd.chess.common.data.FindGameImpl
+import dev.mcd.chess.common.data.GetGameForUserImpl
+import dev.mcd.chess.common.data.GetLobbyInfoImpl
+import dev.mcd.chess.common.data.GetOrCreateUserImpl
+import dev.mcd.chess.common.data.JoinOnlineGameImpl
+import dev.mcd.chess.common.domain.FindGame
+import dev.mcd.chess.common.domain.GetGameForUser
+import dev.mcd.chess.common.domain.GetLobbyInfo
+import dev.mcd.chess.common.domain.GetOrCreateUser
 
 @Module
 @InstallIn(SingletonComponent::class)

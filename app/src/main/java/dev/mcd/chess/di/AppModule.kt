@@ -6,13 +6,13 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.BuildConfig
-import dev.mcd.chess.data.game.BoardSoundsImpl
-import dev.mcd.chess.data.prefs.AppPreferencesImpl
-import dev.mcd.chess.domain.Environment
-import dev.mcd.chess.common.game.BoardSounds
-import dev.mcd.chess.common.game.local.GameSessionRepository
-import dev.mcd.chess.common.game.local.GameSessionRepositoryImpl
-import dev.mcd.chess.domain.prefs.AppPreferences
+import dev.mcd.chess.game.data.BoardSoundsImpl
+import dev.mcd.chess.common.data.AppPreferencesImpl
+import dev.mcd.chess.common.domain.Environment
+import dev.mcd.chess.game.domain.BoardSounds
+import dev.mcd.chess.game.domain.GameSessionRepository
+import dev.mcd.chess.game.data.GameSessionRepositoryImpl
+import dev.mcd.chess.common.domain.AppPreferences
 import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
