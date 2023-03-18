@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
+import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -76,6 +77,7 @@ class BoardInteraction {
     }
 
     fun dropPiece(piece: Piece, square: Square): DropPieceResult {
+        Timber.d("dropPiece $piece square=$square target=$target")
         if (target == Square.NONE) return DropPieceResult.None
         val session = session ?: return DropPieceResult.None
 
@@ -88,6 +90,7 @@ class BoardInteraction {
 
             if (move in session.legalMoves()) {
                 moves.tryEmit(move)
+                Timber.d("dropPiece emit move")
                 result = DropPieceResult.Moved(target)
             } else if (promotions.isNotEmpty()) {
                 selectPromotion(promotions)

@@ -102,6 +102,7 @@ class BotGameViewModel @Inject constructor(
             val game = gameSessionRepository.activeGame().firstOrNull() ?: run {
                 return@intent
             }
+            Timber.d("onPlayerMove: $move")
             if (game.move(move.toString())) {
                 tryMoveBot(game)
             } else {
