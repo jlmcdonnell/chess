@@ -126,6 +126,8 @@ class BotGameViewModel @Inject constructor(
 
     private fun startGame() {
         intent {
+            engine.awaitReady()
+
             val board = Board().apply {
                 clear()
                 loadFromFen(Constants.startStandardFENPosition)

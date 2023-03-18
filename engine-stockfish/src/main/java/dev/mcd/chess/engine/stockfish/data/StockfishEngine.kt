@@ -4,10 +4,15 @@ import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.engine.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.suspendCoroutine
 
 internal class StockfishEngine(
     private val bridge: StockfishJni,
@@ -15,6 +20,10 @@ internal class StockfishEngine(
 ) : ChessEngine {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
+
+    override suspend fun awaitReady() {
+        stateFlow.takeWhile { it != State.Ready }.collect()
+    }
 
     override suspend fun startAndWait() {
         withContext(context) {
@@ -27,7 +36,6 @@ internal class StockfishEngine(
             launch(context) {
                 while (true) {
                     val output = bridge.readLine()
-
                     if (output.startsWith(INIT_TOKEN)) {
                         readyCompletable.complete(Unit)
                     } else if (output.startsWith(BEST_MOVE_TOKEN)) {

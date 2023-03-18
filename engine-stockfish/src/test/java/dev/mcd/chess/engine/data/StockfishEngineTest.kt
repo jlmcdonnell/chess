@@ -33,18 +33,14 @@ class StockfishEngineTest {
 
     @Test
     fun `Start and emit ready`() = runBlocking {
-        val complete = CompletableDeferred<Unit>()
-
         every { bridge.readLine() } returns "Stockfish" andThenJust Awaits
-        every { bridge.main() } coAnswers {
-            complete.complete(Unit)
-        }
+        every { bridge.main() } returns Unit
 
         CoroutineScope(Dispatchers.Default).launch {
             adapter.startAndWait()
         }
 
-        complete.await()
+        adapter.awaitReady()
 
         verify(exactly = 1) { bridge.main() }
     }
