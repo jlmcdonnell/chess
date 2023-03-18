@@ -49,7 +49,7 @@ class JoinOnlineGameImpl @Inject constructor(
                     }
 
                     is GameMessage.MoveMessage -> {
-                        if (!clientSession.doMove(message.move, requireMoveCount = message.count)) {
+                        if (!clientSession.move(message.move, requireMoveCount = message.count)) {
                             requestGameState()
                         }
                     }

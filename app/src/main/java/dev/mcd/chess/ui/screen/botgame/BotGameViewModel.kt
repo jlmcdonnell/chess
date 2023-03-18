@@ -8,14 +8,14 @@ import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.domain.bot.Bot
-import dev.mcd.chess.domain.bot.botFromSlug
+import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.game.local.ClientGameSession
 import dev.mcd.chess.common.game.local.GameSessionRepository
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.domain.bot.Bot
+import dev.mcd.chess.domain.bot.botFromSlug
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -98,8 +98,10 @@ class BotGameViewModel @Inject constructor(
 
     fun onPlayerMove(move: Move) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
-            if (game.doMove(move.toString())) {
+            val game = gameSessionRepository.activeGame().firstOrNull() ?: run {
+                return@intent
+            }
+            if (game.move(move.toString())) {
                 tryMoveBot(game)
             } else {
                 endGame(game)
@@ -108,7 +110,6 @@ class BotGameViewModel @Inject constructor(
     }
 
     private suspend fun tryMoveBot(game: ClientGameSession) {
-        Timber.d("Moving for stockfish")
         val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
         val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
         val delay = delayedMoveTime - System.currentTimeMillis()
@@ -116,7 +117,7 @@ class BotGameViewModel @Inject constructor(
             delay(delay)
         }
 
-        game.doMove(stockfishMoveSan)
+        game.move(stockfishMoveSan)
 
         if (game.termination() != null) {
             endGame(game)
@@ -127,13 +128,6 @@ class BotGameViewModel @Inject constructor(
         intent {
             val board = Board().apply {
                 clear()
-
-                /*
-                    For Debugging:
-                        Promotion      8/8/8/8/2k3p1/8/7p/2K5 w - - 0 1
-                        Castling       r3k2r/8/8/8/8/8/8/R3K2R b KQkq - 1 1
-                        En Passant     rnbqkbnr/ppp1pppp/8/8/3pP3/P6P/1PPP1PP1/RNBQKBNR b KQkq e3 0 3
-                */
                 loadFromFen(Constants.startStandardFENPosition)
             }
             val game = ClientGameSession(

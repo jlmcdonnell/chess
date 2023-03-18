@@ -24,7 +24,6 @@ import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.drawableResource
@@ -36,7 +35,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 
-private const val PIECE_SIZE_MULT_WHEN_DRAGGED = 2
+private const val PIECE_DRAG_SCALE = 1.7f
 
 @Composable
 fun ChessPiece(
@@ -107,10 +106,7 @@ fun ChessPiece(
     val dropping = animatedSize != currentSize.toDp()
     val animatedPan by animateOffsetAsState(
         targetValue = position,
-        animationSpec = spring(
-            visibilityThreshold = Offset.VisibilityThreshold,
-            stiffness = if (dragging && dropping) Spring.StiffnessHigh else Spring.StiffnessMedium
-        )
+        animationSpec = spring(stiffness = Spring.StiffnessMedium)
     )
 
     Image(
@@ -127,7 +123,7 @@ fun ChessPiece(
                         awaitFirstDown()
                         boardInteraction.highlightMoves(square)
                         dragging = true
-                        currentSize = size * PIECE_SIZE_MULT_WHEN_DRAGGED
+                        currentSize = size * PIECE_DRAG_SCALE
 
                         var event: PointerEvent
                         do {
@@ -141,7 +137,7 @@ fun ChessPiece(
                         } while (event.changes.none { it.changedToUp() })
 
                         val dropResult = boardInteraction.dropPiece(piece, square)
-                        if (dropResult is DropPieceResult.Moved){
+                        if (dropResult is DropPieceResult.Moved) {
                             square = dropResult.to
                             squareOffset = square.topLeft(perspective, size)
                         }

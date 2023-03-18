@@ -104,7 +104,7 @@ class OnlineGameViewModel @Inject constructor(
             val terminated = state is State.InGame && (state as? State.InGame)?.terminated == true
             if (!terminated) {
                 Timber.d("Moving for player: $move")
-                session.doMove(move.toString())
+                session.move(move.toString())
                 session.channel.move(move)
             }
         }

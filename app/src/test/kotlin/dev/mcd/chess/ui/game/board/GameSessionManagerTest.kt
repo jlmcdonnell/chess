@@ -38,7 +38,7 @@ class GameSessionManagerTest {
 
             manager.captures().test {
                 "e4 e5 Qh5 g6 Qe5 Be7 Qh8".split(" ").onEach {
-                    session1.doMove(it)
+                    session1.move(it)
                 }
                 assertEquals(emptyList<Piece>(), awaitItem())
                 assertEquals(listOf(Piece.BLACK_PAWN), awaitItem())

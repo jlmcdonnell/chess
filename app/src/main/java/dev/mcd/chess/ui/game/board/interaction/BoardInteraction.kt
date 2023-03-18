@@ -1,16 +1,15 @@
 package dev.mcd.chess.ui.game.board.interaction
 
-import androidx.compose.runtime.Composable
 import androidx.compose.ui.geometry.Offset
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.local.ClientGameSession
-import dev.mcd.chess.ui.extension.topLeft
+import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filter
 import kotlin.math.pow
 import kotlin.math.sqrt
@@ -21,7 +20,7 @@ class BoardInteraction {
     var session: ClientGameSession? = null
 
     private val perspective = MutableStateFlow(Side.WHITE)
-    private val moves = MutableStateFlow(Move(Square.NONE, Square.NONE))
+    private val moves = MutableSharedFlow<Move>(replay=1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val targetChanges = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
@@ -45,18 +44,10 @@ class BoardInteraction {
         this.squareSize = squareSize
     }
 
-    fun placePieceFrom(from: Square): Boolean {
-        return if (target != Square.NONE) {
-            val move = Move(from, target)
-            moves.value = move
-            target = Square.NONE
-            true
-        } else false
-    }
 
     fun promote(move: Move) {
         selectPromotion.value = emptyList()
-        moves.value = move
+        moves.tryEmit(move)
         releaseTarget()
     }
 
@@ -98,9 +89,8 @@ class BoardInteraction {
             val promotions = session.promotions(move)
 
             if (move in session.legalMoves()) {
-                if (placePieceFrom(square)) {
-                    result = DropPieceResult.Moved(target)
-                }
+                moves.tryEmit(move)
+                result = DropPieceResult.Moved(target)
             } else if (promotions.isNotEmpty()) {
                 selectPromotion(promotions)
                 result = DropPieceResult.Promoting
@@ -115,7 +105,6 @@ class BoardInteraction {
 
     fun moves(): Flow<Move> {
         return moves.filter { it.to != Square.NONE && it.from != Square.NONE }
-            .distinctUntilChanged()
     }
 
     fun targets(): Flow<Square> {

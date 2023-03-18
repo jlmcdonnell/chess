@@ -29,24 +29,20 @@ open class ClientGameSession(
         pieceUpdates.emit(board.boardToArray().toList())
     }
 
-    suspend fun doMove(move: String, requireMoveCount: Int? = null): Boolean {
+    suspend fun move(move: String, requireMoveCount: Int? = null): Boolean {
         val lastMove = board.backup.lastOrNull()?.move
         val moveCount = board.moveCounter
         if ((lastMove.toString() == move) && (moveCount == requireMoveCount)) {
             Timber.d("Ignoring the same move count=$moveCount move=${move}")
             return true
         }
-        return runCatching {
-            val moved = board.doMove(move)
+        return board.doMove(move).also { moved ->
             if (moved) {
                 val moveBackup = board.backup.last
                 moves.emit(moveBackup)
                 pieceUpdates.emit(board.boardToArray().toList())
             }
-            moved
-        }.onFailure {
-            Timber.e(it, "doMove: $move")
-        }.getOrElse { false }
+        }
     }
 
     fun termination(): TerminationReason? {
