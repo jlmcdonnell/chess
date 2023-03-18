@@ -29,7 +29,7 @@ class BoardSoundsImpl @Inject constructor(
     private val notifyPlayer by lazy { MediaPlayer.create(context, R.raw.notify, attributes, 0) }
 
     override suspend fun notify() {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             notifyPlayer.seekTo(0)
             notifyPlayer.start()
         }
@@ -38,7 +38,7 @@ class BoardSoundsImpl @Inject constructor(
     override suspend fun awaitMoves(
         session: ClientGameSession,
     ) {
-        withContext(Dispatchers.IO) {
+        withContext(Dispatchers.Default) {
             session.moves().collectLatest { move ->
                 if (session.termination() != null) {
                     notifyPlayer.seekTo(0)
