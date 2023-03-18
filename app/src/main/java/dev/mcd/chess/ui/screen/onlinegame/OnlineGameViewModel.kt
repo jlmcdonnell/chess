@@ -8,11 +8,11 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
-import dev.mcd.chess.feature.online.domain.JoinOnlineGame
-import dev.mcd.chess.feature.online.domain.JoinOnlineGame.Event
-import dev.mcd.chess.feature.online.domain.OnlineClientGameSession
-import dev.mcd.chess.feature.online.domain.FindGame
-import dev.mcd.chess.feature.online.domain.GetOrCreateUser
+import dev.mcd.chess.online.domain.usecase.FindGame
+import dev.mcd.chess.online.domain.usecase.GetOrCreateUser
+import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
+import dev.mcd.chess.online.domain.usecase.JoinOnlineGame.Event
+import dev.mcd.chess.online.domain.OnlineClientGameSession
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.mapNotNull
@@ -129,20 +129,25 @@ class OnlineGameViewModel @Inject constructor(
     private fun startGame(id: GameId) {
         intent {
             runCatching {
-                joinOnlineGame(id).collectLatest { message ->
-                    when (message) {
-                        is Event.FatalError -> fatalError(message.message)
-                        is Event.Termination -> {
-                            reduce {
-                                (state as? State.InGame)?.copy(terminated = true) ?: state
-                            }
-                            postSideEffect(AnnounceTermination(message.reason))
-                        }
+                joinOnlineGame(id).collectLatest { event ->
+                    when (event) {
+                        is Event.FatalError -> fatalError(event.message)
+                        is Event.Termination -> handleTermination(event.reason)
+                        is Event.NewSession -> gameSessionRepository.updateActiveGame(event.session)
                     }
                 }
             }.onFailure {
                 fatalError("joining game", it)
             }
+        }
+    }
+
+    private fun handleTermination(reason: TerminationReason) {
+        intent {
+            reduce {
+                (state as? State.InGame)?.copy(terminated = true) ?: state
+            }
+            postSideEffect(AnnounceTermination(reason))
         }
     }
 

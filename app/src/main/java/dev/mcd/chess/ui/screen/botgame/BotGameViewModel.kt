@@ -12,7 +12,7 @@ import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.feature.game.domain.ClientGameSession
+import dev.mcd.chess.common.game.ClientGameSession
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.common.game.TerminationReason

@@ -5,7 +5,7 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.feature.game.domain.ClientGameSession
+import dev.mcd.chess.common.game.ClientGameSession
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
 import kotlinx.coroutines.runBlocking

@@ -6,13 +6,11 @@ import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.BuildConfig
-import dev.mcd.chess.feature.game.data.BoardSoundsImpl
 import dev.mcd.chess.feature.common.data.AppPreferencesImpl
-import dev.mcd.chess.feature.common.domain.Environment
-import dev.mcd.chess.feature.game.domain.BoardSounds
-import dev.mcd.chess.feature.game.domain.GameSessionRepository
-import dev.mcd.chess.feature.game.data.GameSessionRepositoryImpl
 import dev.mcd.chess.feature.common.domain.AppPreferences
+import dev.mcd.chess.feature.common.domain.Environment
+import dev.mcd.chess.online.domain.AuthStore
+import dev.mcd.chess.online.domain.EndpointProvider
 import kotlinx.coroutines.runBlocking
 import javax.inject.Singleton
 
@@ -36,5 +34,15 @@ abstract class CommonModule {
                 }
             }
         }
+
+        @Provides
+        @Singleton
+        fun endpointProvider(environment: Environment): EndpointProvider = object : EndpointProvider {
+            override fun invoke() = environment.apiUrl
+        }
+
+        @Provides
+        @Singleton
+        fun authStore(appPreferences: AppPreferences): AuthStore = appPreferences
     }
 }

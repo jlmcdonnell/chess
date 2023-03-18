@@ -15,6 +15,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "Chess"
 include ':app'
-include ':engine-stockfish'
 include ':common'
-include ':api'
+include ':engine-stockfish'
+include ':online'

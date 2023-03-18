@@ -1,6 +1,6 @@
 package dev.mcd.chess.feature.game.data
 
-import dev.mcd.chess.feature.game.domain.ClientGameSession
+import dev.mcd.chess.common.game.ClientGameSession
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow

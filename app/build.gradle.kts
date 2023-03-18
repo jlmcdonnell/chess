@@ -62,7 +62,7 @@ dependencies {
         // Projects
         implementation(project(":engine-stockfish"))
         implementation(project(":common"))
-        implementation(project(":api"))
+        implementation(project(":online"))
 
         // Core
         implementation("org.slf4j:slf4j-nop:$slf4j")

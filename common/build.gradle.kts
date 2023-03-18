@@ -14,6 +14,7 @@ java {
 
 dependencies {
     with(Versions) {
-        implementation("com.github.bhlangonijr:chesslib:$chessLib")
+        api("com.github.bhlangonijr:chesslib:$chessLib")
+        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
     }
 }
