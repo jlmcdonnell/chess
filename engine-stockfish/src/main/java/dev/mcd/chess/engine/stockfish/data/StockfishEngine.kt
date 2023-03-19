@@ -3,12 +3,15 @@ package dev.mcd.chess.engine.stockfish.data
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.engine.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
+import kotlinx.coroutines.CoroutineStart
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.yield
+import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
 
 internal class StockfishEngine(
@@ -18,21 +21,31 @@ internal class StockfishEngine(
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
+    override suspend fun load() {
+        withContext(context) {
+            bridge.init()
+        }
+    }
+
     override suspend fun awaitReady() {
+        Timber.tag("Stockfish").d("Awaiting ready")
         stateFlow.takeWhile { it != State.Ready }.collect()
+        Timber.tag("Stockfish").d("Ready")
     }
 
     override suspend fun startAndWait() {
         withContext(context) {
             val readyCompletable = CompletableDeferred<Unit>()
 
-            launch(context) {
+            launch(context, start = CoroutineStart.UNDISPATCHED) {
+                yield()
                 bridge.main()
             }
 
-            launch(context) {
+            launch {
                 while (true) {
                     val output = bridge.readLine()
+                    Timber.tag("Stockfish").d("Stockfish Output: $output")
                     if (output.startsWith(INIT_TOKEN)) {
                         readyCompletable.complete(Unit)
                     } else if (output.startsWith(BEST_MOVE_TOKEN)) {
@@ -42,6 +55,7 @@ internal class StockfishEngine(
                     }
                 }
             }
+
             readyCompletable.await()
             stateFlow.emit(State.Ready)
             awaitCancellation()

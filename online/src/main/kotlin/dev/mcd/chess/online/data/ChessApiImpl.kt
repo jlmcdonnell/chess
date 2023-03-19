@@ -11,7 +11,6 @@ import dev.mcd.chess.online.domain.ChessApi
 import dev.mcd.chess.online.domain.OnlineGameChannel
 import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.online.domain.entity.GameMessage
-import dev.mcd.chess.online.domain.entity.GameSession
 import dev.mcd.chess.online.domain.entity.LobbyInfo
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
@@ -53,9 +52,9 @@ internal class ChessApiImpl constructor(
 
     override suspend fun findGame(
         authToken: String,
-    ): GameSession {
+    ): GameId {
         return withContext(Dispatchers.IO) {
-            val sessionCompletable = CompletableDeferred<GameSession>()
+            val sessionCompletable = CompletableDeferred<GameId>()
 
             client.webSocket(
                 urlString = "$websocketUrl/game/find",
@@ -67,7 +66,7 @@ internal class ChessApiImpl constructor(
                     if (frame is Frame.Text) {
                         val message = frame.gameMessage()
                         if (message is GameMessage.GameState) {
-                            sessionCompletable.complete(message.session)
+                            sessionCompletable.complete(message.id)
                             close()
                         } else {
                             // TODO: Timber.w("Unhandled message: ${message::class}")
@@ -84,26 +83,15 @@ internal class ChessApiImpl constructor(
         }
     }
 
-    override suspend fun game(
-        authToken: String,
-        id: GameId,
-    ): GameSession {
-        return withContext(Dispatchers.IO) {
-            client.get {
-                url("$apiUrl/game/id/$id")
-                bearerAuth(authToken)
-            }.body<GameStateMessageSerializer>().domain()
-        }
-    }
 
     override suspend fun gameForUser(
         authToken: String,
-    ): List<GameSession> {
+    ): List<GameId> {
         return withContext(Dispatchers.IO) {
             client.get {
                 url("$apiUrl/game/user")
                 bearerAuth(authToken)
-            }.body<List<GameStateMessageSerializer>>().map { it.domain() }
+            }.body<List<GameStateMessageSerializer>>().map { it.domain().id }
         }
     }
 

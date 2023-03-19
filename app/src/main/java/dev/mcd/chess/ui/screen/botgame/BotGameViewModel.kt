@@ -47,6 +47,7 @@ class BotGameViewModel @Inject constructor(
     override val container = container<State, SideEffect>(State.Loading) {
         intent {
             repeatOnSubscription {
+                engine.load()
                 engine.startAndWait()
             }
         }
@@ -75,24 +76,33 @@ class BotGameViewModel @Inject constructor(
 
     fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: return@intent
-            runCatching {
-                suspendCancellableCoroutine { continuation ->
-                    intent {
-                        postSideEffect(
-                            SideEffect.ConfirmResignation(
-                                onConfirm = { continuation.resume(Unit) },
-                                onDismiss = { continuation.cancel() }
+            println("onResign: $andNavigateBack")
+            val game = gameSessionRepository.activeGame().firstOrNull()
+            println("onResign: ${game?.id}")
+            if (game != null) {
+                runCatching {
+                    suspendCancellableCoroutine { continuation ->
+                        intent {
+                            postSideEffect(
+                                SideEffect.ConfirmResignation(
+                                    onConfirm = { continuation.resume(Unit) },
+                                    onDismiss = { continuation.cancel() }
+                                )
                             )
-                        )
+                        }
+                    }
+                    endGame(game)
+                    if (andNavigateBack) {
+                        postSideEffect(SideEffect.NavigateBack)
+                    }
+                }.onFailure {
+                    Timber.d("Will not resign")
+                    if (andNavigateBack) {
+                        postSideEffect(SideEffect.NavigateBack)
                     }
                 }
-                endGame(game)
-                if (andNavigateBack) {
-                    postSideEffect(SideEffect.NavigateBack)
-                }
-            }.onFailure {
-                Timber.d("Will not resign")
+            } else if (andNavigateBack) {
+                postSideEffect(SideEffect.NavigateBack)
             }
         }
     }
@@ -104,7 +114,12 @@ class BotGameViewModel @Inject constructor(
             }
             Timber.d("onPlayerMove: $move")
             if (game.move(move.toString())) {
-                tryMoveBot(game)
+                val termination = game.termination()
+                if (termination == null) {
+                    tryMoveBot(game)
+                } else {
+                    endGame(game)
+                }
             } else {
                 endGame(game)
             }
@@ -112,8 +127,10 @@ class BotGameViewModel @Inject constructor(
     }
 
     private suspend fun tryMoveBot(game: ClientGameSession) {
+        Timber.d("tryMoveBot")
         val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
         val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
+        Timber.d("Moving $stockfishMoveSan")
         delay(max(0, delayedMoveTime - System.currentTimeMillis()))
         game.move(stockfishMoveSan)
 
@@ -126,9 +143,12 @@ class BotGameViewModel @Inject constructor(
         intent {
             engine.awaitReady()
 
+            Timber.d("Engine ready")
+
             val board = Board().apply {
                 clear()
-                loadFromFen(Constants.startStandardFENPosition)
+//                loadFromFen(Constants.startStandardFENPosition)
+                loadFromFen("3k4/8/R2K4/8/8/8/8/8 w - - 0 1")
             }
             val game = ClientGameSession(
                 id = UUID.randomUUID().toString(),

@@ -51,7 +51,7 @@ abstract class OnlineModule {
     companion object {
         @Provides
         @Singleton
-        fun chessApi(
+        internal fun chessApi(
             endpointProvider: EndpointProvider,
             client: HttpClient,
         ): ChessApi = ChessApiImpl(

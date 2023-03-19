@@ -17,9 +17,7 @@ internal inline fun <reified T> GameMessageSerializer.decodeContent(): T =
 internal fun GameMessageSerializer.asGameState(): GameMessage.GameState {
     require(message == MessageType.GameState)
     val serializer = decodeContent<GameStateMessageSerializer>()
-    return GameMessage.GameState(
-        session = serializer.domain(),
-    )
+    return serializer.domain()
 }
 
 internal fun GameMessageSerializer.asMove(): GameMessage.MoveMessage {

@@ -6,11 +6,10 @@ import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.online.domain.entity.GameSession
 import dev.mcd.chess.online.domain.entity.LobbyInfo
 
-interface ChessApi {
+internal interface ChessApi {
     suspend fun generateId(): AuthResponse
-    suspend fun findGame(authToken: String): GameSession
-    suspend fun game(authToken: String, id: GameId): GameSession
-    suspend fun gameForUser(authToken: String): List<GameSession>
+    suspend fun gameForUser(authToken: String): List<GameId>
+    suspend fun findGame(authToken: String): GameId
     suspend fun joinGame(authToken: String, id: GameId, block: suspend OnlineGameChannel.() -> Unit)
     suspend fun lobbyInfo(excludeUser: UserId? = null): LobbyInfo
 }

@@ -118,8 +118,8 @@ class OnlineGameViewModel @Inject constructor(
 
                 Timber.d("Authenticated as $userId")
 
-                val game = findGame.invoke()
-                startGame(game.id)
+                val id = findGame.invoke()
+                startGame(id)
             }.onFailure {
                 Timber.e(it, "findingGame")
             }

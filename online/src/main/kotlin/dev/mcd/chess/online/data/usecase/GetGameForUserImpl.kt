@@ -12,6 +12,6 @@ internal class GetGameForUserImpl @Inject constructor(
 ) : GetGameForUser {
     override suspend fun invoke(): GameId? {
         val token = authStore.token() ?: return null
-        return chessApi.gameForUser(token).firstOrNull()?.id
+        return chessApi.gameForUser(token).firstOrNull()
     }
 }

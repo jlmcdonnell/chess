@@ -1,6 +1,7 @@
 package dev.mcd.chess.engine.stockfish.data
 
 interface StockfishJni {
+    fun init()
     fun main()
     fun readLine(): String
     fun writeLn(cmd: String)
@@ -8,7 +9,7 @@ interface StockfishJni {
 
 class AndroidStockfishJni : StockfishJni {
 
-    init {
+    override fun init() {
         System.loadLibrary("stockfish")
     }
 
