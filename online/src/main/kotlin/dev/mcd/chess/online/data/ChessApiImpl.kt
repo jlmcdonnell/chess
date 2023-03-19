@@ -69,7 +69,7 @@ internal class ChessApiImpl constructor(
                             sessionCompletable.complete(message.id)
                             close()
                         } else {
-                            // TODO: Timber.w("Unhandled message: ${message::class}")
+                             throw Exception("Unhandled message: ${message::class}")
                         }
                     }
                 }

@@ -3,7 +3,7 @@ package dev.mcd.chess.online.data.usecase
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.GameResult
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.HumanPlayer
@@ -11,7 +11,7 @@ import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.common.player.UserId
 import dev.mcd.chess.online.domain.AuthStore
 import dev.mcd.chess.online.domain.ChessApi
-import dev.mcd.chess.online.domain.OnlineClientGameSession
+import dev.mcd.chess.online.domain.OnlineGameSession
 import dev.mcd.chess.online.domain.OnlineGameChannel
 import dev.mcd.chess.online.domain.entity.GameMessage
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
@@ -29,7 +29,7 @@ internal class JoinOnlineGameImpl @Inject constructor(
         val authToken = authStore.token() ?: throw Exception("No auth token")
 
         chessApi.joinGame(authToken, id) {
-            var clientSession: ClientGameSession? = null
+            var session: GameSession? = null
 
 
             requestGameState()
@@ -37,24 +37,24 @@ internal class JoinOnlineGameImpl @Inject constructor(
             for (message in incoming) {
                 when (message) {
                     is GameMessage.GameState -> {
-                        if (clientSession == null) {
-                            clientSession = createClientSession(
+                        if (session == null) {
+                            session = createClientSession(
                                 gameId = message.id,
                                 userId = userId,
                                 whitePlayer = message.whitePlayer,
                                 blackPlayer = message.blackPlayer,
                                 channel = this
                             )
-                            clientSession.setBoard(message.board)
-                            send(NewSession(clientSession))
+                            session.setBoard(message.board)
+                            send(NewSession(session))
                         } else {
-                            val event = syncWithRemote(message.board, message.result, clientSession)
+                            val event = syncWithRemote(message.board, message.result, session)
                             event?.let { send(event) }
                         }
                     }
 
                     is GameMessage.MoveMessage -> {
-                        val moved = clientSession?.move(message.move, requireMoveCount = message.count) == true
+                        val moved = session?.move(message.move, requireMoveCount = message.count) == true
                         if (!moved) {
                             requestGameState()
                         }
@@ -76,9 +76,9 @@ internal class JoinOnlineGameImpl @Inject constructor(
         whitePlayer: UserId,
         blackPlayer: UserId,
         channel: OnlineGameChannel,
-    ): ClientGameSession {
+    ): GameSession {
         val opponentId = if (userId == whitePlayer) blackPlayer else whitePlayer
-        return OnlineClientGameSession(
+        return OnlineGameSession(
             id = gameId,
             self = HumanPlayer(
                 name = userId,
@@ -98,7 +98,7 @@ internal class JoinOnlineGameImpl @Inject constructor(
     private suspend fun syncWithRemote(
         remoteBoard: Board,
         result: GameResult,
-        localSession: ClientGameSession
+        localSession: GameSession
     ): JoinOnlineGame.Event? {
         val board = remoteBoard.clone()
         localSession.setBoard(board)

@@ -5,7 +5,7 @@ import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
 import kotlinx.coroutines.runBlocking
@@ -26,8 +26,8 @@ class GameSessionManagerTest {
             val board2 = Board()
             board2.loadFromFen(Constants.startStandardFENPosition)
 
-            val session1 = ClientGameSession("1", player, Side.WHITE, player)
-            val session2 = ClientGameSession("2", player, Side.WHITE, player)
+            val session1 = GameSession("1", player, Side.WHITE, player)
+            val session2 = GameSession("2", player, Side.WHITE, player)
 
             session1.setBoard(board1)
             session2.setBoard(board2)

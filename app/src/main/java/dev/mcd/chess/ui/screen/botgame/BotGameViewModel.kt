@@ -9,7 +9,7 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.common.player.HumanPlayer
@@ -126,7 +126,7 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
-    private suspend fun tryMoveBot(game: ClientGameSession) {
+    private suspend fun tryMoveBot(game: GameSession) {
         Timber.d("tryMoveBot")
         val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
         val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
@@ -149,7 +149,7 @@ class BotGameViewModel @Inject constructor(
                 clear()
                 loadFromFen(Constants.startStandardFENPosition)
             }
-            val game = ClientGameSession(
+            val game = GameSession(
                 id = UUID.randomUUID().toString(),
                 self = HumanPlayer(
                     name = "You",
@@ -168,7 +168,7 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
-    private fun endGame(game: ClientGameSession) {
+    private fun endGame(game: GameSession) {
         intent {
             gameSessionRepository.updateActiveGame(null)
 
@@ -186,7 +186,7 @@ class BotGameViewModel @Inject constructor(
         object Loading : State
 
         data class Game(
-            val game: ClientGameSession,
+            val game: GameSession,
             val terminated: Boolean = false,
         ) : State
     }

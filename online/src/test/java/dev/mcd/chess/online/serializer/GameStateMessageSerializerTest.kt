@@ -8,7 +8,7 @@ import org.junit.Assert
 import org.junit.Test
 import java.util.Base64
 
-internal class InGameStateMessageSerializerTest {
+internal class GameStateMessageSerializerTest {
 
     private val newGamePGN = """
      [Event "null"]
@@ -44,10 +44,10 @@ internal class InGameStateMessageSerializerTest {
         val pgn64 = Base64.getEncoder().encodeToString(newGamePGN.toByteArray())
         val content = "{\"id\":\"id\",\"pgn\":\"$pgn64\"}".trimIndent()
         val state = GameMessageSerializer(MessageType.GameState, content).asGameState()
-        Assert.assertEquals(Square.F6, state.session.game.board.backup.last.move.to)
+        Assert.assertEquals(Square.F6, state.board.backup.last.move.to)
 
         val fen = "rnbqkb1r/pppp1ppp/5n2/4p3/4P3/5N2/PPPP1PPP/RNBQKB1R w KQkq - 2 3"
-        Assert.assertEquals(fen, state.session.game.board.fen)
+        Assert.assertEquals(fen, state.board.fen)
     }
 
     @Test
@@ -57,6 +57,6 @@ internal class InGameStateMessageSerializerTest {
         val state = GameMessageSerializer(MessageType.GameState, content).asGameState()
 
         val fen = "3k4/8/3K3R/8/8/8/8/8 w - - 0 1"
-        Assert.assertEquals(fen, state.session.game.board.fen)
+        Assert.assertEquals(fen, state.board.fen)
     }
 }

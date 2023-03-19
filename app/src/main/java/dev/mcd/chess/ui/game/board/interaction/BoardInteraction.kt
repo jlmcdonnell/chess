@@ -5,7 +5,7 @@ import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -17,7 +17,7 @@ import kotlin.math.sqrt
 
 class BoardInteraction {
 
-    var session: ClientGameSession? = null
+    var session: GameSession? = null
 
     private val perspective = MutableStateFlow(Side.WHITE)
     private val moves = MutableSharedFlow<Move>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)

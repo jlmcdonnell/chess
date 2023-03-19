@@ -8,7 +8,7 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
-import dev.mcd.chess.online.domain.OnlineClientGameSession
+import dev.mcd.chess.online.domain.OnlineGameSession
 import dev.mcd.chess.online.domain.usecase.FindGame
 import dev.mcd.chess.online.domain.usecase.GetOrCreateUser
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
@@ -41,7 +41,7 @@ class OnlineGameViewModel @Inject constructor(
     ) {
         viewModelScope.launch {
             gameSessionRepository.activeGame()
-                .mapNotNull { it as? OnlineClientGameSession }
+                .mapNotNull { it as? OnlineGameSession }
                 .collectLatest { session ->
                     intent {
                         reduce {
@@ -162,7 +162,7 @@ class OnlineGameViewModel @Inject constructor(
 
     sealed interface State {
         data class InGame(
-            val session: OnlineClientGameSession,
+            val session: OnlineGameSession,
             val terminated: Boolean = false,
         ) : State
 

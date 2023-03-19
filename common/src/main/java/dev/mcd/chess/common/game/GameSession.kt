@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
 
-open class ClientGameSession(
+open class GameSession(
     val id: String,
     val self: Player,
     val selfSide: Side,

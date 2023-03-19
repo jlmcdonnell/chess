@@ -7,7 +7,7 @@ import android.media.MediaPlayer
 import com.github.bhlangonijr.chesslib.Piece
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.feature.game.domain.BoardSounds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
@@ -35,7 +35,7 @@ class BoardSoundsImpl @Inject constructor(
     }
 
     override suspend fun awaitMoves(
-        session: ClientGameSession,
+        session: GameSession,
     ) {
         withContext(Dispatchers.Default) {
             session.moves().collectLatest { move ->

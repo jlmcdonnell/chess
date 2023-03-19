@@ -5,7 +5,7 @@ package dev.mcd.chess.ui.game.board
 import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.common.game.ClientGameSession
+import dev.mcd.chess.common.game.GameSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.Flow
@@ -19,13 +19,13 @@ import kotlinx.coroutines.flow.map
 
 class GameSessionManager {
 
-    private val sessionUpdates = MutableStateFlow<ClientGameSession?>(null)
+    private val sessionUpdates = MutableStateFlow<GameSession?>(null)
 
-    suspend fun updateSession(session: ClientGameSession) {
+    suspend fun updateSession(session: GameSession) {
         sessionUpdates.emit(session)
     }
 
-    fun sessionUpdates(): Flow<ClientGameSession> = sessionUpdates.filterNotNull()
+    fun sessionUpdates(): Flow<GameSession> = sessionUpdates.filterNotNull()
 
     fun pieceUpdates() = sessionUpdates.filterNotNull()
         .flatMapLatest { it.pieceUpdates() }
