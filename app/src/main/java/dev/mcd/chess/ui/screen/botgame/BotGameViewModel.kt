@@ -147,8 +147,7 @@ class BotGameViewModel @Inject constructor(
 
             val board = Board().apply {
                 clear()
-//                loadFromFen(Constants.startStandardFENPosition)
-                loadFromFen("3k4/8/R2K4/8/8/8/8/8 w - - 0 1")
+                loadFromFen(Constants.startStandardFENPosition)
             }
             val game = ClientGameSession(
                 id = UUID.randomUUID().toString(),

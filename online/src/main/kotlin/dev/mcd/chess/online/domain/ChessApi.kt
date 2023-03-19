@@ -3,7 +3,6 @@ package dev.mcd.chess.online.domain
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.player.UserId
 import dev.mcd.chess.online.domain.entity.AuthResponse
-import dev.mcd.chess.online.domain.entity.GameSession
 import dev.mcd.chess.online.domain.entity.LobbyInfo
 
 internal interface ChessApi {
