@@ -65,13 +65,13 @@ fun SettingsScreen(
                     currentHost = state.host,
                     onUpdateHost = { viewModel.updateHost(it) },
                 )
-            }
-            Spacer(modifier = Modifier.height(24.dp))
-            TextButton(
-                modifier = Modifier.padding(horizontal = 24.dp),
-                onClick = { viewModel.clearAuthData() },
-            ) {
-                Text(text = "Clear Auth Data")
+                Spacer(modifier = Modifier.height(24.dp))
+                TextButton(
+                    modifier = Modifier.padding(horizontal = 24.dp),
+                    onClick = { viewModel.clearAuthData() },
+                ) {
+                    Text(text = "Clear Auth Data")
+                }
             }
         }
     }
