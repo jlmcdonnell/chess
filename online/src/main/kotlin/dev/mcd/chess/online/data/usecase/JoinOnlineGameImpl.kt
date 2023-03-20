@@ -3,20 +3,26 @@ package dev.mcd.chess.online.data.usecase
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.game.GameResult
-import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.common.game.MoveResult
+import dev.mcd.chess.common.game.MoveString
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.common.player.UserId
+import dev.mcd.chess.online.data.usecase.ValidateMoveFromRemote.Result.SyncRequiredApplyMove
 import dev.mcd.chess.online.domain.AuthStore
 import dev.mcd.chess.online.domain.ChessApi
-import dev.mcd.chess.online.domain.OnlineGameSession
 import dev.mcd.chess.online.domain.OnlineGameChannel
+import dev.mcd.chess.online.domain.OnlineGameSession
 import dev.mcd.chess.online.domain.entity.GameMessage
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame.Event.NewSession
 import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.flow.consumeAsFlow
+import kotlinx.coroutines.flow.filterIsInstance
+import kotlinx.coroutines.flow.first
 import javax.inject.Inject
 
 internal class JoinOnlineGameImpl @Inject constructor(
@@ -29,34 +35,37 @@ internal class JoinOnlineGameImpl @Inject constructor(
         val authToken = authStore.token() ?: throw Exception("No auth token")
 
         chessApi.joinGame(authToken, id) {
-            var session: GameSession? = null
+            var session: GameSession
 
-
-            requestGameState()
+            incoming.consumeAsFlow()
+                .filterIsInstance<GameMessage.GameState>()
+                .first()
+                .let { message ->
+                    session = createClientSession(
+                        gameId = message.id,
+                        userId = userId,
+                        whitePlayer = message.whitePlayer,
+                        blackPlayer = message.blackPlayer,
+                        board = message.board,
+                        channel = this
+                    )
+                    send(NewSession(session))
+                }
 
             for (message in incoming) {
                 when (message) {
                     is GameMessage.GameState -> {
-                        if (session == null) {
-                            session = createClientSession(
-                                gameId = message.id,
-                                userId = userId,
-                                whitePlayer = message.whitePlayer,
-                                blackPlayer = message.blackPlayer,
-                                channel = this
-                            )
-                            session.setBoard(message.board)
-                            send(NewSession(session))
-                        } else {
-                            val event = syncWithRemote(message.board, message.result, session)
-                            event?.let { send(event) }
-                        }
+                        val event = syncWithRemote(message.board, message.result, session)
+                        event?.let { send(event) }
                     }
 
                     is GameMessage.MoveMessage -> {
-                        val moved = session?.move(message.move, requireMoveCount = message.count) == true
-                        if (!moved) {
-                            requestGameState()
+                        val validateResult = ValidateMoveFromRemote(MoveString(message.move), message.count, session)
+                        if (validateResult == SyncRequiredApplyMove) {
+                            val moveResult = session.move(message.move)
+                            if (moveResult == MoveResult.MoveIllegal) {
+                                requestGameState()
+                            }
                         }
                     }
 
@@ -70,11 +79,12 @@ internal class JoinOnlineGameImpl @Inject constructor(
         }
     }
 
-    private fun createClientSession(
+    private suspend fun createClientSession(
         gameId: GameId,
         userId: UserId,
         whitePlayer: UserId,
         blackPlayer: UserId,
+        board: Board,
         channel: OnlineGameChannel,
     ): GameSession {
         val opponentId = if (userId == whitePlayer) blackPlayer else whitePlayer
@@ -92,7 +102,9 @@ internal class JoinOnlineGameImpl @Inject constructor(
             ),
             selfSide = if (userId == whitePlayer) Side.WHITE else Side.BLACK,
             channel = channel,
-        )
+        ).apply {
+            setBoard(board)
+        }
     }
 
     private suspend fun syncWithRemote(
@@ -102,10 +114,13 @@ internal class JoinOnlineGameImpl @Inject constructor(
     ): JoinOnlineGame.Event? {
         val board = remoteBoard.clone()
         localSession.setBoard(board)
+        return getTerminationReason(board, result)?.let { JoinOnlineGame.Event.Termination(it) }
+    }
 
+    private fun getTerminationReason(board: Board, result: GameResult): TerminationReason? {
         val matedOrDraw = board.let { it.isDraw || it.isMated }
 
-        val reason: TerminationReason? = when (result) {
+        return when (result) {
             GameResult.ONGOING -> null
             GameResult.DRAW -> TerminationReason(draw = true)
             GameResult.BLACK_WON -> {
@@ -124,7 +139,5 @@ internal class JoinOnlineGameImpl @Inject constructor(
                 }
             }
         }
-
-        return reason?.let { JoinOnlineGame.Event.Termination(reason) }
     }
 }

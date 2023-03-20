@@ -21,24 +21,23 @@ open class GameSession(
     private val pieceUpdates = MutableStateFlow<List<Piece>>(emptyList())
     private val moves = MutableStateFlow<MoveBackup?>(null)
 
+    val moveCount: Int get() = board.moveCounter
+
     suspend fun setBoard(board: Board) {
         this.board = board
         board.backup.lastOrNull()?.let { moves.emit(it) }
         pieceUpdates.emit(board.boardToArray().toList())
     }
 
-    suspend fun move(move: String, requireMoveCount: Int? = null): Boolean {
-        val lastMove = board.backup.lastOrNull()?.move
-        val moveCount = board.moveCounter
-        if ((lastMove.toString() == move) && (moveCount == requireMoveCount)) {
-            return true
-        }
-        return board.doMove(move).also { moved ->
-            if (moved) {
-                val moveBackup = board.backup.last
-                moves.emit(moveBackup)
-                pieceUpdates.emit(board.boardToArray().toList())
-            }
+    open suspend fun move(move: String): MoveResult {
+        val moved = board.doMove(move)
+        return if (moved) {
+            val moveBackup = board.backup.last
+            moves.emit(moveBackup)
+            pieceUpdates.emit(board.boardToArray().toList())
+            MoveResult.Moved
+        } else {
+            MoveResult.MoveIllegal
         }
     }
 

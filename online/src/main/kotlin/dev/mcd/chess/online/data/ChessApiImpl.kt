@@ -69,7 +69,7 @@ internal class ChessApiImpl constructor(
                             sessionCompletable.complete(message.id)
                             close()
                         } else {
-                             throw Exception("Unhandled message: ${message::class}")
+                            throw Exception("Unhandled message: ${message::class}")
                         }
                     }
                 }
@@ -82,7 +82,6 @@ internal class ChessApiImpl constructor(
             sessionCompletable.await()
         }
     }
-
 
     override suspend fun gameForUser(
         authToken: String,

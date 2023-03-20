@@ -10,6 +10,7 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.common.player.HumanPlayer
@@ -113,7 +114,7 @@ class BotGameViewModel @Inject constructor(
                 return@intent
             }
             Timber.d("onPlayerMove: $move")
-            if (game.move(move.toString())) {
+            if (game.move(move.toString()) == MoveResult.Moved) {
                 val termination = game.termination()
                 if (termination == null) {
                     tryMoveBot(game)

@@ -1,7 +1,7 @@
 package dev.mcd.chess.online.domain.usecase
 
-import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.TerminationReason
 import kotlinx.coroutines.flow.Flow
 
