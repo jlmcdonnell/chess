@@ -5,6 +5,7 @@ package dev.mcd.chess.ui.game.board
 import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.common.game.GameSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -57,5 +58,5 @@ class GameSessionManager {
         return sessionUpdates.value?.promotions(move) ?: emptyList()
     }
 
-    fun lastMove(): MoveBackup? = sessionUpdates.value?.lastMove()
+    fun lastMove(): DirectionalMove? = sessionUpdates.value?.lastMove()
 }

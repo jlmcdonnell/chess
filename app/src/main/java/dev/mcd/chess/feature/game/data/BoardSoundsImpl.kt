@@ -38,7 +38,7 @@ class BoardSoundsImpl @Inject constructor(
         session: GameSession,
     ) {
         withContext(Dispatchers.Default) {
-            session.moves().collectLatest { move ->
+            session.moves().collectLatest { (move, _) ->
                 if (session.termination() != null) {
                     notifyPlayer.seekTo(0)
                     notifyPlayer.start()

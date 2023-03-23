@@ -32,6 +32,7 @@ import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.LocalGameSession
@@ -46,6 +47,7 @@ import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun ChessBoard(
+    game: GameSession,
     modifier: Modifier = Modifier,
     viewModel: ChessBoardViewModel = hiltViewModel(),
     onMove: (Move) -> Unit = {},
@@ -54,7 +56,6 @@ fun ChessBoard(
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
-    val game by LocalGameSession.current.sessionUpdates().collectAsState(null)
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
 
     viewModel.collectAsState()
@@ -83,7 +84,7 @@ fun ChessBoard(
             }
         }
     ) {
-        ReusableContent(game?.id ?: "") {
+        ReusableContent(game.id) {
             Squares(perspective, squareSize)
             SquareHighlight(perspective, squareSizeDp)
             LegalMoves(perspective, squareSize)
@@ -103,9 +104,9 @@ private fun SquareHighlight(
     val lastMove by LocalGameSession.current.moveUpdates().collectAsState(null)
     val squareSizePx = squareSize.toPx()
 
-    lastMove?.move?.let { move ->
-        val moveFromOffset = move.from.topLeft(perspective, squareSizePx)
-        val moveToOffset = move.to.topLeft(perspective, squareSizePx)
+    lastMove?.let { (moveBackup, _) ->
+        val moveFromOffset = moveBackup.move.from.topLeft(perspective, squareSizePx)
+        val moveToOffset = moveBackup.move.to.topLeft(perspective, squareSizePx)
         Box(
             modifier = Modifier
                 .size(squareSize)

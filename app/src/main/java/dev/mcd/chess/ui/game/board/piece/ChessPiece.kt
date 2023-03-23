@@ -60,29 +60,29 @@ fun ChessPiece(
         gameManager
             .moveUpdates()
             .mapNotNull { gameManager.lastMove() }
-            .filter {
+            .filter {(move, _) ->
                 square in listOf(
-                    it.move.from,
-                    it.move.to,
-                    it.rookCastleMove?.from,
-                    it.enPassantTarget
+                    move.move.from,
+                    move.move.to,
+                    move.rookCastleMove?.from,
+                    move.enPassantTarget
                 )
             }
-            .collectLatest { backup ->
-                val move = backup.move
+            .collectLatest { (moveBackup, forward) ->
+                val move = moveBackup.move
                 if (move.from == square) {
                     square = move.to
                     squareOffset = move.to.topLeft(perspective, size)
                     if (move.promotion != Piece.NONE) {
                         piece = move.promotion
                     }
-                } else if (piece == backup.capturedPiece && square == backup.capturedSquare) {
+                } else if (piece == moveBackup.capturedPiece && square == moveBackup.capturedSquare) {
                     captured = true
-                } else if (backup.rookCastleMove?.from == square) {
-                    square = backup.rookCastleMove.to
+                } else if (moveBackup.rookCastleMove?.from == square) {
+                    square = moveBackup.rookCastleMove.to
                     squareOffset = square.topLeft(perspective, size)
-                } else if (backup.enPassantTarget == square) {
-                    square = backup.enPassantTarget
+                } else if (moveBackup.enPassantTarget == square) {
+                    square = moveBackup.enPassantTarget
                     squareOffset = square.topLeft(perspective, size)
                 }
             }
