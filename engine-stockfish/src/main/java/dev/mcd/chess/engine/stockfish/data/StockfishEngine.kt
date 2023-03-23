@@ -55,7 +55,7 @@ internal class StockfishEngine(
             try {
                 awaitCancellation()
             } finally {
-                bridge.writeLine("quit")
+                bridge.writeLine(EngineCommand.Quit.string())
                 job.cancel()
                 moveToState(State.Uninitialized)
             }

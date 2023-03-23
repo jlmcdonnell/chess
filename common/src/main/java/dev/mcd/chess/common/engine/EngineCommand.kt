@@ -14,4 +14,8 @@ sealed interface EngineCommand {
     data class SetSkillLevel(private val level: Int) : EngineCommand {
         override fun string() = "setoption name Skill Level value $level"
     }
+
+    object Quit : EngineCommand {
+        override fun string() = "quit"
+    }
 }
