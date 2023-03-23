@@ -21,6 +21,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
+import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
@@ -48,7 +49,6 @@ class BotGameViewModel @Inject constructor(
     override val container = container<State, SideEffect>(State.Loading) {
         intent {
             repeatOnSubscription {
-                engine.load()
                 engine.startAndWait()
             }
         }
@@ -77,9 +77,7 @@ class BotGameViewModel @Inject constructor(
 
     fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            println("onResign: $andNavigateBack")
             val game = gameSessionRepository.activeGame().firstOrNull()
-            println("onResign: ${game?.id}")
             if (game != null) {
                 runCatching {
                     suspendCancellableCoroutine { continuation ->

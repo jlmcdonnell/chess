@@ -1,6 +1,7 @@
 #include <cstdio>
 #include <unistd.h>
 #include <jni.h>
+#include <android/log.h>
 
 #include "../stockfish/src/bitboard.h"
 #include "../stockfish/src/endgame.h"
@@ -11,11 +12,8 @@
 #include "../stockfish/src/thread.h"
 #include "../stockfish/src/tt.h"
 #include "../stockfish/src/uci.h"
-#include <jni.h>
-#include <jni.h>
-#include <jni.h>
 
-#define NUM_PIPES 2
+#define TAG "StockfishNative"
 #define PARENT_WRITE_PIPE 0
 #define PARENT_READ_PIPE 1
 #define READ_FD 0
@@ -25,23 +23,25 @@
 #define CHILD_READ_FD (pipes[PARENT_WRITE_PIPE][READ_FD])
 #define CHILD_WRITE_FD (pipes[PARENT_READ_PIPE][WRITE_FD])
 
-#define STRINGS_SIZE 250
+#define debug(format, ...) __android_log_print(ANDROID_LOG_DEBUG, TAG, format, ##__VA_ARGS__)
 
-int pipes[NUM_PIPES][2];
-char buffer[STRINGS_SIZE + 1];
+int pipes[2][2];
 
-void stockfish_main() {
+extern "C"
+JNIEXPORT void JNICALL
+Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
     pipe(pipes[PARENT_READ_PIPE]);
     pipe(pipes[PARENT_WRITE_PIPE]);
 
     dup2(CHILD_READ_FD, STDIN_FILENO);
     dup2(CHILD_WRITE_FD, STDOUT_FILENO);
 
+    std::cout << Stockfish::engine_info() << std::endl;
+
     using namespace Stockfish;
 
-    std::cout << engine_info() << std::endl;
-
     CommandLine::init();
+
     UCI::init(Options);
     Tune::init();
     PSQT::init();
@@ -52,67 +52,48 @@ void stockfish_main() {
     Threads.set(size_t(Options["Threads"]));
     Search::clear(); // After threads are up
     Eval::NNUE::init();
-
     UCI::loop();
-
     Threads.set(0);
-}
 
-ssize_t stockfish_stdin_write(const char *data) {
-    return write(PARENT_WRITE_FD, data, strlen(data));
-}
+    close(CHILD_READ_FD);
+    close(CHILD_WRITE_FD);
 
-char *stockfish_stdout_read() {
-    char tmp[1];
-    int index;
-    for (index = 0; index < STRINGS_SIZE; index++) {
-        read(PARENT_READ_FD, tmp, 1);
-        char nextChar = tmp[0];
-        buffer[index] = nextChar;
-        if (nextChar == '\n') {
-            break;
-        }
-    }
-    buffer[index + 1] = 0;
-
-    return buffer;
-}
-
-extern "C"
-JNIEXPORT void JNICALL
-Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
-    stockfish_main();
+    close(PARENT_READ_FD);
+    close(PARENT_WRITE_FD);
 }
 
 extern "C"
 JNIEXPORT jstring
 JNICALL
 Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_readLine(JNIEnv *env, jobject thiz) {
-    char *output = stockfish_stdout_read();
-    // An error occured
-    if (output == nullptr) {
-        return nullptr;
+    char buffer[1024];
+    memset(buffer, 0, sizeof(buffer));
+
+    int n = 0;
+    while (read(PARENT_READ_FD, &buffer[n], 1) > 0) {
+        if (buffer[n] == '\n') {
+            break;
+        }
+        n++;
     }
+    buffer[n] = '\0';
 
-    return env->NewStringUTF(buffer);
+    debug("OUT: %s", buffer);
+
+    if (strlen(buffer) == 0) {
+        return nullptr;
+    } else {
+        return env->NewStringUTF(buffer);
+    }
 }
-
-
 
 extern "C"
 JNIEXPORT jboolean JNICALL
 Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_write(JNIEnv *env, jobject /*thisz*/, jstring command) {
-    ssize_t result;
+    debug("IN: %s", env->GetStringUTFChars(command, JNI_FALSE));
 
-    jboolean isCopy;
-    const char *str = env->GetStringUTFChars(command, &isCopy);
-
-    result = stockfish_stdin_write(str);
-    env->ReleaseStringUTFChars(command, str);
-
-    if (result < 0) {
-        return JNI_FALSE;
-    }
+    const char *nativeString = env->GetStringUTFChars(command, JNI_FALSE);
+    write(PARENT_WRITE_FD, nativeString, strlen(nativeString));
 
     return JNI_TRUE;
 }

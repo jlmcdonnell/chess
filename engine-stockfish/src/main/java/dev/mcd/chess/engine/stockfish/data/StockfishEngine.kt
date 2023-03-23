@@ -1,53 +1,49 @@
 package dev.mcd.chess.engine.stockfish.data
 
+import androidx.annotation.Keep
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.engine.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
-import kotlinx.coroutines.CoroutineStart
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
+import kotlinx.coroutines.isActive
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.yield
 import timber.log.Timber
 import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 internal class StockfishEngine(
     private val bridge: StockfishJni,
-    private val context: CoroutineContext,
+    private val engineContext: CoroutineContext,
 ) : ChessEngine {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
-    override suspend fun load() {
-        withContext(context) {
-            bridge.init()
-        }
+    override fun init() {
+        bridge.init()
     }
 
     override suspend fun awaitReady() {
-        Timber.tag("Stockfish").d("Awaiting ready")
-        stateFlow.takeWhile { it != State.Ready }.collect()
-        Timber.tag("Stockfish").d("Ready")
+        awaitState<State.Ready>()
     }
 
     override suspend fun startAndWait() {
-        withContext(context) {
-            val readyCompletable = CompletableDeferred<Unit>()
-
-            launch(context, start = CoroutineStart.UNDISPATCHED) {
-                yield()
+        awaitState<State.Uninitialized>()
+        CoroutineScope(coroutineContext).launch {
+            launch(engineContext) {
                 bridge.main()
             }
 
-            launch {
-                while (true) {
+            launch(engineContext) {
+                while (isActive) {
                     val output = bridge.readLine()
-                    Timber.tag("Stockfish").d("Stockfish Output: $output")
                     if (output.startsWith(INIT_TOKEN)) {
-                        readyCompletable.complete(Unit)
+                        moveToState(State.Ready)
                     } else if (output.startsWith(BEST_MOVE_TOKEN)) {
                         // 0:bestmove 1:[e2e4] 2:ponder 3:a6a7
                         val move = output.split(" ")[1].trim()
@@ -55,29 +51,33 @@ internal class StockfishEngine(
                     }
                 }
             }
-
-            readyCompletable.await()
-            stateFlow.emit(State.Ready)
-            awaitCancellation()
+        }.let { job ->
+            try {
+                awaitCancellation()
+            } finally {
+                bridge.writeLine("quit")
+                job.cancel()
+                moveToState(State.Uninitialized)
+            }
         }
     }
 
     override suspend fun getMove(fen: String, level: Int, depth: Int): String {
-        return withContext(context) {
-            assertState<State.Ready>()
+        return withContext(engineContext) {
+            awaitState<State.Ready>()
             val moveCompletable = CompletableDeferred<String>()
-            stateFlow.emit(State.Moving(moveCompletable))
+            moveToState(State.Moving(moveCompletable))
 
             listOf(
                 EngineCommand.SetSkillLevel(level),
                 EngineCommand.SetPosition(fen),
                 EngineCommand.Go(depth),
             ).forEach {
-                bridge.writeLn(it.string())
+                bridge.writeLine(it.string())
             }
 
             moveCompletable.await().also {
-                stateFlow.emit(State.Ready)
+                moveToState(State.Ready)
             }
         }
     }
@@ -86,17 +86,26 @@ internal class StockfishEngine(
         return stateFlow.value as? T
     }
 
-    private inline fun <reified T : State> assertState(): T {
-        return stateFlow.value as? T ?: throw Exception("Expected ${T::class.simpleName} but was ${stateFlow.value::class.simpleName}")
+    private suspend inline fun <reified T : State> awaitState() {
+        Timber.tag("Stockfish").d("Awaiting ${T::class.simpleName}")
+        stateFlow.takeWhile { it !is T }.collect()
+    }
+
+    private suspend fun moveToState(state: State) {
+        stateFlow.emit(state)
+        Timber.tag("Stockfish").d("Moved to ${state::class.simpleName}")
     }
 
     private sealed interface State {
+        @Keep
         object Uninitialized : State
 
+        @Keep
         class Moving(
             val completable: CompletableDeferred<String>,
         ) : State
 
+        @Keep
         object Ready : State
     }
 

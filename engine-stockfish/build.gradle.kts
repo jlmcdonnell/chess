@@ -24,19 +24,15 @@ android {
         }
     }
 
-    buildTypes {
-        getByName("release") {
-            isMinifyEnabled = false
-            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-        }
-    }
     kotlin {
         jvmToolchain(BuildSettings.jdkVersion)
     }
+
     externalNativeBuild {
         cmake {
             path = file("src/main/native/CMakeLists.txt")
             version = "3.22.1"
+
         }
     }
 }

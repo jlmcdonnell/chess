@@ -49,9 +49,9 @@ class StockfishEngineTest {
     fun `Get move`(): Unit = runBlocking {
         val move = CompletableDeferred<String>()
 
-        every { bridge.writeLn(SetPosition("TEST").string()) } returns Unit
-        every { bridge.writeLn(SetSkillLevel(0).string()) } returns Unit
-        every { bridge.writeLn(Go(0).string()) } coAnswers {
+        every { bridge.writeLine(SetPosition("TEST").string()) } returns Unit
+        every { bridge.writeLine(SetSkillLevel(0).string()) } returns Unit
+        every { bridge.writeLine(Go(0).string()) } coAnswers {
             move.complete("${StockfishEngine.BEST_MOVE_TOKEN} e2e4")
             Unit
         }

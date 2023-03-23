@@ -17,11 +17,11 @@ import javax.inject.Singleton
 class StockfishModule {
     @Provides
     @Singleton
-    fun stockfishJni(): StockfishJni = AndroidStockfishJni()
+    internal fun stockfishJni(): StockfishJni = AndroidStockfishJni()
 
     @Provides
     @Singleton
-    fun stockfishEngine(bridge: StockfishJni): ChessEngine {
+    internal fun stockfishEngine(bridge: StockfishJni): ChessEngine {
         val context = CoroutineName("Stockfish") + Dispatchers.IO
         return StockfishEngine(bridge, context)
     }

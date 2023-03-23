@@ -14,3 +14,5 @@ add_library(
         ${stockfishCppPaths}
         ${bridgeCppPaths}
 )
+
+target_link_libraries(stockfish log)
