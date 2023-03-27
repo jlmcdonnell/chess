@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.receiveAsFlow
 import javax.inject.Inject
 
 internal class JoinOnlineGameImpl @Inject constructor(
@@ -36,10 +37,12 @@ internal class JoinOnlineGameImpl @Inject constructor(
 
         chessApi.joinGame(authToken, id) {
             runCatching {
-                var session: GameSession? = null
+                val session: GameSession
 
-                for (message in incoming) {
-                    if (session == null && message is GameMessage.GameState) {
+                incoming.receiveAsFlow()
+                    .filterIsInstance<GameMessage.GameState>()
+                    .first()
+                    .let { message ->
                         session = createClientSession(
                             gameId = message.id,
                             userId = userId,
@@ -49,11 +52,9 @@ internal class JoinOnlineGameImpl @Inject constructor(
                             channel = this
                         )
                         send(NewSession(session))
-                    } else if (session == null) {
-                        continue
                     }
-                    
-                    println("message: $message")
+
+                for (message in incoming) {
                     when (message) {
                         is GameMessage.GameState -> {
                             val event = syncWithRemote(message.board, message.result, session)

@@ -10,7 +10,7 @@ object ValidateMoveFromRemote {
     }
 
     operator fun invoke(move: MoveString, moveCount: Int, localSession: GameSession): Result {
-        val lastMove = localSession.lastMove()?.move.toString()
+        val lastMove = localSession.lastMove()?.move?.move.toString()
         val localMoveCount = localSession.moveCount
         return if (move.value == lastMove && moveCount == localMoveCount) {
             Result.InSync
