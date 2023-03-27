@@ -4,7 +4,7 @@ object Versions {
     val compose = "1.4.0-rc01"
     val composeCompiler = "1.4.3"
     val coreKtx = "1.9.0"
-    val coroutines = "1.7.0-Beta"
+    val coroutines = "1.6.4"
     val datastorePreferences = "1.0.0"
     val hilt = "2.45"
     val hiltNavigationCompose = "1.0.0"
@@ -16,6 +16,7 @@ object Versions {
     val navigationCompose = "2.5.3"
     val orbit = "4.6.1"
     val slf4j = "2.0.6"
+    val testRunner = "1.5.2"
     val timber = "5.0.1"
     val turbine = "0.12.1"
 }

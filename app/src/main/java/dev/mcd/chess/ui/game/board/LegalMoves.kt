@@ -28,6 +28,7 @@ import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 
 @Composable
 fun LegalMoves(
@@ -39,7 +40,8 @@ fun LegalMoves(
 
     val pieces by gameManager.pieceUpdates().collectAsState(emptyList())
     val highlightMovesFrom by LocalBoardInteraction.current
-        .highlightMovesFrom().collectAsState(Square.NONE)
+        .highlightMovesFrom()
+        .collectAsState(Square.NONE)
 
     var highlightMoves by remember { mutableStateOf<List<Pair<Square, Boolean>>>(emptyList()) }
 

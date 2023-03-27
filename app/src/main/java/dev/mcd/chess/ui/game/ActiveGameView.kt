@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,6 +23,7 @@ import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
+import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
 @Composable
@@ -31,13 +33,15 @@ fun ActiveGameView(
     onResign: () -> Unit,
     terminated: Boolean,
 ) {
-    val boardInteraction by remember { mutableStateOf(BoardInteraction()) }
     val sessionManager = LocalGameSession.current
+    val boardInteraction = remember(game.id) { BoardInteraction(game) }
 
     LaunchedEffect(game) {
         Timber.d("Game ID: ${game.id}")
         sessionManager.updateSession(game)
-        boardInteraction.setPerspective(game.selfSide)
+        boardInteraction.moves().collectLatest {
+            onMove(it)
+        }
     }
     PlayerStrip(
         modifier = Modifier
@@ -50,16 +54,16 @@ fun ActiveGameView(
         side = game.selfSide,
     )
     Spacer(Modifier.height(4.dp))
-    CompositionLocalProvider(
-        LocalBoardInteraction provides boardInteraction
-    ) {
-        ChessBoard(
-            modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(ratio = 1f),
-            onMove = { onMove(it) },
-            game = game,
-        )
+
+    CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
+        ReusableContent(boardInteraction) {
+            ChessBoard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .aspectRatio(ratio = 1f),
+                gameId = game.id,
+            )
+        }
     }
     Spacer(Modifier.height(4.dp))
     CapturedPieces(
@@ -81,8 +85,13 @@ fun ActiveGameView(
             modifier = Modifier.align(Alignment.CenterEnd),
             terminated = terminated,
             onResignClicked = { onResign() },
-            onUndoClicked = {  },
-            onRedoClicked = {  },
+            onUndoClicked = {
+                game.undo()
+            },
+            onRedoClicked = {
+                game.redo()
+                boardInteraction.enableInteraction(game.isLive())
+            },
         )
     }
 }

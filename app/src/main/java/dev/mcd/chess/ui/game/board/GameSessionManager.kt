@@ -2,7 +2,6 @@
 
 package dev.mcd.chess.ui.game.board
 
-import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.DirectionalMove
@@ -54,9 +53,7 @@ class GameSessionManager {
         return sessionUpdates.value?.legalMoves() ?: emptyList()
     }
 
-    fun promotions(move: Move): List<Move> {
-        return sessionUpdates.value?.promotions(move) ?: emptyList()
-    }
-
     fun lastMove(): DirectionalMove? = sessionUpdates.value?.lastMove()
+
+    fun previousMove(): Move? = sessionUpdates.value?.previousMove()
 }

@@ -145,7 +145,6 @@ class BotGameViewModel @Inject constructor(
             Timber.d("Engine ready")
 
             val board = Board().apply {
-                clear()
                 loadFromFen(Constants.startStandardFENPosition)
             }
             val game = GameSession(

@@ -15,6 +15,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -31,8 +32,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.LocalGameSession
@@ -42,37 +42,25 @@ import dev.mcd.chess.ui.extension.toPx
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.LegalMoves
 import dev.mcd.chess.ui.game.board.PromotionSelector
-import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun ChessBoard(
-    game: GameSession,
+    gameId: GameId,
     modifier: Modifier = Modifier,
     viewModel: ChessBoardViewModel = hiltViewModel(),
-    onMove: (Move) -> Unit = {},
 ) {
     var squareSizeDp by remember { mutableStateOf(0.dp) }
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
+    val target by boardInteraction.targets().collectAsState(Square.NONE)
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
 
     viewModel.collectAsState()
 
-    LaunchedEffect(Unit) {
-        boardInteraction.moves().collectLatest {
-            onMove(it)
-        }
-    }
-
-    LaunchedEffect(game) {
-        boardInteraction.session = game
-    }
-
     LaunchedEffect(perspective, squareSize) {
-        val squarePositions =
-            Square.values().associateWith { square -> square.center(perspective, squareSize) }
+        val squarePositions = Square.values().associateWith { square -> square.center(perspective, squareSize) }
         boardInteraction.updateSquareData(squarePositions, squareSize)
     }
 
@@ -84,9 +72,10 @@ fun ChessBoard(
             }
         }
     ) {
-        ReusableContent(game.id) {
+        ReusableContent(gameId) {
             Squares(perspective, squareSize)
-            SquareHighlight(perspective, squareSizeDp)
+            MoveHighlight(perspective, squareSizeDp)
+            TargetHighlight(perspective, squareSizeDp, target)
             LegalMoves(perspective, squareSize)
             Pieces(perspective, squareSize)
             PromotionSelector(modifier = Modifier.align(Alignment.Center))
@@ -95,35 +84,17 @@ fun ChessBoard(
 }
 
 @Composable
-private fun SquareHighlight(
+private fun TargetHighlight(
     perspective: Side,
     squareSize: Dp,
+    target: Square,
 ) {
     val boardTheme = LocalBoardTheme.current
-    val targetSquare by LocalBoardInteraction.current.targets().collectAsState(Square.NONE)
-    val lastMove by LocalGameSession.current.moveUpdates().collectAsState(null)
     val squareSizePx = squareSize.toPx()
 
-    lastMove?.let { (moveBackup, _) ->
-        val moveFromOffset = moveBackup.move.from.topLeft(perspective, squareSizePx)
-        val moveToOffset = moveBackup.move.to.topLeft(perspective, squareSizePx)
-        Box(
-            modifier = Modifier
-                .size(squareSize)
-                .offset(moveFromOffset.x.toDp(), moveFromOffset.y.toDp())
-                .background(boardTheme.lastMoveHighlight)
-        )
-        Box(
-            modifier = Modifier
-                .size(squareSize)
-                .offset(moveToOffset.x.toDp(), moveToOffset.y.toDp())
-                .background(boardTheme.lastMoveHighlight)
-        )
-    }
-
-    if (targetSquare != Square.NONE) {
+    if (target != Square.NONE) {
         val offset by animateOffsetAsState(
-            targetValue = targetSquare
+            targetValue = target
                 .topLeft(perspective, squareSizePx)
                 .minus(Offset(squareSizePx / 2, squareSizePx / 2)),
             animationSpec = spring(stiffness = Spring.StiffnessHigh)
@@ -166,8 +137,7 @@ private fun Pieces(
     perspective: Side,
     squareSize: Float,
 ) {
-    val session = LocalGameSession.current
-    val game by session.sessionUpdates().collectAsState(null)
+    val game by LocalGameSession.current.sessionUpdates().collectAsState(null)
     var pieces by remember { mutableStateOf(emptyList<Piece>()) }
 
     ReusableContent(game?.id ?: "") {

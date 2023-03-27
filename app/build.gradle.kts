@@ -97,5 +97,8 @@ dependencies {
         // Test
         testImplementation("junit:junit:$junit")
         testImplementation("app.cash.turbine:turbine:$turbine")
+        androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose")
+        debugImplementation("androidx.compose.ui:ui-test-manifest:$compose")
     }
 }

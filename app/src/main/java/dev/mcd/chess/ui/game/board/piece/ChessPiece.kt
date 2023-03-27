@@ -19,10 +19,13 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
+import dev.mcd.chess.common.game.extension.relevantToSquare
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.drawableResource
@@ -30,8 +33,8 @@ import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
+import dev.mcd.chess.ui.game.board.piece.GetMoveOutputs
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.mapNotNull
 
 private const val PIECE_DRAG_SCALE = 1.7f
@@ -44,7 +47,6 @@ fun ChessPiece(
     initialSquare: Square,
 ) {
     var captured by remember { mutableStateOf(false) }
-    if (captured) return
 
     val gameManager = LocalGameSession.current
     val boardInteraction = LocalBoardInteraction.current
@@ -60,30 +62,14 @@ fun ChessPiece(
         gameManager
             .moveUpdates()
             .mapNotNull { gameManager.lastMove() }
-            .filter {(move, _) ->
-                square in listOf(
-                    move.move.from,
-                    move.move.to,
-                    move.rookCastleMove?.from,
-                    move.enPassantTarget
-                )
-            }
-            .collectLatest { (moveBackup, forward) ->
-                val move = moveBackup.move
-                if (move.from == square) {
-                    square = move.to
-                    squareOffset = move.to.topLeft(perspective, size)
-                    if (move.promotion != Piece.NONE) {
-                        piece = move.promotion
-                    }
-                } else if (piece == moveBackup.capturedPiece && square == moveBackup.capturedSquare) {
-                    captured = true
-                } else if (moveBackup.rookCastleMove?.from == square) {
-                    square = moveBackup.rookCastleMove.to
-                    squareOffset = square.topLeft(perspective, size)
-                } else if (moveBackup.enPassantTarget == square) {
-                    square = moveBackup.enPassantTarget
-                    squareOffset = square.topLeft(perspective, size)
+            .relevantToSquare(square)
+            .collectLatest { directionalMove ->
+                val output = GetMoveOutputs(perspective, size, directionalMove, piece, captured, square)
+                with(output) {
+                    square = newSquare
+                    piece = newPiece
+                    captured = newCaptured
+                    squareOffset = newSquareOffset
                 }
             }
     }
@@ -108,8 +94,13 @@ fun ChessPiece(
         animationSpec = spring(stiffness = Spring.StiffnessMedium)
     )
 
+    if (captured) {
+        return
+    }
+
     Image(
         modifier = Modifier
+            .semantics { contentDescription = square.toString() }
             .size(animatedSize)
             .zIndex(if (dragging || dropping) 1f else 0f)
             .graphicsLayer {

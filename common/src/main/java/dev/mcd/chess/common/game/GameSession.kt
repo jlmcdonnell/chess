@@ -1,6 +1,7 @@
 package dev.mcd.chess.common.game
 
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
@@ -8,6 +9,7 @@ import dev.mcd.chess.common.player.Player
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterNotNull
+import java.util.Stack
 
 open class GameSession(
     val id: String,
@@ -22,9 +24,11 @@ open class GameSession(
 
     val moveCount: Int get() = board.moveCounter
 
+    private val history = Stack<Move>()
+
     suspend fun setBoard(board: Board) {
         this.board = board
-        board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, forward = true)) }
+        board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, undo = false)) }
         pieceUpdates.emit(board.boardToArray().toList())
     }
 
@@ -32,13 +36,32 @@ open class GameSession(
         val moved = board.doMove(move)
         return if (moved) {
             val moveBackup = board.backup.last
-            moves.emit(DirectionalMove(moveBackup, forward = true))
+            moves.emit(DirectionalMove(moveBackup, undo = false))
             pieceUpdates.emit(board.boardToArray().toList())
             MoveResult.Moved
         } else {
             MoveResult.MoveIllegal
         }
     }
+
+    fun undo() {
+        if (board.backup.size > 0) {
+            val lastMove = board.backup.last()
+            history.push(board.undoMove())
+            moves.tryEmit(DirectionalMove(lastMove, undo = true))
+            pieceUpdates.tryEmit(board.boardToArray().toList())
+        }
+    }
+
+    fun redo() {
+        if (history.size > 0) {
+            board.doMove(history.pop())
+            moves.tryEmit(DirectionalMove(board.backup.last, undo = false))
+            pieceUpdates.tryEmit(board.boardToArray().toList())
+        }
+    }
+
+    fun isLive() = history.size == 0
 
     fun termination(): TerminationReason? {
         val mated = board.sideToMove.takeIf { board.isMated }
@@ -56,6 +79,8 @@ open class GameSession(
     fun moves(): Flow<DirectionalMove> = moves.filterNotNull()
 
     fun lastMove(): DirectionalMove? = moves.value
+
+    fun previousMove(): Move? = board.backup.lastOrNull()?.move
 
     fun legalMoves() = board.legalMoves().toList()
 

@@ -15,29 +15,18 @@ import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
-class BoardInteraction {
+class BoardInteraction(
+    private val session: GameSession,
+) {
 
-    var session: GameSession? = null
-
-    private val perspective = MutableStateFlow(Side.WHITE)
+    private val perspective = MutableStateFlow(session.selfSide)
     private val moves = MutableSharedFlow<Move>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
-    private val targetChanges = MutableStateFlow(Square.NONE)
+    private val target = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
     private var squareSize = 0f
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
-
-    var target: Square = Square.NONE
-        private set(value) {
-            field = value
-            targetChanges.value = field
-        }
-
-    var highlightMovesFrom: Square = Square.NONE
-        private set(value) {
-            field = value
-            highlightMoveChanges.value = field
-        }
+    private var enableInteraction = true
 
     fun updateSquareData(squarePositions: Map<Square, Offset>, squareSize: Float) {
         this.squarePositions = squarePositions
@@ -45,63 +34,77 @@ class BoardInteraction {
     }
 
     fun promote(move: Move) {
-        selectPromotion.value = emptyList()
-        moves.tryEmit(move)
-        releaseTarget()
+        if (enableInteraction) {
+            selectPromotion.value = emptyList()
+            moves.tryEmit(move)
+            releaseTarget()
+        }
     }
 
     fun selectPromotion(moves: List<Move>) {
-        selectPromotion.value = moves
+        if (enableInteraction) {
+            selectPromotion.value = moves
+        }
     }
 
     fun highlightMoves(from: Square) {
-        highlightMovesFrom = from
+        if (enableInteraction) {
+            highlightMoveChanges.value = from
+        }
     }
 
     fun disableHighlightMoves() {
-        highlightMovesFrom = Square.NONE
+        if (enableInteraction) {
+            highlightMoveChanges.value = Square.NONE
+        }
     }
 
     fun updateDragPosition(position: Offset) {
-        var closest: Pair<Square, Float>? = null
-        for ((sq, offset) in squarePositions) {
-            val (x1, y1) = offset
-            val (x2, y2) = position
-            val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
+        if (enableInteraction) {
+            var closest: Pair<Square, Float>? = null
+            for ((sq, offset) in squarePositions) {
+                val (x1, y1) = offset
+                val (x2, y2) = position
+                val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
 
-            if ((closest == null || distance < closest.second) && distance <= squareSize) {
-                closest = sq to distance
+                if ((closest == null || distance < closest.second) && distance <= squareSize) {
+                    closest = sq to distance
+                }
             }
+            val newTarget = closest?.first ?: Square.NONE
+            target.value = newTarget
         }
-        target = closest?.first ?: Square.NONE
     }
 
     fun dropPiece(piece: Piece, square: Square): DropPieceResult {
-        Timber.d("dropPiece $piece square=$square target=$target")
-        if (target == Square.NONE) return DropPieceResult.None
-        val session = session ?: return DropPieceResult.None
+        if (enableInteraction) {
+            Timber.d("dropPiece $piece square=$square target=$target")
+            if (target.value == Square.NONE) return DropPieceResult.None
 
-        var result: DropPieceResult = DropPieceResult.None
+            var result: DropPieceResult = DropPieceResult.None
 
-        if (session.selfSide == piece.pieceSide) {
-            val target = target
-            val move = Move(square, target)
-            val promotions = session.promotions(move)
+            if (session.selfSide == piece.pieceSide) {
+                val move = Move(square, target.value)
+                val promotions = session.promotions(move)
 
-            if (move in session.legalMoves()) {
-                moves.tryEmit(move)
-                Timber.d("dropPiece emit move")
-                result = DropPieceResult.Moved(target)
-            } else if (promotions.isNotEmpty()) {
-                selectPromotion(promotions)
-                result = DropPieceResult.Promoting
+                if (move in session.legalMoves()) {
+                    if (moves.tryEmit(move)) {
+                        Timber.d("dropPiece emit move: $this")
+                    }
+                    result = DropPieceResult.Moved(target.value)
+                } else if (promotions.isNotEmpty()) {
+                    selectPromotion(promotions)
+                    result = DropPieceResult.Promoting
+                }
             }
-        }
 
-        if (result != DropPieceResult.Promoting) {
-            releaseTarget()
+            if (result != DropPieceResult.Promoting) {
+                releaseTarget()
+            }
+            return result
+        } else {
+            return DropPieceResult.None
         }
-        return result
     }
 
     fun moves(): Flow<Move> {
@@ -109,7 +112,7 @@ class BoardInteraction {
     }
 
     fun targets(): Flow<Square> {
-        return targetChanges
+        return target
     }
 
     fun selectPromotion(): Flow<List<Move>> {
@@ -125,6 +128,15 @@ class BoardInteraction {
     fun highlightMovesFrom(): Flow<Square> = highlightMoveChanges
 
     private fun releaseTarget() {
-        target = Square.NONE
+        target.value = Square.NONE
+    }
+
+    fun enableInteraction(enableInteraction: Boolean) {
+        this.enableInteraction = enableInteraction
+        if (!enableInteraction) {
+            releaseTarget()
+            highlightMoveChanges.tryEmit(Square.NONE)
+            selectPromotion.tryEmit(emptyList())
+        }
     }
 }
