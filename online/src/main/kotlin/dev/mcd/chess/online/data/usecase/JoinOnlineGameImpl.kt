@@ -35,46 +35,50 @@ internal class JoinOnlineGameImpl @Inject constructor(
         val authToken = authStore.token() ?: throw Exception("No auth token")
 
         chessApi.joinGame(authToken, id) {
-            var session: GameSession
+            runCatching {
+                var session: GameSession? = null
 
-            incoming.consumeAsFlow()
-                .filterIsInstance<GameMessage.GameState>()
-                .first()
-                .let { message ->
-                    session = createClientSession(
-                        gameId = message.id,
-                        userId = userId,
-                        whitePlayer = message.whitePlayer,
-                        blackPlayer = message.blackPlayer,
-                        board = message.board,
-                        channel = this
-                    )
-                    send(NewSession(session))
-                }
-
-            for (message in incoming) {
-                when (message) {
-                    is GameMessage.GameState -> {
-                        val event = syncWithRemote(message.board, message.result, session)
-                        event?.let { send(event) }
+                for (message in incoming) {
+                    if (session == null && message is GameMessage.GameState) {
+                        session = createClientSession(
+                            gameId = message.id,
+                            userId = userId,
+                            whitePlayer = message.whitePlayer,
+                            blackPlayer = message.blackPlayer,
+                            board = message.board,
+                            channel = this
+                        )
+                        send(NewSession(session))
+                    } else if (session == null) {
+                        continue
                     }
+                    
+                    println("message: $message")
+                    when (message) {
+                        is GameMessage.GameState -> {
+                            val event = syncWithRemote(message.board, message.result, session)
+                            event?.let { send(event) }
+                        }
 
-                    is GameMessage.MoveMessage -> {
-                        val validateResult = ValidateMoveFromRemote(MoveString(message.move), message.count, session)
-                        if (validateResult == SyncRequiredApplyMove) {
-                            val moveResult = session.move(message.move)
-                            if (moveResult == MoveResult.MoveIllegal) {
-                                requestGameState()
+                        is GameMessage.MoveMessage -> {
+                            val validateResult = ValidateMoveFromRemote(MoveString(message.move), message.count, session)
+                            if (validateResult == SyncRequiredApplyMove) {
+                                val moveResult = session.move(message.move)
+                                if (moveResult == MoveResult.MoveIllegal) {
+                                    requestGameState()
+                                }
                             }
                         }
-                    }
 
-                    is GameMessage.ErrorNotUsersMove,
-                    is GameMessage.ErrorGameTerminated,
-                    is GameMessage.ErrorInvalidMove -> {
-                        send(JoinOnlineGame.Event.FatalError(message::class.simpleName!!))
+                        is GameMessage.ErrorNotUsersMove,
+                        is GameMessage.ErrorGameTerminated,
+                        is GameMessage.ErrorInvalidMove -> {
+                            send(JoinOnlineGame.Event.FatalError(message::class.simpleName!!))
+                        }
                     }
                 }
+            }.onFailure {
+                it.printStackTrace()
             }
         }
     }
