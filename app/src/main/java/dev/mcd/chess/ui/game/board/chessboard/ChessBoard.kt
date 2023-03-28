@@ -54,7 +54,6 @@ fun ChessBoard(
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
-    val target by boardInteraction.targets().collectAsState(Square.NONE)
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
 
     viewModel.collectAsState()
@@ -75,7 +74,7 @@ fun ChessBoard(
         ReusableContent(gameId) {
             Squares(perspective, squareSize)
             MoveHighlight(perspective, squareSizeDp)
-            TargetHighlight(perspective, squareSizeDp, target)
+            TargetHighlight(perspective, squareSizeDp)
             LegalMoves(perspective, squareSize)
             Pieces(perspective, squareSize)
             PromotionSelector(modifier = Modifier.align(Alignment.Center))
@@ -87,10 +86,10 @@ fun ChessBoard(
 private fun TargetHighlight(
     perspective: Side,
     squareSize: Dp,
-    target: Square,
 ) {
     val boardTheme = LocalBoardTheme.current
     val squareSizePx = squareSize.toPx()
+    val target by LocalBoardInteraction.current.targets().collectAsState(Square.NONE)
 
     if (target != Square.NONE) {
         val offset by animateOffsetAsState(
