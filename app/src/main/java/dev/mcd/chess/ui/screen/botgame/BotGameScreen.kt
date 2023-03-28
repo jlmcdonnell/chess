@@ -12,7 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.ui.game.ActiveGameView
+import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.AnnounceTermination
@@ -62,7 +62,7 @@ fun BotGameScreen(
             }
 
             when (val s = state) {
-                is Game -> ActiveGameView(
+                is Game -> GameView(
                     game = s.game,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,

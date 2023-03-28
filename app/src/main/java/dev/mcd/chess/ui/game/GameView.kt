@@ -10,10 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +24,7 @@ import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
 @Composable
-fun ActiveGameView(
+fun GameView(
     game: GameSession,
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
@@ -56,7 +53,7 @@ fun ActiveGameView(
     Spacer(Modifier.height(4.dp))
 
     CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
-        ReusableContent(boardInteraction) {
+        ReusableContent(game.id) {
             ChessBoard(
                 modifier = Modifier
                     .fillMaxWidth()

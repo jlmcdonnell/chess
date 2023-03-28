@@ -39,6 +39,9 @@ object UpdateChessPieceState {
                 newState.moves.pop()
             }
         } else {
+            if (!state.moves.empty() && state.moves.peek() == move) {
+                return state
+            }
             if (!state.captured) {
                 if (move.from == state.square) {
                     newState.square = move.to

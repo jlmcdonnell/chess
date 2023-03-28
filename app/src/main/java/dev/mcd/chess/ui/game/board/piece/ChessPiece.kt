@@ -29,6 +29,7 @@ import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
+import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.extension.relevantToSquare
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
@@ -47,6 +48,7 @@ private const val PIECE_DRAG_SCALE = 1.7f
 data class PieceSquare(val square: Square, val piece: Piece)
 
 val PieceSquareKey = SemanticsPropertyKey<PieceSquare>("PieceSquareKey")
+
 var SemanticsPropertyReceiver.pieceSquare by PieceSquareKey
 
 @Composable
@@ -132,8 +134,10 @@ fun ChessPiece(
 
                             val dropResult = boardInteraction.dropPiece(state.piece, state.square)
                             if (dropResult is DropPieceResult.Moved) {
-                                state.square = dropResult.to
-                                state.squareOffset = state.square.topLeft(perspective, size)
+                                state = state.copy(
+                                    square = dropResult.to,
+                                    squareOffset = dropResult.to.topLeft(perspective, size),
+                                )
                             }
 
                             boardInteraction.disableHighlightMoves()

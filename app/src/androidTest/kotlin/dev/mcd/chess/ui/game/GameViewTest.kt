@@ -1,44 +1,29 @@
-package dev.mcd.chess.ui.game.board
+package dev.mcd.chess.ui.game
 
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
+import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
+import androidx.compose.ui.test.performClick
+import androidx.compose.ui.test.performTouchInput
 import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.Piece.BLACK_BISHOP
-import com.github.bhlangonijr.chesslib.Piece.BLACK_PAWN
-import com.github.bhlangonijr.chesslib.Piece.BLACK_ROOK
-import com.github.bhlangonijr.chesslib.Piece.WHITE_PAWN
-import com.github.bhlangonijr.chesslib.Piece.WHITE_QUEEN
+import com.github.bhlangonijr.chesslib.Piece.*
+import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.Square.B7
-import com.github.bhlangonijr.chesslib.Square.D1
-import com.github.bhlangonijr.chesslib.Square.D5
-import com.github.bhlangonijr.chesslib.Square.D7
-import com.github.bhlangonijr.chesslib.Square.E2
-import com.github.bhlangonijr.chesslib.Square.E4
-import com.github.bhlangonijr.chesslib.Square.E5
-import com.github.bhlangonijr.chesslib.Square.E7
-import com.github.bhlangonijr.chesslib.Square.F8
-import com.github.bhlangonijr.chesslib.Square.G7
-import com.github.bhlangonijr.chesslib.Square.H5
-import com.github.bhlangonijr.chesslib.Square.H8
-import dev.mcd.chess.TestBoardSounds
-import dev.mcd.chess.TestGameSessionRepository
+import com.github.bhlangonijr.chesslib.Square.*
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
-import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
-import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
-import dev.mcd.chess.ui.game.board.chessboard.ChessBoardViewModel
-import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
+import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.piece.PieceSquare
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.theme.ChessTheme
@@ -47,7 +32,7 @@ import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
-class ChessBoardTest {
+class GameViewTest {
 
     @get:Rule
     val composeRule = createComposeRule()
@@ -111,10 +96,23 @@ class ChessBoardTest {
     }
 
     @Test
-    fun undoMove(): Unit = runBlocking {
+    fun testUndoMove(): Unit = runBlocking {
         with(composeRule) {
             move("e2e4")
 
+            assertPiece(WHITE_PAWN on E4)
+
+            undoMove()
+
+            assertPiece(WHITE_PAWN on E2)
+            assertNoPiece(WHITE_PAWN on E4)
+        }
+    }
+
+    @Test
+    fun undoMoveAfterUserInput(): Unit = runBlocking {
+        with(composeRule) {
+            dragMove(WHITE_PAWN, E2, E4)
             assertPiece(WHITE_PAWN on E4)
 
             undoMove()
@@ -143,15 +141,16 @@ class ChessBoardTest {
     @Test
     fun undoMoveAfterSeveralCaptures(): Unit = runBlocking {
         with(composeRule) {
-            move("e2e4")
+            dragMove(WHITE_PAWN, "e2e4")
             move("e7e5")
-            move("d1h5")
+            dragMove(WHITE_QUEEN, "d1h5")
             move("g7g6")
-            move("h5e5")
+            dragMove(WHITE_QUEEN, "h5e5")
             move("f8e7")
-            move("e5h8")
+            dragMove(WHITE_QUEEN, "e5h8")
 
             undoMove()
+
             assertPiece(
                 BLACK_ROOK on H8,
                 WHITE_QUEEN on E5
@@ -190,16 +189,11 @@ class ChessBoardTest {
         // Context: This would fail before ChessPieceState cached the moves for a piece.
 
         with(composeRule) {
-            val moves =
-                listOf("e2e4", "e7e6", "b1c3", "b8c6", "f1b5", "a7a6", "b5c6", "b7c6", "d1h5", "d7d5", "e4d5", "c6d5", "c3d5", "d8d5", "h5d5", "e6d5")
+            val moves = "e2e4 e7e6 b1c3 b8c6 f1b5 a7a6 b5c6 b7c6 d1h5 d7d5 e4d5 c6d5 c3d5 d8d5 h5d5 e6d5".split(" ")
 
-            moves.forEach {
-                move(it)
-            }
+            moves.forEach { move(it) }
 
-            repeat(moves.size) {
-                undoMove()
-            }
+            repeat(moves.size) { undoMove() }
 
             assertPiece(
                 BLACK_PAWN on B7,
@@ -210,12 +204,30 @@ class ChessBoardTest {
 
     private suspend fun ComposeTestRule.move(move: String) {
         gameRule.game.move(move)
-        mainClock.advanceTimeBy(1000)
+        mainClock.advanceTimeBy(200)
+    }
+
+    private fun ComposeTestRule.dragMove(piece: Piece, move: String) {
+        dragMove(
+            piece,
+            Square.valueOf(move.substring(0, 2).uppercase()),
+            Square.valueOf(move.substring(2, 4).uppercase())
+        )
+    }
+
+    private fun ComposeTestRule.dragMove(piece: Piece, from: Square, to: Square) {
+        onNode(SemanticsMatcher.expectValue(PieceSquareKey, piece on from))
+            .performTouchInput {
+                down(from.position())
+                moveTo(to.position())
+                up()
+            }
+        mainClock.advanceTimeBy(500)
     }
 
     private fun ComposeTestRule.undoMove() {
-        gameRule.game.undo()
-        mainClock.advanceTimeBy(1000)
+        onNode(hasContentDescription("Undo move")).performClick()
+        mainClock.advanceTimeBy(500)
     }
 
     private fun ComposeTestRule.assertPiece(vararg pieceSquare: PieceSquare) {
@@ -232,6 +244,19 @@ class ChessBoardTest {
 
     private infix fun Piece.on(square: Square): PieceSquare = PieceSquare(square, this)
 
+    private fun squareSize(): Float {
+        return composeRule.onNodeWithContentDescription("Board")
+            .fetchSemanticsNode()
+            .layoutInfo
+            .width / 8f
+    }
+
+    private fun Square.position(): Offset {
+        val squareSize = squareSize()
+        val (x, y) = topLeft(Side.WHITE, squareSize)
+        return Offset(x + squareSize / 2, y + squareSize / 2)
+    }
+
     @Suppress("TestFunctionName")
     @Composable
     private fun TestChessBoard(game: GameSession) {
@@ -242,19 +267,16 @@ class ChessBoardTest {
         }
 
         ChessTheme {
-            Surface {
-                Box(Modifier.fillMaxSize()) {
-                    val boardViewModel =
-                        ChessBoardViewModel(TestBoardSounds(), TestGameSessionRepository())
-                    val boardInteraction = BoardInteraction(game)
-
-                    CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
-                        ChessBoard(
-                            gameId = game.id,
-                            viewModel = boardViewModel,
-                            modifier = Modifier.fillMaxSize(),
-                        )
-                    }
+            Surface(Modifier.fillMaxSize()) {
+                Column(Modifier.fillMaxSize()) {
+                    GameView(
+                        game = game,
+                        onMove = {
+                            runBlocking { game.move(it.toString()) }
+                        },
+                        onResign = {},
+                        terminated = false,
+                    )
                 }
             }
         }

@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.ui.game.ActiveGameView
+import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
@@ -78,7 +78,7 @@ fun OnlineGameScreen(
             }
 
             when (val s = state) {
-                is InGame -> ActiveGameView(
+                is InGame -> GameView(
                     game = s.session,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,

@@ -6,6 +6,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -24,9 +25,10 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
@@ -42,21 +44,17 @@ import dev.mcd.chess.ui.game.board.LegalMoves
 import dev.mcd.chess.ui.game.board.PromotionSelector
 import dev.mcd.chess.ui.game.board.piece.ChessPiece
 import dev.mcd.chess.ui.game.board.piece.ChessPieceState
-import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
 fun ChessBoard(
     gameId: GameId,
     modifier: Modifier = Modifier,
-    viewModel: ChessBoardViewModel = hiltViewModel(),
 ) {
     var squareSizeDp by remember { mutableStateOf(0.dp) }
     var squareSize by remember { mutableStateOf(0f) }
     val density = LocalDensity.current
     val boardInteraction = LocalBoardInteraction.current
     val perspective by boardInteraction.perspective().collectAsState(Side.WHITE)
-
-    viewModel.collectAsState()
 
     LaunchedEffect(perspective, squareSize) {
         val squarePositions = Square.values().associateWith { square -> square.center(perspective, squareSize) }
@@ -117,7 +115,7 @@ private fun Squares(
     val darkSquareColor = LocalBoardTheme.current.squareDark
     val lightSquareColor = LocalBoardTheme.current.squareLight
 
-    Canvas(Modifier) {
+    Canvas(Modifier.fillMaxSize().semantics { contentDescription = "Board" }) {
         for (square in Square.values()) {
             if (square != Square.NONE) {
                 val color = if (square.isLightSquare) lightSquareColor else darkSquareColor

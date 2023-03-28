@@ -91,7 +91,7 @@ class BoardInteraction(
                     if (moves.tryEmit(move)) {
                         Timber.d("dropPiece emit move: $this")
                     }
-                    result = DropPieceResult.Moved(target.value)
+                    result = DropPieceResult.Moved(square, target.value)
                 } else if (promotions.isNotEmpty()) {
                     selectPromotion(promotions)
                     result = DropPieceResult.Promoting
