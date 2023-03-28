@@ -28,7 +28,7 @@ import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import dev.mcd.chess.common.game.extension.relevantToSquare
+import dev.mcd.chess.common.game.extension.relevantToMove
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.drawableResource
@@ -37,7 +37,7 @@ import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.mapNotNull
+import kotlinx.coroutines.flow.filter
 
 private const val PIECE_DRAG_SCALE = 1.7f
 
@@ -62,11 +62,9 @@ fun ChessPiece(
     var dragging by remember { mutableStateOf(false) }
     var state by remember { mutableStateOf(initialState) }
 
-    LaunchedEffect(state.square) {
-        gameManager
-            .moveUpdates()
-            .mapNotNull { gameManager.lastMove() }
-            .relevantToSquare(state.square)
+    LaunchedEffect(Unit) {
+        gameManager.moveUpdates()
+            .filter { (move, _) -> state.square.relevantToMove(move) }
             .collectLatest { directionalMove ->
                 state = UpdateChessPieceState(perspective, size, directionalMove, state)
                 pan = Offset.Zero

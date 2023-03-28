@@ -59,12 +59,12 @@ class GameViewTest {
             assertPiece(WHITE_PAWN on E2)
             assertPiece(BLACK_PAWN on E7)
 
-            listOf("e2e4", "e7e5").forEach { move ->
-                move(move)
-            }
+            move("e2e4")
+            move("e7e5")
 
             assertPiece(WHITE_PAWN on E4)
             assertPiece(BLACK_PAWN on E5)
+
             assertNoPiece(WHITE_PAWN on E2)
             assertNoPiece(BLACK_PAWN on E7)
         }
