@@ -1,6 +1,5 @@
 package dev.mcd.chess.ui.game.board.chessboard
 
-import ChessPiece
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.spring
@@ -15,7 +14,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -42,6 +40,8 @@ import dev.mcd.chess.ui.extension.toPx
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.LegalMoves
 import dev.mcd.chess.ui.game.board.PromotionSelector
+import dev.mcd.chess.ui.game.board.piece.ChessPiece
+import dev.mcd.chess.ui.game.board.piece.ChessPieceState
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -96,9 +96,9 @@ private fun TargetHighlight(
             targetValue = target
                 .topLeft(perspective, squareSizePx)
                 .minus(Offset(squareSizePx / 2, squareSizePx / 2)),
-            animationSpec = spring(stiffness = Spring.StiffnessHigh)
+            animationSpec = spring(stiffness = Spring.StiffnessHigh),
+            label = "Target Highlight",
         )
-
         Box(
             modifier = Modifier
                 .offset(offset.x.toDp(), offset.y.toDp())
@@ -137,20 +137,22 @@ private fun Pieces(
     squareSize: Float,
 ) {
     val game by LocalGameSession.current.sessionUpdates().collectAsState(null)
-    var pieces by remember { mutableStateOf(emptyList<Piece>()) }
-
-    ReusableContent(game?.id ?: "") {
-        pieces = game?.pieceUpdates()?.value ?: return
-
-        pieces.forEachIndexed { index, piece ->
-            if (piece != Piece.NONE) {
-                ChessPiece(
-                    initialSquare = Square.squareAt(index),
-                    initialPiece = piece,
-                    perspective = perspective,
-                    size = squareSize,
-                )
-            }
+    val pieces = remember(game?.id) {
+        game?.pieceUpdates()?.value ?: emptyList()
+    }
+    pieces.forEachIndexed { index, piece ->
+        if (piece != Piece.NONE) {
+            val initialSquare = Square.squareAt(index)
+            ChessPiece(
+                perspective = perspective,
+                size = squareSize,
+                initialState = ChessPieceState(
+                    square = initialSquare,
+                    squareOffset = initialSquare.topLeft(perspective, squareSize),
+                    piece = piece,
+                    captured = false,
+                ),
+            )
         }
     }
 }

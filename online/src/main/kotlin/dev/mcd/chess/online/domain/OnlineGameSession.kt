@@ -7,7 +7,7 @@ import dev.mcd.chess.common.player.Player
 open class OnlineGameSession(
     id: String,
     self: Player,
-    selfSide: Side,
     opponent: Player,
+    selfSide: Side,
     val channel: OnlineGameChannel,
-) : GameSession(id, self, selfSide, opponent)
+) : GameSession(id, self, opponent, selfSide)

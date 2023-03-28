@@ -24,6 +24,7 @@ android {
             useSupportLibrary = true
         }
     }
+
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
@@ -36,20 +37,18 @@ android {
             signingConfig = signingConfigs.getByName("debug")
         }
     }
+
     kotlin {
         jvmToolchain(BuildSettings.jdkVersion)
     }
+
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeCompiler
-    }
-    packagingOptions {
-        resources {
-            excludes += "/META-INF/**"
-        }
     }
 }
 

@@ -1,10 +1,10 @@
 package dev.mcd.chess.common.game
 
 import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.Player
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -12,10 +12,10 @@ import kotlinx.coroutines.flow.filterNotNull
 import java.util.Stack
 
 open class GameSession(
-    val id: String,
-    val self: Player,
-    val selfSide: Side,
-    val opponent: Player,
+    val id: String = "",
+    val self: Player = HumanPlayer(),
+    val opponent: Player = HumanPlayer(),
+    val selfSide: Side = Side.WHITE,
 ) {
     private lateinit var board: Board
 

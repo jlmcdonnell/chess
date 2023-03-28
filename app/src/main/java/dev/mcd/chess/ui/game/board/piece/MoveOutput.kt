@@ -1,79 +1,65 @@
 package dev.mcd.chess.ui.game.board.piece
 
-import androidx.compose.ui.geometry.Offset
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.ui.extension.topLeft
 
-data class MoveOutput(
-    val newPiece: Piece,
-    val newCaptured: Boolean,
-    val newSquare: Square,
-    val newSquareOffset: Offset,
-)
-
-object GetMoveOutputs {
+object UpdateChessPieceState {
     operator fun invoke(
         perspective: Side,
         size: Float,
         directionalMove: DirectionalMove,
-        piece: Piece,
-        captured: Boolean,
-        square: Square,
-    ): MoveOutput {
+        state: ChessPieceState,
+    ): ChessPieceState {
         val (moveBackup, undo) = directionalMove
         val move = moveBackup.move
-        var newPiece = piece
-        var newSquare = square
-        var newCaptured = captured
-        var newSquareOffset = square.topLeft(perspective, size)
-
+        val newState = state.copy()
 
         if (undo) {
-            if (move.to == square) {
-                if (move.promotion != Piece.NONE && piece == move.promotion) {
-                    newPiece = moveBackup.movingPiece
-                }
-                if (moveBackup.capturedPiece == piece) {
-                    newCaptured = false
-                } else if (moveBackup.movingPiece == piece) {
-                    newSquare = move.from
-                    newSquareOffset = square.topLeft(perspective, size)
-                }
-            } else if (moveBackup.rookCastleMove?.to == square) {
-                newSquare = moveBackup.rookCastleMove.from
-                newSquareOffset = square.topLeft(perspective, size)
-            } else if (moveBackup.enPassantTarget == square) {
-                newCaptured = false
+            if (state.moves.empty() || state.moves.peek() != move) {
+                return state
             }
 
-        } else {
-            if (!captured) {
-                if (move.from == square) {
-                    newSquare = move.to
-                    newSquareOffset = move.to.topLeft(perspective, size)
-                    if (move.promotion != Piece.NONE) {
-                        newPiece = move.promotion
-                    }
-                } else if (piece == moveBackup.capturedPiece && square == moveBackup.capturedSquare) {
-                    newCaptured = true
-                } else if (moveBackup.rookCastleMove?.from == square) {
-                    newSquare = moveBackup.rookCastleMove.to
-                    newSquareOffset = square.topLeft(perspective, size)
-                } else if (moveBackup.enPassantTarget == square) {
-                    newSquare = moveBackup.enPassantTarget
-                    newSquareOffset = square.topLeft(perspective, size)
+            if (move.to == state.square) {
+                if (move.promotion != Piece.NONE && state.piece == move.promotion) {
+                    newState.piece = moveBackup.movingPiece
                 }
+                if (moveBackup.capturedPiece == state.piece) {
+                    newState.captured = false
+                } else if (moveBackup.movingPiece == state.piece) {
+                    newState.square = move.from
+                }
+            } else if (moveBackup.rookCastleMove?.to == state.square) {
+                newState.square = moveBackup.rookCastleMove.from
+            } else if (moveBackup.enPassantTarget == state.square) {
+                newState.captured = false
+            }
+            if (newState != state) {
+                newState.moves.pop()
+            }
+        } else {
+            if (!state.captured) {
+                if (move.from == state.square) {
+                    newState.square = move.to
+                    if (move.promotion != Piece.NONE) {
+                        newState.piece = move.promotion
+                    }
+                } else if (state.piece == moveBackup.capturedPiece && state.square == moveBackup.capturedSquare) {
+                    newState.captured = true
+                } else if (moveBackup.rookCastleMove?.from == state.square) {
+                    newState.square = moveBackup.rookCastleMove.to
+                } else if (moveBackup.enPassantTarget == state.square) {
+                    newState.square = moveBackup.enPassantTarget
+                }
+            }
+            if (newState != state) {
+                newState.moves.push(moveBackup.move)
             }
         }
 
-        return MoveOutput(
-            newPiece = newPiece,
-            newCaptured = newCaptured,
-            newSquare = newSquare,
-            newSquareOffset = newSquareOffset,
-        )
+        newState.squareOffset = newState.square.topLeft(perspective, size)
+
+        return newState
     }
 }

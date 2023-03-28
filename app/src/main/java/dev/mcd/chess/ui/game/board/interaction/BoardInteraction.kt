@@ -16,7 +16,7 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class BoardInteraction(
-    private val session: GameSession,
+    private val session: GameSession = GameSession(),
 ) {
 
     private val perspective = MutableStateFlow(session.selfSide)
