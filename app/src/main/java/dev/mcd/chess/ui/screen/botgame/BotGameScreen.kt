@@ -12,8 +12,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.GameTermination
+import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.AnnounceTermination
 import dev.mcd.chess.ui.screen.botgame.BotGameViewModel.SideEffect.ConfirmResignation

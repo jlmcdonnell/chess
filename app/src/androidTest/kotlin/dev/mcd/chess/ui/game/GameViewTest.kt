@@ -20,6 +20,7 @@ import com.github.bhlangonijr.chesslib.Piece.*
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.Square.*
+import dalvik.annotation.TestTarget
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
@@ -202,6 +203,11 @@ class GameViewTest {
         }
     }
 
+    @Test
+    fun undoAfterPromotion() {
+        TODO("Not implemented")
+    }
+
     private suspend fun ComposeTestRule.move(move: String) {
         gameRule.game.move(move)
         mainClock.advanceTimeBy(200)
@@ -276,6 +282,7 @@ class GameViewTest {
                         },
                         onResign = {},
                         terminated = false,
+                        sounds = {},
                     )
                 }
             }

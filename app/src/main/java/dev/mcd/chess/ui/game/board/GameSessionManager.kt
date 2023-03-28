@@ -4,7 +4,6 @@ package dev.mcd.chess.ui.game.board
 
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.move.Move
-import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.common.game.GameSession
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -27,9 +26,6 @@ class GameSessionManager {
 
     fun sessionUpdates(): Flow<GameSession> = sessionUpdates.filterNotNull()
 
-    fun pieceUpdates() = sessionUpdates.filterNotNull()
-        .flatMapLatest { it.pieceUpdates() }
-
     fun moveUpdates() = sessionUpdates
         .filterNotNull()
         .flatMapLatest { it.moves() }
@@ -49,11 +45,11 @@ class GameSessionManager {
         }
     }.distinctUntilChanged()
 
+    fun pieces(): List<Piece> = sessionUpdates.value?.pieces() ?: emptyList()
+
     fun legalMoves(): List<Move> {
         return sessionUpdates.value?.legalMoves() ?: emptyList()
     }
-
-    fun lastMove(): DirectionalMove? = sessionUpdates.value?.lastMove()
 
     fun previousMove(): Move? = sessionUpdates.value?.previousMove()
 }

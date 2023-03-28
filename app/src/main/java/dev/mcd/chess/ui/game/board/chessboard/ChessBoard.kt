@@ -115,7 +115,10 @@ private fun Squares(
     val darkSquareColor = LocalBoardTheme.current.squareDark
     val lightSquareColor = LocalBoardTheme.current.squareLight
 
-    Canvas(Modifier.fillMaxSize().semantics { contentDescription = "Board" }) {
+    Canvas(
+        Modifier
+            .fillMaxSize()
+            .semantics { contentDescription = "Board" }) {
         for (square in Square.values()) {
             if (square != Square.NONE) {
                 val color = if (square.isLightSquare) lightSquareColor else darkSquareColor
@@ -135,9 +138,8 @@ private fun Pieces(
     squareSize: Float,
 ) {
     val game by LocalGameSession.current.sessionUpdates().collectAsState(null)
-    val pieces = remember(game?.id) {
-        game?.pieceUpdates()?.value ?: emptyList()
-    }
+    val pieces = remember(game?.id) { game?.pieces() ?: emptyList() }
+
     pieces.forEachIndexed { index, piece ->
         if (piece != Piece.NONE) {
             val initialSquare = Square.squareAt(index)

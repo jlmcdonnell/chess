@@ -25,8 +25,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.GameTermination
+import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.ConfirmResignation

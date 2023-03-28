@@ -20,6 +20,7 @@ import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
+import dev.mcd.chess.ui.game.board.sounds.BoardSounds
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -29,6 +30,7 @@ fun GameView(
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
     terminated: Boolean,
+    sounds: @Composable (() -> Unit) = { BoardSounds() },
 ) {
     val sessionManager = LocalGameSession.current
     val boardInteraction = remember(game.id) { BoardInteraction(game) }
@@ -40,6 +42,9 @@ fun GameView(
             onMove(it)
         }
     }
+
+    sounds()
+
     PlayerStrip(
         modifier = Modifier
             .padding(horizontal = 12.dp)

@@ -19,7 +19,6 @@ open class GameSession(
 ) {
     private lateinit var board: Board
 
-    private val pieceUpdates = MutableStateFlow<List<Piece>>(emptyList())
     private val moves = MutableStateFlow<DirectionalMove?>(null)
 
     val moveCount: Int get() = board.moveCounter
@@ -29,7 +28,6 @@ open class GameSession(
     suspend fun setBoard(board: Board) {
         this.board = board
         board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, undo = false)) }
-        pieceUpdates.emit(board.boardToArray().toList())
     }
 
     open suspend fun move(move: String): MoveResult {
@@ -37,7 +35,6 @@ open class GameSession(
         return if (moved) {
             val moveBackup = board.backup.last
             moves.emit(DirectionalMove(moveBackup, undo = false))
-            pieceUpdates.emit(board.boardToArray().toList())
             MoveResult.Moved
         } else {
             MoveResult.MoveIllegal
@@ -49,7 +46,6 @@ open class GameSession(
             val lastMove = board.backup.last()
             history.push(board.undoMove())
             moves.tryEmit(DirectionalMove(lastMove, undo = true))
-            pieceUpdates.tryEmit(board.boardToArray().toList())
         }
     }
 
@@ -57,8 +53,11 @@ open class GameSession(
         if (history.size > 0) {
             board.doMove(history.pop())
             moves.tryEmit(DirectionalMove(board.backup.last, undo = false))
-            pieceUpdates.tryEmit(board.boardToArray().toList())
         }
+    }
+
+    fun pieces(): List<Piece> {
+        return board.boardToArray().toList()
     }
 
     fun isLive() = history.size == 0
@@ -93,6 +92,4 @@ open class GameSession(
         .filter { it != Piece.NONE }
 
     fun fen() = board.fen!!
-
-    fun pieceUpdates() = pieceUpdates
 }
