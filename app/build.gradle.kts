@@ -71,11 +71,16 @@ dependencies {
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtx")
 
         // Compose
-        implementation("androidx.compose.ui:ui:$compose")
-        implementation("androidx.compose.foundation:foundation:$compose")
-        implementation("androidx.compose.material:material:$compose")
-        implementation("androidx.compose.material:material-icons-extended:$compose")
-        debugImplementation("androidx.compose.ui:ui-tooling:$compose")
+        implementation(platform("androidx.compose:compose-bom:$compose"))
+        androidTestImplementation(platform("androidx.compose:compose-bom:$compose"))
+        implementation("androidx.compose.ui:ui")
+        implementation("androidx.compose.foundation:foundation")
+        implementation("androidx.compose.material:material")
+        implementation("androidx.compose.material:material-icons-extended")
+        debugImplementation("androidx.compose.ui:ui-tooling")
+        debugImplementation("androidx.compose.ui:ui-tooling-preview")
+        androidTestImplementation("androidx.compose.ui:ui-test-junit4")
+        debugImplementation("androidx.compose.ui:ui-test-manifest")
 
         // Orbit
         implementation("org.orbit-mvi:orbit-core:$orbit")
@@ -98,7 +103,5 @@ dependencies {
         testImplementation("junit:junit:$junit")
         testImplementation("app.cash.turbine:turbine:$turbine")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4:$compose")
-        debugImplementation("androidx.compose.ui:ui-test-manifest:$compose")
     }
 }
