@@ -16,7 +16,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
@@ -29,14 +28,12 @@ import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.extension.relevantToSquare
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
-import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
@@ -72,6 +69,8 @@ fun ChessPiece(
             .relevantToSquare(state.square)
             .collectLatest { directionalMove ->
                 state = UpdateChessPieceState(perspective, size, directionalMove, state)
+                pan = Offset.Zero
+                currentSize = size
             }
     }
 
@@ -91,26 +90,25 @@ fun ChessPiece(
         }
     }
 
-    val dropping = animatedSize != currentSize.toDp()
     val animatedPan by animateOffsetAsState(
         targetValue = position,
         animationSpec = spring(stiffness = Spring.StiffnessMedium),
         label = "Piece Move"
     )
 
+    val moving = animatedSize != currentSize.toDp() || animatedPan != position || dragging
+
     if (state.captured) {
         return
     }
-
 
     Image(
         modifier = Modifier
             .semantics {
                 pieceSquare = PieceSquare(state.square, state.piece)
             }
-            .alpha(if (state.captured) 0.2f else 1f)
             .size(animatedSize)
-            .zIndex(if (dragging || dropping) 1f else 0f)
+            .zIndex(if (moving) 1f else 0f)
             .offset(x = animatedPan.x.toDp(), y = animatedPan.y.toDp())
             .pointerInput(Unit) {
                 coroutineScope {
@@ -132,17 +130,11 @@ fun ChessPiece(
                                 boardInteraction.updateDragPosition(dragPosition)
                             } while (event.changes.none { it.changedToUp() })
 
-                            val dropResult = boardInteraction.dropPiece(state.piece, state.square)
-                            if (dropResult is DropPieceResult.Moved) {
-                                state = state.copy(
-                                    square = dropResult.to,
-                                    squareOffset = dropResult.to.topLeft(perspective, size),
-                                )
+                            if (boardInteraction.dropPiece(state.piece, state.square) == DropPieceResult.None) {
+                                pan = Offset.Zero
+                                currentSize = size
+                                boardInteraction.clearHighlightMoves()
                             }
-
-                            boardInteraction.disableHighlightMoves()
-                            pan = Offset.Zero
-                            currentSize = size
                             dragging = false
                         }
                     }

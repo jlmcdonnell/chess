@@ -3,7 +3,7 @@ package dev.mcd.chess.engine.stockfish.data
 internal interface StockfishJni {
     fun init()
     fun main()
-    fun readLine(): String
+    fun readLine(): String?
     fun writeLine(cmd: String)
 }
 

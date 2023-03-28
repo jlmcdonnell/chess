@@ -6,7 +6,6 @@ import dev.mcd.chess.common.engine.EngineCommand
 import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.awaitCancellation
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.takeWhile
@@ -41,7 +40,7 @@ internal class StockfishEngine(
 
             launch(engineContext) {
                 while (isActive) {
-                    val output = bridge.readLine()
+                    val output = bridge.readLine() ?: continue
                     if (output.startsWith(INIT_TOKEN)) {
                         moveToState(State.Ready)
                     } else if (output.startsWith(BEST_MOVE_TOKEN)) {

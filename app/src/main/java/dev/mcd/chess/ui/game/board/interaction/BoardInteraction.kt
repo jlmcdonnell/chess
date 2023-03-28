@@ -53,7 +53,7 @@ class BoardInteraction(
         }
     }
 
-    fun disableHighlightMoves() {
+    fun clearHighlightMoves() {
         if (enableInteraction) {
             highlightMoveChanges.value = Square.NONE
         }
@@ -92,6 +92,7 @@ class BoardInteraction(
                         Timber.d("dropPiece emit move: $this")
                     }
                     result = DropPieceResult.Moved(square, target.value)
+                    clearHighlightMoves()
                 } else if (promotions.isNotEmpty()) {
                     selectPromotion(promotions)
                     result = DropPieceResult.Promoting
