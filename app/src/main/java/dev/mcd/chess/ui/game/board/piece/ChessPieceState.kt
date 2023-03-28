@@ -13,4 +13,3 @@ data class ChessPieceState(
     var captured: Boolean,
     val moves: Stack<Move> = Stack(),
 )
-

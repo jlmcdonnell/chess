@@ -21,13 +21,9 @@ import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.semantics.SemanticsPropertyKey
-import androidx.compose.ui.semantics.SemanticsPropertyReceiver
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
-import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
-import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.common.game.extension.relevantToMove
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
@@ -38,15 +34,6 @@ import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-
-private const val PIECE_DRAG_SCALE = 1.7f
-
-
-data class PieceSquare(val square: Square, val piece: Piece)
-
-val PieceSquareKey = SemanticsPropertyKey<PieceSquare>("PieceSquareKey")
-
-var SemanticsPropertyReceiver.pieceSquare by PieceSquareKey
 
 @Composable
 fun ChessPiece(
@@ -103,7 +90,7 @@ fun ChessPiece(
     Image(
         modifier = Modifier
             .semantics {
-                pieceSquare = PieceSquare(state.square, state.piece)
+                pieceSquare = SquarePieceTag(state.square, state.piece)
             }
             .size(animatedSize)
             .zIndex(if (moving) 1f else 0f)
@@ -115,7 +102,7 @@ fun ChessPiece(
                             awaitFirstDown()
                             boardInteraction.highlightMoves(state.square)
                             dragging = true
-                            currentSize = size * PIECE_DRAG_SCALE
+                            currentSize = size * 1.7f
 
                             var event: PointerEvent
                             do {

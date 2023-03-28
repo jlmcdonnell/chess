@@ -24,7 +24,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.topLeft
-import dev.mcd.chess.ui.game.board.piece.PieceSquare
+import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.theme.ChessTheme
 import kotlinx.coroutines.runBlocking
@@ -230,19 +230,19 @@ class GameViewTest {
         mainClock.advanceTimeBy(500)
     }
 
-    private fun ComposeTestRule.assertPiece(vararg pieceSquare: PieceSquare) {
+    private fun ComposeTestRule.assertPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.forEach {
             onNode(SemanticsMatcher.expectValue(PieceSquareKey, it)).assertExists()
         }
     }
 
-    private fun ComposeTestRule.assertNoPiece(vararg pieceSquare: PieceSquare) {
+    private fun ComposeTestRule.assertNoPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.forEach {
             onNode(SemanticsMatcher.expectValue(PieceSquareKey, it)).assertDoesNotExist()
         }
     }
 
-    private infix fun Piece.on(square: Square): PieceSquare = PieceSquare(square, this)
+    private infix fun Piece.on(square: Square): SquarePieceTag = SquarePieceTag(square, this)
 
     private fun squareSize(): Float {
         return composeRule.onNodeWithContentDescription("Board")

@@ -5,6 +5,23 @@ import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.ui.extension.topLeft
 
+/**
+ *      _                         _
+ *     |_|                       |_|
+ *     | |         /^^^\         | |
+ *    _| |_      (| "o" |)      _| |_
+ *  _| | | | _    (_---_)    _ | | | |_
+ * | | | | |' |    _| |_    | `| | | | |
+ * \          /   /     \   \          /
+ *  \        /  / /(. .)\ \  \        /
+ *    \    /  / /  | . |  \ \  \    /
+ *      \  \/ /    ||-||    \ \/  /
+ *        \_/      || ||      \_/
+ *                 () ()
+ *                 || ||
+ *                ooO Ooo
+ */
+
 object UpdateChessPieceState {
     operator fun invoke(
         perspective: Side,
