@@ -1,5 +1,6 @@
 object Versions {
     val activityCompose = "1.7.0"
+    val androidGradlePlugin = "8.1.0-alpha10"
     val chessLib = "1.3.3"
     val compose = "2023.03.00"
     val composeCompiler = "1.4.4"
@@ -10,6 +11,7 @@ object Versions {
     val hiltNavigationCompose = "1.0.0"
     val junit = "4.13.2"
     val ktor = "2.2.4"
+    val kotlin = "1.8.10"
     val kotlinxSerializationJson = "1.5.0"
     val lifecycleRuntimeKtx = "2.6.1"
     val mockk = "1.13.4"
