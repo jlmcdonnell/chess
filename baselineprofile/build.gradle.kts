@@ -32,5 +32,6 @@ dependencies {
         implementation("androidx.test.ext:junit:$junitExt")
         implementation("androidx.test.uiautomator:uiautomator:$uiautomator")
         implementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
+        implementation("androidx.test:runner:$testRunner")
     }
 }
