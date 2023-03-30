@@ -6,6 +6,7 @@ plugins {
     id("com.google.dagger.hilt.android")
     id("kotlin-kapt")
     id("kotlinx-serialization")
+    id("androidx.baselineprofile")
 }
 
 android {
@@ -20,6 +21,8 @@ android {
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        testInstrumentationRunnerArguments["androidx.benchmark.suppressErrors"] = "EMULATOR"
+
         vectorDrawables {
             useSupportLibrary = true
         }
@@ -28,12 +31,13 @@ android {
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard/proguard-rules.pro")
+            signingConfig = signingConfigs.getByName("debug")
+        }
 
-            proguardFiles(
-                getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
-            )
-
+        val benchmark by creating {
+            isMinifyEnabled = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard/benchmark-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
     }
@@ -57,6 +61,8 @@ kapt {
 }
 
 dependencies {
+    "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
+
     with(Versions) {
         // Projects
         implementation(project(":engine-stockfish"))
@@ -68,6 +74,7 @@ dependencies {
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
         implementation("androidx.core:core-ktx:$coreKtx")
         implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtx")
+        implementation("androidx.profileinstaller:profileinstaller:$androidProfileInstaller")
 
         // Compose
         implementation(platform("androidx.compose:compose-bom:$compose"))
@@ -102,5 +109,6 @@ dependencies {
         testImplementation("junit:junit:$junit")
         testImplementation("app.cash.turbine:turbine:$turbine")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
+        androidTestImplementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
     }
 }

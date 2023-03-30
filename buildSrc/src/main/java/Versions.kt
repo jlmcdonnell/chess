@@ -1,6 +1,9 @@
 object Versions {
     val activityCompose = "1.7.0"
     val androidGradlePlugin = "8.1.0-alpha10"
+    val androidBenchmarkJunit = "1.2.0-alpha12"
+    val androidProfileInstaller = "1.3.0"
+    val baselineProfilePlugin = "1.2.0-SNAPSHOT"
     val chessLib = "1.3.3"
     val compose = "2023.03.00"
     val composeCompiler = "1.4.4"
@@ -10,6 +13,7 @@ object Versions {
     val hilt = "2.45"
     val hiltNavigationCompose = "1.0.0"
     val junit = "4.13.2"
+    val junitExt = "1.1.5"
     val ktor = "2.2.4"
     val kotlin = "1.8.10"
     val kotlinxSerializationJson = "1.5.0"
@@ -21,4 +25,5 @@ object Versions {
     val testRunner = "1.5.2"
     val timber = "5.0.1"
     val turbine = "0.12.1"
+    val uiautomator = "2.2.0"
 }

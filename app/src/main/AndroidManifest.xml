@@ -13,11 +13,11 @@
         android:supportsRtl="true"
         android:networkSecurityConfig="@xml/security_config"
         android:usesCleartextTraffic="true"
-        android:theme="@style/Theme.Chess">
+        android:theme="@style/Theme.Chess"
+        tools:replace="android:networkSecurityConfig">
         <activity
             android:name=".ui.MainActivity"
             android:exported="true"
-            android:label="@string/app_name"
             android:screenOrientation="portrait"
             android:theme="@style/Theme.Chess"
             tools:ignore="LockedOrientationActivity">

@@ -20,7 +20,9 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import com.github.bhlangonijr.chesslib.Side
@@ -130,6 +132,6 @@ fun ChessPiece(
                 }
             },
         painter = painterResource(id = state.piece.drawableResource()),
-        contentDescription = state.piece.name,
+        contentDescription = state.square.name,
     )
 }
