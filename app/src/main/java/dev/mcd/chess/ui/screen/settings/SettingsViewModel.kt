@@ -19,9 +19,14 @@ class SettingsViewModel @Inject constructor(
     override val container = container<State, SideEffect>(State()) {
         intent {
             val host = appPreferences.host()
+            val prefillHosts = listOf(
+                Environment.Production.apiUrl,
+                "http://10.0.2.2:8080",
+            )
             reduce {
                 state.copy(
                     host = host,
+                    prefillHosts = prefillHosts,
                     showDebug = BuildConfig.DEBUG,
                 )
             }
@@ -45,8 +50,8 @@ class SettingsViewModel @Inject constructor(
     object SideEffect
 
     data class State(
-        val productionUrl: String = Environment.Production.apiUrl,
         val host: String = "",
+        val prefillHosts: List<String> = emptyList(),
         val showDebug: Boolean = false,
     )
 }

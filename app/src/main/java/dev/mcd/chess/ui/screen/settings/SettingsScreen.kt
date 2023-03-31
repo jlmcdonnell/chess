@@ -3,11 +3,15 @@
 package dev.mcd.chess.ui.screen.settings
 
 import android.content.Intent
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Arrangement.Absolute.spacedBy
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Chip
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -60,17 +64,11 @@ fun SettingsScreen(
         ) {
             if (state.showDebug) {
                 DebugSettings(
-                    productionUrl = state.productionUrl,
+                    prefillHosts = state.prefillHosts,
                     currentHost = state.host,
                     onUpdateHost = { viewModel.updateHost(it) },
+                    onClearAuthData = { viewModel.clearAuthData() },
                 )
-                Spacer(modifier = Modifier.height(24.dp))
-                TextButton(
-                    modifier = Modifier.padding(horizontal = 24.dp),
-                    onClick = { viewModel.clearAuthData() },
-                ) {
-                    Text(text = "Clear Auth Data")
-                }
             }
         }
     }
@@ -78,9 +76,10 @@ fun SettingsScreen(
 
 @Composable
 fun DebugSettings(
-    productionUrl: String,
+    prefillHosts: List<String>,
     currentHost: String,
     onUpdateHost: (String) -> Unit,
+    onClearAuthData: () -> Unit,
 ) {
     var debugApiHost by remember {
         mutableStateOf(TextFieldValue(text = currentHost))
@@ -114,22 +113,57 @@ fun DebugSettings(
             }
         },
     )
-    Chip(
+    LazyRow(
         modifier = Modifier.padding(horizontal = 24.dp),
-        onClick = {
-            debugApiHost = TextFieldValue(text = productionUrl)
-            onUpdateHost(productionUrl)
-        },
-    ) {
-        Text(text = productionUrl)
+        horizontalArrangement = spacedBy(12.dp),
+
+        ) {
+        items(prefillHosts) { host ->
+            HostChip(
+                host = host,
+                onClick = {
+                    debugApiHost = TextFieldValue(text = host)
+                    onUpdateHost(host)
+                },
+            )
+        }
     }
+
     Spacer(modifier = Modifier.height(24.dp))
-    TextButton(
-        modifier = Modifier.padding(horizontal = 24.dp),
-        onClick = {
-            restart()
-        },
+    LazyRow(
+        Modifier
+            .padding(24.dp)
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
-        Text(text = "Restart")
+        item {
+            TextButton(
+                onClick = {
+                    restart()
+                },
+            ) {
+                Text(text = "Restart")
+            }
+        }
+        item {
+            TextButton(
+                onClick = { onClearAuthData() },
+            ) {
+                Text(text = "Clear Auth Data")
+            }
+        }
+    }
+
+}
+
+@Composable
+fun HostChip(
+    host: String,
+    onClick: () -> Unit,
+) {
+    Chip(
+        onClick = onClick,
+    ) {
+        Text(text = host)
     }
 }
