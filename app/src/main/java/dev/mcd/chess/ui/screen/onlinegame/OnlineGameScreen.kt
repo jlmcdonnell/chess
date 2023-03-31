@@ -22,8 +22,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.mcd.chess.R
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.GameView
@@ -88,8 +90,7 @@ fun OnlineGameScreen(
                 is FindingGame -> FindingGameView(s.username, navigateBack)
                 is FatalError -> Text(
                     text = """
-                        A VERY BAD HAPPENED
-                        
+                        Error:
                         ${s.message}
                     """,
                     color = Color.Red,
@@ -126,12 +127,12 @@ private fun FindingGameView(
         ) {
             if (username != null) {
                 Text(
-                    text = "Playing as $username",
+                    text = stringResource(R.string.playing_as, username),
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Text(
-                        text = "Finding Game",
+                        text = stringResource(R.string.finding_game),
                     )
                     Spacer(modifier = Modifier.width(12.dp))
                     CircularProgressIndicator(
@@ -142,10 +143,10 @@ private fun FindingGameView(
 
                 Spacer(modifier = Modifier.height(24.dp))
                 TextButton(onClick = { onCancel() }) {
-                    Text(text = "Cancel")
+                    Text(text = stringResource(R.string.cancel))
                 }
             } else {
-                Text(text = "Authenticating")
+                Text(text = stringResource(R.string.authenticating))
             }
         }
     }

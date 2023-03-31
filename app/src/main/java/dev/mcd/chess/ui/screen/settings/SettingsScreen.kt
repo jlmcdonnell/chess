@@ -32,9 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.mcd.chess.R
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -45,10 +47,13 @@ fun SettingsScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Settings") },
+                title = { Text(text = stringResource(id = R.string.settings)) },
                 navigationIcon = {
                     IconButton(onClick = { onDismiss() }) {
-                        Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = "Back")
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack),
+                            contentDescription = stringResource(R.string.back),
+                        )
                     }
                 },
             )
@@ -103,12 +108,12 @@ fun DebugSettings(
             onUpdateHost(it.text)
             debugApiHost = it
         },
-        label = { Text(text = "API Host") },
+        label = { Text(text = stringResource(R.string.api_host)) },
         trailingIcon = {
             IconButton(onClick = { debugApiHost = debugApiHost.copy(text = "") }) {
                 Icon(
                     painter = rememberVectorPainter(image = Icons.Rounded.Clear),
-                    contentDescription = "Clear",
+                    contentDescription = stringResource(R.string.clear),
                 )
             }
         },
@@ -141,14 +146,14 @@ fun DebugSettings(
                     restart()
                 },
             ) {
-                Text(text = "Restart")
+                Text(text = stringResource(R.string.restart))
             }
         }
         item {
             TextButton(
                 onClick = { onClearAuthData() },
             ) {
-                Text(text = "Clear Auth Data")
+                Text(text = stringResource(R.string.clear_auth_data))
             }
         }
     }

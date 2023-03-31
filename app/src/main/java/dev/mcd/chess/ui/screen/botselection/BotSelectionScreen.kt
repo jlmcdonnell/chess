@@ -34,9 +34,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
+import dev.mcd.chess.R
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.ui.LocalAppColors
@@ -51,10 +53,10 @@ fun BotSelectionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Play Computer") },
+                title = { Text(text = stringResource(R.string.play_computer)) },
                 navigationIcon = {
                     IconButton(onClick = { onDismiss() }) {
-                        Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = "Back")
+                        Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = stringResource(R.string.back))
                     }
                 },
             )

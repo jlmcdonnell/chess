@@ -10,7 +10,9 @@ import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import dev.mcd.chess.R
 import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.common.player.PlayerImage.None
 import dev.mcd.chess.common.player.PlayerImage.Url
@@ -30,7 +32,7 @@ fun PlayerImageView(image: PlayerImage) {
             Icon(
                 modifier = modifier.padding(8.dp),
                 imageVector = Icons.Rounded.Person,
-                contentDescription = "Default",
+                contentDescription = stringResource(R.string.default_player_image_desc),
                 tint = LocalAppColors.current.profileImageForeground,
             )
         }

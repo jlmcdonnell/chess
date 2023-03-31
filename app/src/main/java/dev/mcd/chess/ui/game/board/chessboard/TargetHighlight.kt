@@ -14,7 +14,9 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
 import com.github.bhlangonijr.chesslib.Square
+import dev.mcd.chess.R
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.extension.toDp
@@ -32,7 +34,7 @@ fun TargetHighlight() {
                 .topLeft()
                 .minus(Offset(squareSize / 2, squareSize / 2)),
             animationSpec = spring(stiffness = Spring.StiffnessHigh),
-            label = "Target Highlight",
+            label = stringResource(R.string.target_highlight_desc),
         )
         Box(
             modifier = Modifier

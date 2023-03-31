@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.text.ExperimentalTextApi
@@ -20,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.File
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
+import dev.mcd.chess.R
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.extension.topLeft
 
@@ -33,10 +35,11 @@ fun Squares() {
     val squareLabelStyleLight = boardTheme.squareTextStyle.copy(color = darkSquareColor)
     val squareLabelStyleDark = boardTheme.squareTextStyle.copy(color = lightSquareColor)
 
+    val boardDesc = stringResource(R.string.board)
     Canvas(
         Modifier
             .fillMaxSize()
-            .semantics { contentDescription = "Board" },
+            .semantics { contentDescription = boardDesc },
     ) {
         for (square in Square.values()) {
             if (square != Square.NONE) {

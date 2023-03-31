@@ -9,6 +9,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import dev.mcd.chess.R
 
 @Composable
 fun GameOptions(
@@ -25,7 +27,7 @@ fun GameOptions(
             ) {
                 Icon(
                     imageVector = Icons.Rounded.EmojiFlags,
-                    contentDescription = "Resign",
+                    contentDescription = stringResource(R.string.resign),
                 )
             }
         }
@@ -39,7 +41,7 @@ fun UndoMove(onClick: () -> Unit) {
     IconButton(onClick) {
         Icon(
             imageVector = Icons.Rounded.Undo,
-            contentDescription = "Undo move",
+            contentDescription = stringResource(R.string.undo_move),
         )
     }
 }
@@ -49,7 +51,7 @@ fun RedoMove(onClick: () -> Unit) {
     IconButton(onClick) {
         Icon(
             imageVector = Icons.Rounded.Redo,
-            contentDescription = "Redo move",
+            contentDescription = stringResource(R.string.redo_move),
         )
     }
 }

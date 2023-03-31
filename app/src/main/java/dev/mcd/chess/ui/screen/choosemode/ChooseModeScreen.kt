@@ -16,7 +16,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material3.Card
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -30,8 +29,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import dev.mcd.chess.R
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.screen.choosemode.ChooseModeViewModel.SideEffect.NavigateToExistingGame
@@ -57,12 +58,12 @@ fun ChooseModeScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text(text = "Chess") },
+                title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
                     IconButton(onClick = { onNavigateSettings() }) {
                         Icon(
                             painter = rememberVectorPainter(image = Icons.Rounded.Settings),
-                            contentDescription = "Settings",
+                            contentDescription = stringResource(R.string.settings),
                         )
                     }
                 },
@@ -109,14 +110,14 @@ private fun PlayComputerButton(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Play Computer",
+                text = stringResource(id = R.string.play_computer),
                 style = MaterialTheme.typography.titleSmall,
             )
             Spacer(modifier = Modifier.height(36.dp))
             Icon(
                 modifier = Modifier.size(32.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.Computer),
-                contentDescription = "Play Computer",
+                contentDescription = stringResource(R.string.play_computer),
             )
         }
     }
@@ -139,7 +140,7 @@ private fun PlayOnlineButton(
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
-                text = "Play Online",
+                text = stringResource(R.string.play_online),
                 style = MaterialTheme.typography.titleSmall,
             )
             if (inLobby != null) {
@@ -150,7 +151,7 @@ private fun PlayOnlineButton(
                 }
                 Text(
                     modifier = Modifier.height(24.dp),
-                    text = "$inLobby waiting",
+                    text = stringResource(R.string.waiting, inLobby),
                     style = MaterialTheme.typography.bodySmall,
                     color = color,
                 )
@@ -162,7 +163,7 @@ private fun PlayOnlineButton(
             Icon(
                 modifier = Modifier.size(32.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
-                contentDescription = "Play Online",
+                contentDescription = stringResource(R.string.play_online),
             )
         }
     }
