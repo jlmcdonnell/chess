@@ -1,3 +1,5 @@
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
     with(Versions) {
         id("androidx.baselineprofile") version baselineProfilePlugin apply false
@@ -17,4 +19,8 @@ tasks.create("clean", Delete::class) {
 
 subprojects {
     apply(plugin = "org.jlleitschuh.gradle.ktlint")
+
+    configure<KtlintExtension> {
+        version.set("0.48.2")
+    }
 }

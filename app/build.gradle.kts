@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import org.jlleitschuh.gradle.ktlint.KtlintExtension
-
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -51,9 +49,6 @@ android {
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
     }
-    configure<KtlintExtension> {
-        version.set("0.48.2")
-    }
 
     buildFeatures {
         compose = true
@@ -72,7 +67,7 @@ kapt {
 dependencies {
     with(Versions) {
         // Projects
-        implementation(project(":engine-stockfish"))
+        implementation(project(":enginestockfish"))
         implementation(project(":common"))
         implementation(project(":online"))
         "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
