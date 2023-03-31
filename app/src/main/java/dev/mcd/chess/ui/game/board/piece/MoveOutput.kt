@@ -41,6 +41,7 @@ object UpdateChessPieceState {
             if (move.to == state.square) {
                 if (move.promotion != Piece.NONE && state.piece == move.promotion) {
                     newState.piece = moveBackup.movingPiece
+                    newState.square = move.from
                 }
                 if (moveBackup.capturedPiece == state.piece) {
                     newState.captured = false

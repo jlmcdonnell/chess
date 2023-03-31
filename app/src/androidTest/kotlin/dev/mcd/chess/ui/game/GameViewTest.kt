@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.hasContentDescription
+import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
@@ -20,16 +21,14 @@ import com.github.bhlangonijr.chesslib.Piece.*
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.Square.*
-import dalvik.annotation.TestTarget
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.topLeft
-import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
+import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
 import kotlinx.coroutines.runBlocking
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 
@@ -41,21 +40,19 @@ class GameViewTest {
     @get:Rule
     val gameRule = createGameSessionRule()
 
-    @Before
-    fun setUp() {
-        with(composeRule) {
-            mainClock.autoAdvance = false
-            setContent {
-                TestChessBoard(gameRule.game)
-            }
-            mainClock.advanceTimeByFrame()
+
+    private fun ComposeContentTestRule.setupChessBoard(game: GameSession = gameRule.game) {
+        mainClock.autoAdvance = false
+        setContent {
+            TestChessBoard(game)
         }
+        mainClock.advanceTimeByFrame()
     }
 
     @Test
     fun piecesRespondToBoardMoves(): Unit = runBlocking {
         with(composeRule) {
-            mainClock.advanceTimeByFrame()
+            setupChessBoard()
 
             assertPiece(WHITE_PAWN on E2)
             assertPiece(BLACK_PAWN on E7)
@@ -74,6 +71,8 @@ class GameViewTest {
     @Test
     fun pieceHighlighting(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             onNodeWithTag("highlight-from").assertDoesNotExist()
             onNodeWithTag("highlight-to").assertDoesNotExist()
 
@@ -87,6 +86,8 @@ class GameViewTest {
     @Test
     fun pieceCapture(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             move("e2e4")
             move("d7d5")
             move("e4d5")
@@ -99,6 +100,8 @@ class GameViewTest {
     @Test
     fun testUndoMove(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             move("e2e4")
 
             assertPiece(WHITE_PAWN on E4)
@@ -113,6 +116,8 @@ class GameViewTest {
     @Test
     fun undoMoveAfterUserInput(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             dragMove(WHITE_PAWN, E2, E4)
             assertPiece(WHITE_PAWN on E4)
 
@@ -126,6 +131,8 @@ class GameViewTest {
     @Test
     fun undoMoveAfterCapture(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             move("e2e4")
             move("d7d5")
             move("e4d5")
@@ -142,6 +149,8 @@ class GameViewTest {
     @Test
     fun undoMoveAfterSeveralCaptures(): Unit = runBlocking {
         with(composeRule) {
+            setupChessBoard()
+
             dragMove(WHITE_PAWN, "e2e4")
             move("e7e5")
             dragMove(WHITE_QUEEN, "d1h5")
@@ -190,6 +199,8 @@ class GameViewTest {
         // Context: This would fail before ChessPieceState cached the moves for a piece.
 
         with(composeRule) {
+            setupChessBoard()
+
             val moves = "e2e4 e7e6 b1c3 b8c6 f1b5 a7a6 b5c6 b7c6 d1h5 d7d5 e4d5 c6d5 c3d5 d8d5 h5d5 e6d5".split(" ")
 
             moves.forEach { move(it) }
@@ -204,8 +215,24 @@ class GameViewTest {
     }
 
     @Test
-    fun undoAfterPromotion() {
-        TODO("Not implemented")
+    fun undoAfterPromotion(): Unit = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                sideToMove = Side.WHITE
+                setPiece(BLACK_KING, E8)
+                setPiece(WHITE_KING, E1)
+                setPiece(WHITE_PAWN, A7)
+            }
+            gameRule.game.setBoard(board)
+
+            setupChessBoard()
+
+            move("a7a8q")
+            undoMove()
+
+            assertPiece(WHITE_PAWN on A7)
+        }
     }
 
     private suspend fun ComposeTestRule.move(move: String) {

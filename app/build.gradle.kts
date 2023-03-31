@@ -29,16 +29,15 @@ android {
     }
 
     buildTypes {
-        getByName("release") {
+        val release = getByName("release") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard/proguard-rules.pro")
             signingConfig = signingConfigs.getByName("debug")
         }
-
-        val benchmark by creating {
+        create("benchmark") {
             isMinifyEnabled = true
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard/benchmark-rules.pro")
-            signingConfig = signingConfigs.getByName("debug")
+            signingConfig = release.signingConfig
         }
     }
 
@@ -61,13 +60,12 @@ kapt {
 }
 
 dependencies {
-    "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
-
     with(Versions) {
         // Projects
         implementation(project(":engine-stockfish"))
         implementation(project(":common"))
         implementation(project(":online"))
+        "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
 
         // Core
         implementation("org.slf4j:slf4j-nop:$slf4j")
