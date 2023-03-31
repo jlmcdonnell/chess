@@ -99,7 +99,7 @@ class GameViewTest {
     }
 
     @Test
-    fun testUndoMove(): Unit = runBlocking {
+    fun undoMove(): Unit = runBlocking {
         with(composeRule) {
             setupChessBoard()
 
@@ -233,6 +233,67 @@ class GameViewTest {
             undoMove()
 
             assertPiece(WHITE_PAWN on A7)
+        }
+    }
+
+    @Test
+    fun undoAfterEnPassant(): Unit = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                sideToMove = Side.WHITE
+                setPiece(BLACK_KING, E8)
+                setPiece(WHITE_KING, E1)
+                setPiece(WHITE_PAWN, E2)
+                setPiece(BLACK_PAWN, D4)
+            }
+            gameRule.game.setBoard(board)
+
+            setupChessBoard()
+
+            move("e2e4")
+            move("d4e3")
+            undoMove()
+
+            assertPiece(WHITE_PAWN on E4)
+            assertPiece(BLACK_PAWN on D4)
+            assertNoPiece(BLACK_PAWN on E3)
+        }
+    }
+
+    @Test
+    fun undoAfterCastle(): Unit = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                sideToMove = Side.WHITE
+                setPiece(WHITE_KING, E1)
+                setPiece(WHITE_ROOK, H1)
+                setPiece(WHITE_ROOK, A1)
+                setPiece(BLACK_KING, E8)
+                setPiece(BLACK_ROOK, H8)
+                setPiece(BLACK_ROOK, A8)
+            }
+            gameRule.game.setBoard(board)
+
+            setupChessBoard()
+
+            move("O-O-O")
+            undoMove()
+            assertPiece(WHITE_ROOK on A1)
+
+            move("O-O")
+            undoMove()
+            assertPiece(WHITE_ROOK on H1)
+
+            gameRule.board.sideToMove = Side.BLACK
+            move("O-O-O")
+            undoMove()
+            assertPiece(BLACK_ROOK on A8)
+
+            move("O-O")
+            undoMove()
+            assertPiece(BLACK_ROOK on H8)
         }
     }
 
