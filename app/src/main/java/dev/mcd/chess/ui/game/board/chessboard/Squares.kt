@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalTextApi::class)
+@file:OptIn(ExperimentalTextApi::class, ExperimentalTextApi::class)
 
 package dev.mcd.chess.ui.game.board.chessboard
 
@@ -23,11 +23,9 @@ import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.extension.topLeft
 
+context(BoardLayout)
 @Composable
-fun Squares(
-    perspective: Side,
-    squareSize: Float,
-) {
+fun Squares() {
     val textMeasurer = rememberTextMeasurer()
     val boardTheme = LocalBoardTheme.current
     val darkSquareColor = boardTheme.squareDark
@@ -45,22 +43,20 @@ fun Squares(
                 val color = if (square.isLightSquare) lightSquareColor else darkSquareColor
                 drawRect(
                     color = color,
-                    topLeft = square.topLeft(perspective, squareSize),
+                    topLeft = square.topLeft(),
                     size = Size(squareSize, squareSize),
                 )
-                drawRanks(textMeasurer, square, perspective, squareSize, squareLabelStyleLight, squareLabelStyleDark)
-                drawFiles(textMeasurer, square, perspective, squareSize, squareLabelStyleLight, squareLabelStyleDark)
+                drawRanks(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
+                drawFiles(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
             }
         }
     }
 }
 
-context(DrawScope)
+context(DrawScope, BoardLayout)
 private fun drawRanks(
     textMeasurer: TextMeasurer,
     square: Square,
-    perspective: Side,
-    squareSize: Float,
     squareLabelStyleLight: TextStyle,
     squareLabelStyleDark: TextStyle,
 ) {
@@ -73,17 +69,15 @@ private fun drawRanks(
             textMeasurer = textMeasurer,
             style = style,
             text = square.rank.notation,
-            topLeft = square.topLeft(perspective, squareSize).plus(Offset(2.dp.toPx(), 2.dp.toPx())),
+            topLeft = square.topLeft().plus(Offset(2.dp.toPx(), 2.dp.toPx())),
         )
     }
 }
 
-context(DrawScope)
+context(DrawScope, BoardLayout)
 private fun drawFiles(
     textMeasurer: TextMeasurer,
     square: Square,
-    perspective: Side,
-    squareSize: Float,
     squareLabelStyleLight: TextStyle,
     squareLabelStyleDark: TextStyle,
 ) {
@@ -101,9 +95,7 @@ private fun drawFiles(
             textMeasurer = textMeasurer,
             style = style,
             text = label,
-            topLeft = square.topLeft(perspective, squareSize).plus(offset),
+            topLeft = square.topLeft().plus(offset),
         )
     }
 }
-
-

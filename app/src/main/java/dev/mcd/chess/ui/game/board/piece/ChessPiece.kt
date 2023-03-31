@@ -23,13 +23,13 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
-import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.common.game.extension.relevantToMove
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
@@ -37,16 +37,15 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.withContext
 
+context(BoardLayout)
 @Composable
 fun ChessPiece(
-    size: Float,
-    perspective: Side,
     initialState: ChessPieceState,
 ) {
     val gameManager = LocalGameSession.current
     val boardInteraction = LocalBoardInteraction.current
 
-    var currentSize by remember { mutableStateOf(size) }
+    var currentSize by remember { mutableStateOf(squareSize) }
     var pan by remember { mutableStateOf(Offset.Zero) }
     var dragging by remember { mutableStateOf(false) }
     var state by remember { mutableStateOf(initialState) }
@@ -56,9 +55,9 @@ fun ChessPiece(
             gameManager.moveUpdates()
                 .filter { (move, _) -> state.square.relevantToMove(move) }
                 .collectLatest { directionalMove ->
-                    state = UpdateChessPieceState(perspective, size, directionalMove, state)
+                    state = UpdateChessPieceState(directionalMove, state)
                     pan = Offset.Zero
-                    currentSize = size
+                    currentSize = squareSize
                 }
         }
     }
@@ -106,7 +105,7 @@ fun ChessPiece(
                             awaitFirstDown()
                             boardInteraction.highlightMoves(state.square)
                             dragging = true
-                            currentSize = size * 1.7f
+                            currentSize = squareSize * 1.7f
 
                             var event: PointerEvent
                             do {
@@ -115,13 +114,13 @@ fun ChessPiece(
                                     .calculatePan()
                                     .orZero()
 
-                                val dragPosition = pan + state.squareOffset + Offset(size / 2f, size / 2f)
+                                val dragPosition = pan + state.squareOffset + Offset(squareSize / 2f, squareSize / 2f)
                                 boardInteraction.updateDragPosition(dragPosition)
                             } while (event.changes.none { it.changedToUp() })
 
                             if (boardInteraction.dropPiece(state.piece, state.square) == DropPieceResult.None) {
                                 pan = Offset.Zero
-                                currentSize = size
+                                currentSize = squareSize
                                 boardInteraction.clearHighlightMoves()
                             }
                             dragging = false

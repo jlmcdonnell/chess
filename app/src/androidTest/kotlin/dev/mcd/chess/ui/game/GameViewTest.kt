@@ -18,6 +18,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
+import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Piece.*
 import com.github.bhlangonijr.chesslib.Side
@@ -27,6 +28,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
@@ -348,8 +350,14 @@ class GameViewTest {
 
     private fun Square.position(): Offset {
         val squareSize = squareSize()
-        val (x, y) = topLeft(Side.WHITE, squareSize)
-        return Offset(x + squareSize / 2, y + squareSize / 2)
+        BoardLayout(
+            squareSizeDp = squareSize.dp,
+            squareSize = squareSize,
+            perspective = Side.WHITE,
+        ).run {
+            val (x, y) = topLeft()
+            return Offset(x + squareSize / 2, y + squareSize / 2)
+        }
     }
 
     @Suppress("TestFunctionName")

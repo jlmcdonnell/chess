@@ -6,6 +6,7 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,13 +25,17 @@ class BoardInteraction(
     private val target = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
-    private var squareSize = 0f
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
     private var enableInteraction = true
+    private var boardLayout: BoardLayout = BoardLayout()
 
-    fun updateSquareData(squarePositions: Map<Square, Offset>, squareSize: Float) {
+    fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
         this.squarePositions = squarePositions
-        this.squareSize = squareSize
+    }
+
+    fun updateBoardLayout(boardLayout: BoardLayout) {
+        this.boardLayout = boardLayout
+        perspective.tryEmit(boardLayout.perspective)
     }
 
     fun promote(move: Move) {
@@ -67,7 +72,7 @@ class BoardInteraction(
                 val (x2, y2) = position
                 val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
 
-                if ((closest == null || distance < closest.second) && distance <= squareSize) {
+                if ((closest == null || distance < closest.second) && distance <= boardLayout.squareSize) {
                     closest = sq to distance
                 }
             }

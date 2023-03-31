@@ -1,9 +1,9 @@
 package dev.mcd.chess.ui.game.board.piece
 
 import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
 /**
  *      _                         _
@@ -23,9 +23,9 @@ import dev.mcd.chess.ui.extension.topLeft
  */
 
 object UpdateChessPieceState {
+
+    context(BoardLayout)
     operator fun invoke(
-        perspective: Side,
-        size: Float,
         directionalMove: DirectionalMove,
         state: ChessPieceState,
     ): ChessPieceState {
@@ -79,7 +79,7 @@ object UpdateChessPieceState {
             }
         }
 
-        newState.squareOffset = newState.square.topLeft(perspective, size)
+        newState.squareOffset = newState.square.topLeft()
 
         return newState
     }

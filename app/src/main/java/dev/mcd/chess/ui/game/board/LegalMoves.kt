@@ -21,19 +21,17 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
+context(BoardLayout)
 @Composable
-fun LegalMoves(
-    perspective: Side,
-    squareSize: Float,
-) {
+fun LegalMoves() {
     val gameManager = LocalGameSession.current
     val theme = LocalBoardTheme.current
 
@@ -64,7 +62,7 @@ fun LegalMoves(
 
     ReusableContent(highlightMovesFrom) {
         highlightMoves.forEach { (square, pieceOnSquare) ->
-            val offset = square.topLeft(perspective, squareSize)
+            val offset = square.topLeft()
             if (pieceOnSquare) {
                 Canvas(
                     modifier = Modifier
