@@ -4,7 +4,7 @@ package dev.mcd.chess.ui.game
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Surface
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -164,7 +164,7 @@ class GameViewTest {
 
             assertPiece(
                 BLACK_ROOK on H8,
-                WHITE_QUEEN on E5
+                WHITE_QUEEN on E5,
             )
 
             undoMove()
@@ -306,7 +306,7 @@ class GameViewTest {
         dragMove(
             piece,
             Square.valueOf(move.substring(0, 2).uppercase()),
-            Square.valueOf(move.substring(2, 4).uppercase())
+            Square.valueOf(move.substring(2, 4).uppercase()),
         )
     }
 

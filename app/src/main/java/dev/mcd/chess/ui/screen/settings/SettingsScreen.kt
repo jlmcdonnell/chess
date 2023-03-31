@@ -15,7 +15,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
-import androidx.compose.material3.AssistChip
 import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -117,8 +116,7 @@ fun DebugSettings(
     LazyRow(
         modifier = Modifier.padding(horizontal = 24.dp),
         horizontalArrangement = spacedBy(12.dp),
-
-        ) {
+    ) {
         items(prefillHosts) { host ->
             HostChip(
                 host = host,
@@ -154,7 +152,6 @@ fun DebugSettings(
             }
         }
     }
-
 }
 
 @Composable
