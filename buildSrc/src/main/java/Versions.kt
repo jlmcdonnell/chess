@@ -17,6 +17,7 @@ object Versions {
     val ktor = "2.2.4"
     val kotlin = "1.8.10"
     val kotlinxSerializationJson = "1.5.0"
+    val ktlint = "11.3.1"
     val lifecycleRuntimeKtx = "2.6.1"
     val mockk = "1.13.4"
     val navigationCompose = "2.5.3"

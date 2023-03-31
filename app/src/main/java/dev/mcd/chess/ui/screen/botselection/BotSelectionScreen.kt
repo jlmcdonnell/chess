@@ -56,9 +56,9 @@ fun BotSelectionScreen(
                     IconButton(onClick = { onDismiss() }) {
                         Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = "Back")
                     }
-                }
+                },
             )
-        }
+        },
     ) { padding ->
         var selectedSide by remember { mutableStateOf(Side.WHITE) }
 
@@ -77,14 +77,16 @@ fun BotSelectionScreen(
                                     it.border(
                                         width = 4.dp,
                                         color = MaterialTheme.colors.primary,
-                                        shape = RoundedCornerShape(8.dp)
+                                        shape = RoundedCornerShape(8.dp),
                                     )
-                                } else it
+                                } else {
+                                    it
+                                }
                             }
                             .size(64.dp)
                             .padding(8.dp),
                         painter = painterResource(piece.drawableResource()),
-                        contentDescription = side.name
+                        contentDescription = side.name,
                     )
                 }
             }
@@ -104,12 +106,12 @@ fun BotSelectionScreen(
 private fun BotItem(
     modifier: Modifier = Modifier,
     bot: Bot,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(8.dp),
     ) {
         Row(
             modifier = Modifier

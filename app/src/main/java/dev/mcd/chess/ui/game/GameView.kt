@@ -49,7 +49,7 @@ fun GameView(
         modifier = Modifier
             .padding(horizontal = 12.dp)
             .padding(top = 16.dp, bottom = 8.dp),
-        player = game.opponent
+        player = game.opponent,
     )
     CapturedPieces(
         modifier = Modifier.padding(horizontal = 12.dp),
@@ -70,7 +70,7 @@ fun GameView(
     Spacer(Modifier.height(4.dp))
     CapturedPieces(
         modifier = Modifier.padding(horizontal = 12.dp),
-        side = game.selfSide.flip()
+        side = game.selfSide.flip(),
     )
     Spacer(Modifier.height(8.dp))
     Box(
@@ -81,7 +81,7 @@ fun GameView(
     ) {
         PlayerStrip(
             modifier = Modifier,
-            player = game.self
+            player = game.self,
         )
         GameOptions(
             modifier = Modifier.align(Alignment.CenterEnd),

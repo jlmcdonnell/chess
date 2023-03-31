@@ -25,7 +25,7 @@ class MainActivity : ComponentActivity() {
                     modifier = Modifier
                         .padding(systemBarsPadding)
                         .fillMaxSize(),
-                    color = MaterialTheme.colors.background
+                    color = MaterialTheme.colors.background,
                 ) {
                     Routing()
                 }

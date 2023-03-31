@@ -67,7 +67,7 @@ fun ChessBoard(
                 squareSize = it.size.width.div(8).toFloat()
                 squareSizeDp = squareSize.toDp()
             }
-        }
+        },
     ) {
         ReusableContent(gameId) {
             Squares(perspective, squareSize)
@@ -102,7 +102,7 @@ private fun TargetHighlight(
                 .offset(offset.x.toDp(), offset.y.toDp())
                 .size(squareSize * 2)
                 .clip(CircleShape)
-                .background(boardTheme.targetSquareHighlight)
+                .background(boardTheme.targetSquareHighlight),
         )
     }
 }
@@ -118,14 +118,15 @@ private fun Squares(
     Canvas(
         Modifier
             .fillMaxSize()
-            .semantics { contentDescription = "Board" }) {
+            .semantics { contentDescription = "Board" },
+    ) {
         for (square in Square.values()) {
             if (square != Square.NONE) {
                 val color = if (square.isLightSquare) lightSquareColor else darkSquareColor
                 drawRect(
                     color = color,
                     topLeft = square.topLeft(perspective, squareSize),
-                    size = Size(squareSize, squareSize)
+                    size = Size(squareSize, squareSize),
                 )
             }
         }

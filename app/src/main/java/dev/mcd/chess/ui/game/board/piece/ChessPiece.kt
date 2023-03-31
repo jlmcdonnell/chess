@@ -20,7 +20,6 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -84,7 +83,7 @@ fun ChessPiece(
     val animatedPan by animateOffsetAsState(
         targetValue = position,
         animationSpec = spring(stiffness = Spring.StiffnessMedium),
-        label = "Piece Move"
+        label = "Piece Move",
     )
 
     val moving = animatedSize != currentSize.toDp() || animatedPan != position || dragging

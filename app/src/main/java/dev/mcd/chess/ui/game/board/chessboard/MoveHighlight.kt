@@ -1,6 +1,5 @@
 package dev.mcd.chess.ui.game.board.chessboard
 
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.offset
@@ -43,14 +42,14 @@ fun MoveHighlight(
                 .testTag("highlight-from")
                 .size(squareSize)
                 .offset(moveFromOffset.x.toDp(), moveFromOffset.y.toDp())
-                .background(boardTheme.lastMoveHighlight)
+                .background(boardTheme.lastMoveHighlight),
         )
         Box(
             modifier = Modifier
                 .testTag("highlight-to")
                 .size(squareSize)
                 .offset(moveToOffset.x.toDp(), moveToOffset.y.toDp())
-                .background(boardTheme.lastMoveHighlight)
+                .background(boardTheme.lastMoveHighlight),
         )
     }
 }

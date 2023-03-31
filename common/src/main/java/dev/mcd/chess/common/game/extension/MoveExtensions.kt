@@ -9,6 +9,6 @@ fun Square.relevantToMove(move: MoveBackup): Boolean {
         move.move.to,
         move.rookCastleMove?.from,
         move.rookCastleMove?.to,
-        move.enPassantTarget
+        move.enPassantTarget,
     )
 }

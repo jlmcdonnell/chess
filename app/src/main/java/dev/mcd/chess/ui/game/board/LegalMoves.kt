@@ -70,9 +70,9 @@ fun LegalMoves(
                     modifier = Modifier
                         .offset(
                             x = offset.x.toDp(),
-                            y = offset.y.toDp()
+                            y = offset.y.toDp(),
                         )
-                        .size(squareSize.toDp())
+                        .size(squareSize.toDp()),
                 ) {
                     val border = size.width / 8f
                     drawArc(
@@ -82,7 +82,7 @@ fun LegalMoves(
                         startAngle = 0f,
                         sweepAngle = 360f,
                         style = Stroke(width = border, cap = StrokeCap.Round),
-                        size = Size(size.width - border, size.height - border)
+                        size = Size(size.width - border, size.height - border),
                     )
                 }
             } else {
@@ -94,7 +94,7 @@ fun LegalMoves(
                         )
                         .clip(CircleShape)
                         .size(squareSize.toDp() / 2)
-                        .background(theme.legalMoveHighlight)
+                        .background(theme.legalMoveHighlight),
                 )
             }
         }

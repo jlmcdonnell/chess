@@ -5,7 +5,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EmojiFlags
-import androidx.compose.material.icons.rounded.LocalPrintshop
 import androidx.compose.material.icons.rounded.Print
 import androidx.compose.material.icons.rounded.Redo
 import androidx.compose.material.icons.rounded.Undo
@@ -30,7 +29,7 @@ fun GameOptions(
     Row(modifier) {
         if (!terminated) {
             IconButton(
-                onClick = { onResignClicked() }
+                onClick = { onResignClicked() },
             ) {
                 Icon(
                     imageVector = Icons.Rounded.EmojiFlags,
@@ -67,6 +66,7 @@ fun UndoMove(onClick: () -> Unit) {
         )
     }
 }
+
 @Composable
 fun RedoMove(onClick: () -> Unit) {
     IconButton(onClick) {

@@ -32,7 +32,6 @@ android {
         cmake {
             path = file("src/main/native/CMakeLists.txt")
             version = "3.22.1"
-
         }
     }
 }

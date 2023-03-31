@@ -28,7 +28,7 @@ fun GameTermination(
         Column(
             Modifier
                 .padding(12.dp)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
             Reason(reason)
             Row(modifier = Modifier.align(Alignment.End)) {

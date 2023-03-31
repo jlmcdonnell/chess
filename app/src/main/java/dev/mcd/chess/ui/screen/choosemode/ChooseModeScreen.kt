@@ -59,7 +59,7 @@ fun ChooseModeScreen(
                 IconButton(onClick = { onNavigateSettings() }) {
                     Icon(
                         painter = rememberVectorPainter(image = Icons.Rounded.Settings),
-                        contentDescription = "Settings"
+                        contentDescription = "Settings",
                     )
                 }
             },
@@ -69,7 +69,7 @@ fun ChooseModeScreen(
             modifier = Modifier
                 .padding(it)
                 .fillMaxSize(),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Row(
                 modifier = Modifier
@@ -78,13 +78,13 @@ fun ChooseModeScreen(
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 Card(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 ) {
                     Column(
                         modifier = Modifier
                             .clickable { onPlayOnline() }
                             .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "Play Online",
@@ -111,20 +111,20 @@ fun ChooseModeScreen(
                         Icon(
                             modifier = Modifier.size(32.dp),
                             painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
-                            contentDescription = "Play Online"
+                            contentDescription = "Play Online",
                         )
                     }
                 }
                 Spacer(modifier = Modifier.width(24.dp))
                 Card(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f),
                 ) {
                     Column(
                         modifier = Modifier
                             .clickable { onPlayBot() }
                             .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         Text(
                             text = "Play Computer",
@@ -134,7 +134,7 @@ fun ChooseModeScreen(
                         Icon(
                             modifier = Modifier.size(32.dp),
                             painter = rememberVectorPainter(image = Icons.Rounded.Computer),
-                            contentDescription = "Play Computer"
+                            contentDescription = "Play Computer",
                         )
                     }
                 }

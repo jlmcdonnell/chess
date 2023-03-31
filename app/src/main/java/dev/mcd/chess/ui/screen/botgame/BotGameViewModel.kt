@@ -21,7 +21,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
-import kotlinx.coroutines.job
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
@@ -85,8 +84,8 @@ class BotGameViewModel @Inject constructor(
                             postSideEffect(
                                 SideEffect.ConfirmResignation(
                                     onConfirm = { continuation.resume(Unit) },
-                                    onDismiss = { continuation.cancel() }
-                                )
+                                    onDismiss = { continuation.cancel() },
+                                ),
                             )
                         }
                     }
@@ -152,7 +151,7 @@ class BotGameViewModel @Inject constructor(
                 self = HumanPlayer(
                     name = "You",
                     rating = 900,
-                    image = PlayerImage.None
+                    image = PlayerImage.None,
                 ),
                 selfSide = side,
                 opponent = bot,

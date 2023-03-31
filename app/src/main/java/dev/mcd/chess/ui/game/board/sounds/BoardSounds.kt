@@ -9,7 +9,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import com.github.bhlangonijr.chesslib.Piece
 import dev.mcd.chess.R
@@ -17,7 +16,6 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.ui.LocalGameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.withContext
 
 @Composable

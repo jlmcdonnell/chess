@@ -1,5 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
+import org.jlleitschuh.gradle.ktlint.KtlintExtension
+
 plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
@@ -43,6 +45,14 @@ android {
 
     kotlin {
         jvmToolchain(BuildSettings.jdkVersion)
+    }
+
+    // Opt in to kotlin context receivers
+    kotlinOptions {
+        freeCompilerArgs += "-Xcontext-receivers"
+    }
+    configure<KtlintExtension> {
+        version.set("0.48.2")
     }
 
     buildFeatures {

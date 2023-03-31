@@ -23,6 +23,6 @@ fun ResignationDialog(
             TextButton(onClick = { onDismiss() }) {
                 Text("No")
             }
-        }
+        },
     )
 }

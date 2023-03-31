@@ -20,7 +20,6 @@ import dev.mcd.chess.online.domain.entity.GameMessage
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame.Event.NewSession
 import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.flow.filterIsInstance
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.receiveAsFlow

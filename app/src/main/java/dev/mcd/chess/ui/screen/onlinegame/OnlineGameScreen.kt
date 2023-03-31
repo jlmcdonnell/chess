@@ -92,7 +92,7 @@ fun OnlineGameScreen(
                         
                         ${s.message}
                     """,
-                    color = Color.Red
+                    color = Color.Red,
                 )
             }
 
@@ -101,7 +101,7 @@ fun OnlineGameScreen(
                 GameTermination(
                     reason = reason,
                     onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null }
+                    onDismiss = { showTerminationReason = null },
                 )
             }
         }
@@ -116,11 +116,11 @@ private fun FindingGameView(
     Card(
         modifier = Modifier
             .padding(24.dp)
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Column(
             modifier = Modifier.padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             if (username != null) {
                 Text(
@@ -134,7 +134,7 @@ private fun FindingGameView(
                     Spacer(modifier = Modifier.width(12.dp))
                     CircularProgressIndicator(
                         modifier = Modifier.size(18.dp),
-                        strokeWidth = 2.dp
+                        strokeWidth = 2.dp,
                     )
                 }
 

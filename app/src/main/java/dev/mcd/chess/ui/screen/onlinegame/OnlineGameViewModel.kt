@@ -80,8 +80,8 @@ class OnlineGameViewModel @Inject constructor(
                         postSideEffect(
                             SideEffect.ConfirmResignation(
                                 onConfirm = { continuation.resume(Unit) },
-                                onDismiss = { continuation.cancel() }
-                            )
+                                onDismiss = { continuation.cancel() },
+                            ),
                         )
                     }
                 }

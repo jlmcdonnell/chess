@@ -46,7 +46,7 @@ fun SettingsScreen(
                     IconButton(onClick = { onDismiss() }) {
                         Icon(painter = rememberVectorPainter(image = Icons.Rounded.ArrowBack), contentDescription = "Back")
                     }
-                }
+                },
             )
         },
     ) { padding ->
@@ -56,9 +56,8 @@ fun SettingsScreen(
         Column(
             Modifier
                 .padding(padding)
-                .fillMaxWidth()
+                .fillMaxWidth(),
         ) {
-
             if (state.showDebug) {
                 DebugSettings(
                     productionUrl = state.productionUrl,
@@ -110,10 +109,10 @@ fun DebugSettings(
             IconButton(onClick = { debugApiHost = debugApiHost.copy(text = "") }) {
                 Icon(
                     painter = rememberVectorPainter(image = Icons.Rounded.Clear),
-                    contentDescription = "Clear"
+                    contentDescription = "Clear",
                 )
             }
-        }
+        },
     )
     Chip(
         modifier = Modifier.padding(horizontal = 24.dp),

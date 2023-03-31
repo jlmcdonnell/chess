@@ -75,7 +75,7 @@ fun BotGameScreen(
                 GameTermination(
                     reason = reason,
                     onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null }
+                    onDismiss = { showTerminationReason = null },
                 )
             }
         }

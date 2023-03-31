@@ -25,12 +25,13 @@ fun PlayerImageView(image: PlayerImage) {
 
     when (image) {
         is Url,
-        is None -> {
+        is None,
+        -> {
             Icon(
                 modifier = modifier.padding(8.dp),
                 imageVector = Icons.Rounded.Person,
                 contentDescription = "Default",
-                tint = LocalAppColors.current.profileImageForeground
+                tint = LocalAppColors.current.profileImageForeground,
             )
         }
     }

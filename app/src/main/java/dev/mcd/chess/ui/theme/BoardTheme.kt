@@ -17,5 +17,5 @@ val defaultBoardTheme = BoardTheme(
     moveHint = Color(0x6AE8FF00),
     targetSquareHighlight = Color(0x28000000),
     legalMoveHighlight = Color(0x28000000),
-    lastMoveHighlight = Color(0x72379AFF)
+    lastMoveHighlight = Color(0x72379AFF),
 )

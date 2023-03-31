@@ -1,5 +1,7 @@
 package dev.mcd.chess.ui.game
 
+/* ktlint-disable no-wildcard-imports other-rule-id */
+
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.Surface
@@ -39,7 +41,6 @@ class GameViewTest {
 
     @get:Rule
     val gameRule = createGameSessionRule()
-
 
     private fun ComposeContentTestRule.setupChessBoard(game: GameSession = gameRule.game) {
         mainClock.autoAdvance = false
