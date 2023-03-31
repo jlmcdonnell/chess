@@ -3,6 +3,7 @@ package dev.mcd.chess.ui.screen.choosemode
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,17 +12,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.Card
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -52,19 +54,21 @@ fun ChooseModeScreen(
         }
     }
 
-    Scaffold(topBar = {
-        TopAppBar(
-            title = { Text(text = "Chess") },
-            actions = {
-                IconButton(onClick = { onNavigateSettings() }) {
-                    Icon(
-                        painter = rememberVectorPainter(image = Icons.Rounded.Settings),
-                        contentDescription = "Settings",
-                    )
-                }
-            },
-        )
-    }) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text(text = "Chess") },
+                actions = {
+                    IconButton(onClick = { onNavigateSettings() }) {
+                        Icon(
+                            painter = rememberVectorPainter(image = Icons.Rounded.Settings),
+                            contentDescription = "Settings",
+                        )
+                    }
+                },
+            )
+        },
+    ) {
         Column(
             modifier = Modifier
                 .padding(it)
@@ -77,68 +81,89 @@ fun ChooseModeScreen(
                     .padding(16.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
-                Card(
-                    modifier = Modifier.weight(1f),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .clickable { onPlayOnline() }
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = "Play Online",
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                        val inLobby = state.inLobby
-                        if (inLobby != null) {
-                            val color = if (inLobby > 0) {
-                                LocalAppColors.current.green
-                            } else {
-                                Color.Unspecified
-                            }
-                            Text(
-                                modifier = Modifier.height(24.dp),
-                                text = "${state.inLobby} waiting",
-                                style = MaterialTheme.typography.subtitle1,
-                                color = color,
-                            )
-                            Spacer(modifier = Modifier.height(12.dp))
-                        } else {
-                            Spacer(modifier = Modifier.height(36.dp))
-                        }
-
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
-                            contentDescription = "Play Online",
-                        )
-                    }
-                }
+                PlayOnlineButton(
+                    inLobby = state.inLobby,
+                    onClick = onPlayOnline,
+                )
                 Spacer(modifier = Modifier.width(24.dp))
-                Card(
-                    modifier = Modifier
-                        .weight(1f),
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .clickable { onPlayBot() }
-                            .padding(24.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                    ) {
-                        Text(
-                            text = "Play Computer",
-                            style = MaterialTheme.typography.subtitle1,
-                        )
-                        Spacer(modifier = Modifier.height(36.dp))
-                        Icon(
-                            modifier = Modifier.size(32.dp),
-                            painter = rememberVectorPainter(image = Icons.Rounded.Computer),
-                            contentDescription = "Play Computer",
-                        )
-                    }
-                }
+                PlayComputerButton(onClick = onPlayBot)
             }
+        }
+    }
+}
+
+context(ColumnScope)
+@Composable
+private fun PlayComputerButton(
+    onClick: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier
+            .weight(1f),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Play Computer",
+                style = MaterialTheme.typography.titleSmall,
+            )
+            Spacer(modifier = Modifier.height(36.dp))
+            Icon(
+                modifier = Modifier.size(32.dp),
+                painter = rememberVectorPainter(image = Icons.Rounded.Computer),
+                contentDescription = "Play Computer",
+            )
+        }
+    }
+}
+
+context(ColumnScope)
+@Composable
+private fun PlayOnlineButton(
+    inLobby: Int?,
+    onClick: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.weight(1f),
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Text(
+                text = "Play Online",
+                style = MaterialTheme.typography.titleSmall,
+            )
+            if (inLobby != null) {
+                val color = if (inLobby > 0) {
+                    LocalAppColors.current.green
+                } else {
+                    Color.Unspecified
+                }
+                Text(
+                    modifier = Modifier.height(24.dp),
+                    text = "$inLobby waiting",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = color,
+                )
+                Spacer(modifier = Modifier.height(12.dp))
+            } else {
+                Spacer(modifier = Modifier.height(36.dp))
+            }
+
+            Icon(
+                modifier = Modifier.size(32.dp),
+                painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
+                contentDescription = "Play Online",
+            )
         }
     }
 }

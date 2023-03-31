@@ -13,16 +13,21 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.InputChip
+import androidx.compose.material3.InputChipDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableChipBorder
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -69,15 +74,15 @@ fun BotSelectionScreen(
                     Image(
                         modifier = Modifier
                             .padding(vertical = 24.dp, horizontal = 16.dp)
-                            .clip(RoundedCornerShape(8.dp))
+                            .clip(CircleShape)
                             .background(LocalAppColors.current.neutralPieceBackground)
                             .clickable { selectedSide = side }
                             .let {
                                 if (selectedSide == side) {
                                     it.border(
-                                        width = 4.dp,
-                                        color = MaterialTheme.colors.primary,
-                                        shape = RoundedCornerShape(8.dp),
+                                        width = 2.dp,
+                                        color = MaterialTheme.colorScheme.primary,
+                                        shape = CircleShape,
                                     )
                                 } else {
                                     it
@@ -108,7 +113,7 @@ private fun BotItem(
     bot: Bot,
     onClick: () -> Unit,
 ) {
-    Card(
+    ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
             .padding(8.dp),
@@ -116,7 +121,8 @@ private fun BotItem(
         Row(
             modifier = Modifier
                 .clickable { onClick() }
-                .padding(16.dp),
+                .padding(16.dp)
+                .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             PlayerImageView(image = bot.image)

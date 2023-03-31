@@ -48,6 +48,7 @@ android {
     // Opt in to kotlin context receivers
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
+        freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
     }
 
     buildFeatures {
@@ -84,7 +85,7 @@ dependencies {
         androidTestImplementation(platform("androidx.compose:compose-bom:$compose"))
         implementation("androidx.compose.ui:ui")
         implementation("androidx.compose.foundation:foundation")
-        implementation("androidx.compose.material:material")
+        implementation("androidx.compose.material3:material3")
         implementation("androidx.compose.material:material-icons-extended")
         debugImplementation("androidx.compose.ui:ui-tooling")
         debugImplementation("androidx.compose.ui:ui-tooling-preview")

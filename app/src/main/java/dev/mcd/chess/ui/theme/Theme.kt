@@ -1,7 +1,7 @@
 package dev.mcd.chess.ui.theme
 
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.graphics.Color
@@ -14,15 +14,15 @@ class AppColors(
     val profileImageForeground: Color = Color.Transparent,
 )
 
-private val DarkColorPalette = darkColors(
+private val darkColorPalette = darkColorScheme(
     primary = Color(0xFF00E9A6),
-    primaryVariant = Color(0xFF008F66),
+    primaryContainer = Color(0xFF008F66),
     secondary = Color(0xFF03DAC5),
     background = Color(0xFF2E3D5A),
     surface = Color(0xFF2E3D5A),
 )
 
-private val DefaultAppColors = AppColors(
+private val defaultAppColors = AppColors(
     green = Color(0xFF00FF37),
     neutralPieceBackground = Color(0xFF26324B),
     profileImageBackground = Color(0xFF27334B),
@@ -31,9 +31,9 @@ private val DefaultAppColors = AppColors(
 
 @Composable
 fun ChessTheme(content: @Composable () -> Unit) {
-    CompositionLocalProvider(LocalAppColors provides DefaultAppColors) {
+    CompositionLocalProvider(LocalAppColors provides defaultAppColors) {
         MaterialTheme(
-            colors = DarkColorPalette,
+            colorScheme = darkColorPalette,
             typography = Typography,
             shapes = Shapes,
             content = content,
