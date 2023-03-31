@@ -27,8 +27,12 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
+import androidx.compose.ui.text.ExperimentalTextApi
+import androidx.compose.ui.text.drawText
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.github.bhlangonijr.chesslib.File
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
@@ -107,31 +111,6 @@ private fun TargetHighlight(
     }
 }
 
-@Composable
-private fun Squares(
-    perspective: Side,
-    squareSize: Float,
-) {
-    val darkSquareColor = LocalBoardTheme.current.squareDark
-    val lightSquareColor = LocalBoardTheme.current.squareLight
-
-    Canvas(
-        Modifier
-            .fillMaxSize()
-            .semantics { contentDescription = "Board" },
-    ) {
-        for (square in Square.values()) {
-            if (square != Square.NONE) {
-                val color = if (square.isLightSquare) lightSquareColor else darkSquareColor
-                drawRect(
-                    color = color,
-                    topLeft = square.topLeft(perspective, squareSize),
-                    size = Size(squareSize, squareSize),
-                )
-            }
-        }
-    }
-}
 
 @Composable
 private fun Pieces(
