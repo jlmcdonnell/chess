@@ -56,7 +56,6 @@ fun GameView(
         side = game.selfSide,
     )
     Spacer(Modifier.height(4.dp))
-
     CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
         ReusableContent(game.id) {
             ChessBoard(
@@ -72,7 +71,6 @@ fun GameView(
         modifier = Modifier.padding(horizontal = 12.dp),
         side = game.selfSide.flip(),
     )
-    Spacer(Modifier.height(8.dp))
     Box(
         modifier = Modifier
             .padding(horizontal = 12.dp)
@@ -89,6 +87,7 @@ fun GameView(
             onResignClicked = { onResign() },
             onUndoClicked = {
                 game.undo()
+                boardInteraction.enableInteraction(false)
             },
             onRedoClicked = {
                 game.redo()

@@ -15,26 +15,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.R
 import dev.mcd.chess.common.player.PlayerImage
-import dev.mcd.chess.common.player.PlayerImage.None
-import dev.mcd.chess.common.player.PlayerImage.Url
 
 @Composable
 fun PlayerImageView(image: PlayerImage) {
-    val modifier = Modifier
-        .clip(CircleShape)
-        .background(MaterialTheme.colorScheme.onSurfaceVariant)
-        .size(40.dp)
-
-    when (image) {
-        is Url,
-        is None,
-        -> {
-            Icon(
-                modifier = modifier.padding(8.dp),
-                imageVector = Icons.Rounded.Person,
-                contentDescription = stringResource(R.string.default_player_image_desc),
-                tint = MaterialTheme.colorScheme.surfaceVariant
-            )
-        }
-    }
+    Icon(
+        modifier = Modifier
+            .clip(CircleShape)
+            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+            .size(24.dp)
+            .padding(3.dp),
+        imageVector = Icons.Rounded.Person,
+        contentDescription = stringResource(R.string.default_player_image_desc),
+        tint = MaterialTheme.colorScheme.surfaceVariant
+    )
 }

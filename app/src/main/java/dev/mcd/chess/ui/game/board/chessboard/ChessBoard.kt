@@ -38,7 +38,7 @@ fun ChessBoard(
     Box(
         modifier = modifier.boardLayout(perspective) { boardLayout = it },
     ) {
-        ReusableContent(gameId) {
+        ReusableContent(listOf(gameId, perspective)) {
             boardLayout.run {
                 Squares()
                 MoveHighlight()

@@ -47,15 +47,15 @@ fun Squares() {
                     topLeft = square.topLeft(),
                     size = Size(squareSize, squareSize),
                 )
-                drawRanks(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
-                drawFiles(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
+                drawRankLabels(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
+                drawFileLabels(textMeasurer, square, squareLabelStyleLight, squareLabelStyleDark)
             }
         }
     }
 }
 
 context(DrawScope, BoardLayout)
-private fun drawRanks(
+private fun drawRankLabels(
     textMeasurer: TextMeasurer,
     square: Square,
     squareLabelStyleLight: TextStyle,
@@ -76,7 +76,7 @@ private fun drawRanks(
 }
 
 context(DrawScope, BoardLayout)
-private fun drawFiles(
+private fun drawFileLabels(
     textMeasurer: TextMeasurer,
     square: Square,
     squareLabelStyleLight: TextStyle,
