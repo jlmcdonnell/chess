@@ -10,8 +10,9 @@
 - Online mode (backend built with Ktor)
 - Pieces taken from https://chess.com, and sounds taken from https://github.com/lichess-org/lila
 
-<img width="300" alt="screen1" src="https://user-images.githubusercontent.com/2794581/226145675-436a9c31-731e-4215-9d36-29ef0b4db421.png">
-<img width="300" alt="screen2" src="https://user-images.githubusercontent.com/2794581/226145678-0f8b1f24-eb9f-4609-a64a-3f0715b3f2ae.png">
+<img width="300" alt="screen1" src="https://user-images.githubusercontent.com/2794581/229290301-0b6f78b9-5a6d-427e-9aae-5272c702e091.png"> <img width="300" alt="screen2" src="https://user-images.githubusercontent.com/2794581/229290311-6fef7645-8bae-43d5-82df-c338226ea7b9.png">
+
+
 
 
 ## Feature roadmap
