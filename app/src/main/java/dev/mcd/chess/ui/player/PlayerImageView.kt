@@ -21,11 +21,11 @@ fun PlayerImageView(image: PlayerImage) {
     Icon(
         modifier = Modifier
             .clip(CircleShape)
-            .background(MaterialTheme.colorScheme.onSurfaceVariant)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
             .size(24.dp)
             .padding(3.dp),
         imageVector = Icons.Rounded.Person,
         contentDescription = stringResource(R.string.default_player_image_desc),
-        tint = MaterialTheme.colorScheme.surfaceVariant
+        tint = MaterialTheme.colorScheme.onSurfaceVariant
     )
 }

@@ -74,17 +74,16 @@ fun ChooseModeScreen(
                 .fillMaxSize(),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            Row(
+            Column(
                 modifier = Modifier
                     .fillMaxWidth(1f)
                     .padding(24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 PlayOnlineButton(
                     inLobby = state.inLobby,
                     onClick = onPlayOnline,
                 )
-                Spacer(modifier = Modifier.width(24.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 PlayComputerButton(onClick = onPlayBot)
             }
         }
@@ -97,65 +96,68 @@ private fun PlayComputerButton(
     onClick: () -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick() }
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(id = R.string.play_computer),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Spacer(modifier = Modifier.height(36.dp))
             Icon(
                 modifier = Modifier.size(42.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.Computer),
                 contentDescription = stringResource(R.string.play_computer),
             )
+            Spacer(modifier = Modifier.width(24.dp))
+            Text(
+                text = stringResource(id = R.string.play_computer),
+                style = MaterialTheme.typography.titleMedium,
+            )
         }
     }
 }
 
-context(ColumnScope)
 @Composable
 private fun PlayOnlineButton(
     inLobby: Int?,
     onClick: () -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier.weight(1f),
+        modifier = Modifier.fillMaxWidth(),
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onClick() }
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
+                .padding(vertical = 16.dp)
+                .padding(start = 16.dp, end = 24.dp),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            Text(
-                text = stringResource(R.string.play_online),
-                style = MaterialTheme.typography.titleMedium,
-            )
-            if (inLobby != null) {
-                Text(
-                    modifier = Modifier.height(24.dp),
-                    text = stringResource(R.string.waiting, inLobby),
-                    style = MaterialTheme.typography.bodySmall,
-                )
-                Spacer(modifier = Modifier.height(12.dp))
-            } else {
-                Spacer(modifier = Modifier.height(36.dp))
-            }
-
             Icon(
                 modifier = Modifier.size(42.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
                 contentDescription = stringResource(R.string.play_online),
             )
+            Spacer(modifier = Modifier.width(24.dp))
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Text(
+                    text = stringResource(R.string.play_online),
+                    style = MaterialTheme.typography.titleMedium,
+                )
+                if (inLobby != null) {
+                    Spacer(modifier = Modifier.width(40.dp))
+                    Text(
+                        text = stringResource(R.string.waiting, inLobby),
+                        style = MaterialTheme.typography.bodySmall,
+                    )
+                }
+            }
         }
     }
 }

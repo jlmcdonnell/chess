@@ -10,8 +10,8 @@ import androidx.compose.ui.unit.sp
 object BoardTheme {
     val squareDark @Composable get() = MaterialTheme.colorScheme.tertiaryContainer
     val squareLight @Composable get() = MaterialTheme.colorScheme.tertiary
-    val lastMoveHighlightOnDark @Composable get() = MaterialTheme.colorScheme.onTertiaryContainer.copy(alpha = .2f)
-    val lastMoveHighlightOnLight @Composable get() = MaterialTheme.colorScheme.onTertiary.copy(alpha = .3f)
+    val lastMoveHighlightOnDark @Composable get() = Color(0x4AD8B449)
+    val lastMoveHighlightOnLight @Composable get() = Color(0x4AD8B449)
     val targetSquareHighlight = Color(0x28000000)
     val legalMoveHighlight = Color(0x28000000)
 
