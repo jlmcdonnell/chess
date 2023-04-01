@@ -33,6 +33,7 @@ import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
 import kotlinx.coroutines.runBlocking
+import org.junit.Assert.fail
 import org.junit.Rule
 import org.junit.Test
 
@@ -297,6 +298,11 @@ class GameViewTest {
             undoMove()
             assertPiece(BLACK_ROOK on H8)
         }
+    }
+
+    @Test
+    private fun moveAfterTermination() {
+        fail("Not implemented")
     }
 
     private suspend fun ComposeTestRule.move(move: String) {

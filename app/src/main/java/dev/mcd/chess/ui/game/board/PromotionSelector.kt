@@ -34,8 +34,7 @@ fun PromotionSelector(modifier: Modifier) {
     if (promotionMoves.isNotEmpty()) {
         ElevatedCard(modifier = modifier) {
             Column(
-                modifier = Modifier
-                    .background(Color.DarkGray),
+                modifier = Modifier.background(Color.DarkGray),
             ) {
                 promotionMoves.forEachIndexed { i, move ->
                     val verticalPadding = if (i == 0 || i == promotionMoves.lastIndex) 8.dp else 4.dp

@@ -16,25 +16,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.R
 import dev.mcd.chess.common.game.GameId
-import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.screen.choosemode.ChooseModeViewModel.SideEffect.NavigateToExistingGame
 import org.orbitmvi.orbit.compose.collectAsState
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -57,7 +55,7 @@ fun ChooseModeScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(id = R.string.app_name)) },
                 actions = {
                     IconButton(onClick = { onNavigateSettings() }) {
@@ -79,7 +77,7 @@ fun ChooseModeScreen(
             Row(
                 modifier = Modifier
                     .fillMaxWidth(1f)
-                    .padding(16.dp),
+                    .padding(24.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
             ) {
                 PlayOnlineButton(
@@ -99,8 +97,7 @@ private fun PlayComputerButton(
     onClick: () -> Unit,
 ) {
     ElevatedCard(
-        modifier = Modifier
-            .weight(1f),
+        modifier = Modifier.weight(1f),
     ) {
         Column(
             modifier = Modifier
@@ -111,11 +108,11 @@ private fun PlayComputerButton(
         ) {
             Text(
                 text = stringResource(id = R.string.play_computer),
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
             )
             Spacer(modifier = Modifier.height(36.dp))
             Icon(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(42.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.Computer),
                 contentDescription = stringResource(R.string.play_computer),
             )
@@ -141,19 +138,13 @@ private fun PlayOnlineButton(
         ) {
             Text(
                 text = stringResource(R.string.play_online),
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
             )
             if (inLobby != null) {
-                val color = if (inLobby > 0) {
-                    LocalAppColors.current.green
-                } else {
-                    Color.Unspecified
-                }
                 Text(
                     modifier = Modifier.height(24.dp),
                     text = stringResource(R.string.waiting, inLobby),
                     style = MaterialTheme.typography.bodySmall,
-                    color = color,
                 )
                 Spacer(modifier = Modifier.height(12.dp))
             } else {
@@ -161,7 +152,7 @@ private fun PlayOnlineButton(
             }
 
             Icon(
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(42.dp),
                 painter = rememberVectorPainter(image = Icons.Rounded.PersonSearch),
                 contentDescription = stringResource(R.string.play_online),
             )

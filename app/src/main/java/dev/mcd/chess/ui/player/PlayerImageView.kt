@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -16,13 +17,12 @@ import dev.mcd.chess.R
 import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.common.player.PlayerImage.None
 import dev.mcd.chess.common.player.PlayerImage.Url
-import dev.mcd.chess.ui.LocalAppColors
 
 @Composable
 fun PlayerImageView(image: PlayerImage) {
     val modifier = Modifier
         .clip(CircleShape)
-        .background(LocalAppColors.current.profileImageBackground)
+        .background(MaterialTheme.colorScheme.onSurfaceVariant)
         .size(40.dp)
 
     when (image) {
@@ -33,7 +33,7 @@ fun PlayerImageView(image: PlayerImage) {
                 modifier = modifier.padding(8.dp),
                 imageVector = Icons.Rounded.Person,
                 contentDescription = stringResource(R.string.default_player_image_desc),
-                tint = LocalAppColors.current.profileImageForeground,
+                tint = MaterialTheme.colorScheme.surfaceVariant
             )
         }
     }

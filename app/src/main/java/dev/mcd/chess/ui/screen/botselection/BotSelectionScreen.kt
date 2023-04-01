@@ -16,13 +16,13 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.ArrowBack
+import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +41,6 @@ import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.feature.game.domain.DefaultBots
-import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
 
@@ -52,7 +51,7 @@ fun BotSelectionScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
+            CenterAlignedTopAppBar(
                 title = { Text(text = stringResource(R.string.play_computer)) },
                 navigationIcon = {
                     IconButton(onClick = { onDismiss() }) {
@@ -72,13 +71,13 @@ fun BotSelectionScreen(
                         modifier = Modifier
                             .padding(vertical = 24.dp, horizontal = 16.dp)
                             .clip(CircleShape)
-                            .background(LocalAppColors.current.neutralPieceBackground)
+                            .background(MaterialTheme.colorScheme.surfaceVariant)
                             .clickable { selectedSide = side }
                             .let {
                                 if (selectedSide == side) {
                                     it.border(
                                         width = 2.dp,
-                                        color = MaterialTheme.colorScheme.primary,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                                         shape = CircleShape,
                                     )
                                 } else {
@@ -124,7 +123,10 @@ private fun BotItem(
         ) {
             PlayerImageView(image = bot.image)
             Spacer(modifier = Modifier.width(24.dp))
-            Text(text = bot.name)
+            Text(
+                text = bot.name,
+                style = MaterialTheme.typography.bodyLarge,
+            )
         }
     }
 }

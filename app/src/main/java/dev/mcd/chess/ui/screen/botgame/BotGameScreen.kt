@@ -68,6 +68,7 @@ fun BotGameScreen(
                     onResign = viewModel::onResign,
                     terminated = s.terminated,
                 )
+
                 is Loading -> Unit
             }
 

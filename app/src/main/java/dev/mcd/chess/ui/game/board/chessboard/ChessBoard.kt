@@ -33,7 +33,6 @@ fun ChessBoard(
             boardLayout.run { square.center() }
         }
         boardInteraction.updateSquarePositions(squarePositions)
-        boardInteraction.updateBoardLayout(boardLayout)
     }
 
     Box(

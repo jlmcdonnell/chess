@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -12,6 +13,8 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -43,27 +46,13 @@ fun CapturedPieces(
             .filter { piece -> piece.pieceSide == side }
             .sortedBy { piece -> piece.pieceType.ordinal }
             .forEachIndexed { i, piece ->
-                val resource = when (piece.pieceSide!!) {
-                    Side.WHITE -> {
-                        when (piece.pieceType!!) {
-                            PieceType.PAWN -> R.drawable.captured_wp
-                            PieceType.KNIGHT -> R.drawable.captured_wn
-                            PieceType.BISHOP -> R.drawable.captured_wb
-                            PieceType.ROOK -> R.drawable.captured_wr
-                            PieceType.QUEEN -> R.drawable.captured_wq
-                            else -> null
-                        }
-                    }
-                    Side.BLACK -> {
-                        when (piece.pieceType) {
-                            PieceType.PAWN -> R.drawable.captured_bp
-                            PieceType.KNIGHT -> R.drawable.captured_bn
-                            PieceType.BISHOP -> R.drawable.captured_bb
-                            PieceType.ROOK -> R.drawable.captured_br
-                            PieceType.QUEEN -> R.drawable.captured_bq
-                            else -> null
-                        }
-                    }
+                val resource = when (piece.pieceType) {
+                    PieceType.PAWN -> R.drawable.captured_p
+                    PieceType.KNIGHT -> R.drawable.captured_n
+                    PieceType.BISHOP -> R.drawable.captured_b
+                    PieceType.ROOK -> R.drawable.captured_r
+                    PieceType.QUEEN -> R.drawable.captured_q
+                    else -> null
                 }
                 resource?.let {
                     Image(
@@ -73,6 +62,7 @@ fun CapturedPieces(
                         contentScale = ContentScale.FillHeight,
                         painter = painterResource(id = resource),
                         contentDescription = null,
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onTertiaryContainer)
                     )
                 }
             }

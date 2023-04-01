@@ -4,6 +4,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
+import dev.mcd.chess.R
 
 @Composable
 fun ResignationDialog(
@@ -12,16 +14,16 @@ fun ResignationDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text("Resign") },
-        text = { Text("Are you sure you want to resign?") },
+        title = { Text(stringResource(id = R.string.resign_confirm)) },
+        text = { Text(stringResource(R.string.confirm_resign)) },
         confirmButton = {
             TextButton(onClick = { onConfirm() }) {
-                Text("Yes")
+                Text(stringResource(R.string.yes))
             }
         },
         dismissButton = {
             TextButton(onClick = { onDismiss() }) {
-                Text("No")
+                Text(stringResource(R.string.no))
             }
         },
     )

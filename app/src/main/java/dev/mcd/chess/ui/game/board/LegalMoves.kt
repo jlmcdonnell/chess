@@ -23,17 +23,16 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.ui.LocalBoardInteraction
-import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
+import dev.mcd.chess.ui.game.board.chessboard.BoardTheme
 
 context(BoardLayout)
 @Composable
 fun LegalMoves() {
     val gameManager = LocalGameSession.current
-    val theme = LocalBoardTheme.current
 
     val highlightMovesFrom by LocalBoardInteraction.current
         .highlightMovesFrom()
@@ -60,6 +59,8 @@ fun LegalMoves() {
         }
     }
 
+    val legalMoveHighlight = BoardTheme.legalMoveHighlight
+
     ReusableContent(highlightMovesFrom) {
         highlightMoves.forEach { (square, pieceOnSquare) ->
             val offset = square.topLeft()
@@ -74,7 +75,7 @@ fun LegalMoves() {
                 ) {
                     val border = size.width / 8f
                     drawArc(
-                        color = theme.legalMoveHighlight,
+                        color = legalMoveHighlight,
                         useCenter = true,
                         topLeft = Offset(border / 2, border / 2),
                         startAngle = 0f,
@@ -92,7 +93,7 @@ fun LegalMoves() {
                         )
                         .clip(CircleShape)
                         .size(squareSize.toDp() / 2)
-                        .background(theme.legalMoveHighlight),
+                        .background(legalMoveHighlight),
                 )
             }
         }

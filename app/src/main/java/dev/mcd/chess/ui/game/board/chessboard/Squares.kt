@@ -22,18 +22,16 @@ import com.github.bhlangonijr.chesslib.File
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.R
-import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.extension.topLeft
 
 context(BoardLayout)
 @Composable
 fun Squares() {
     val textMeasurer = rememberTextMeasurer()
-    val boardTheme = LocalBoardTheme.current
-    val darkSquareColor = boardTheme.squareDark
-    val lightSquareColor = boardTheme.squareLight
-    val squareLabelStyleLight = boardTheme.squareTextStyle.copy(color = darkSquareColor)
-    val squareLabelStyleDark = boardTheme.squareTextStyle.copy(color = lightSquareColor)
+    val darkSquareColor = BoardTheme.squareDark
+    val lightSquareColor = BoardTheme.squareLight
+    val squareLabelStyleLight = BoardTheme.squareTextStyle.copy(color = darkSquareColor)
+    val squareLabelStyleDark = BoardTheme.squareTextStyle.copy(color = lightSquareColor)
 
     val boardDesc = stringResource(R.string.board)
     Canvas(

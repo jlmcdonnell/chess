@@ -3,6 +3,7 @@
     <string name="back">Back</string>
     <string name="clear">Clear</string>
     <string name="resign">Resign</string>
+    <string name="resign_confirm">Confirm Resignation</string>
     <string name="settings">Settings</string>
     <string name="redo_move">Redo move</string>
     <string name="undo_move">Undo move</string>
@@ -19,5 +20,14 @@
     <string name="api_host">API Host</string>
     <string name="restart">Restart</string>
     <string name="clear_auth_data">Clear Auth Data</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="confirm_resign">Are you sure you want to resign?</string>
+    <string name="black_won_by_checkmate">Black won by checkmate</string>
+    <string name="white_won_by_checkmate">White won by checkmate</string>
+    <string name="game_ended_by_draw">Game ended by draw</string>
+    <string name="white_resigned">White resigned</string>
+    <string name="black_resigned">Black resigned</string>
+    <string name="dismiss">Dismiss</string>
 
 </resources>

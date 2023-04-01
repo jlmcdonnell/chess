@@ -27,15 +27,9 @@ class BoardInteraction(
     private var squarePositions: Map<Square, Offset> = emptyMap()
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
     private var enableInteraction = true
-    private var boardLayout: BoardLayout = BoardLayout()
 
     fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
         this.squarePositions = squarePositions
-    }
-
-    fun updateBoardLayout(boardLayout: BoardLayout) {
-        this.boardLayout = boardLayout
-        perspective.tryEmit(boardLayout.perspective)
     }
 
     fun promote(move: Move) {
@@ -64,6 +58,7 @@ class BoardInteraction(
         }
     }
 
+    context(BoardLayout)
     fun updateDragPosition(position: Offset) {
         if (enableInteraction) {
             var closest: Pair<Square, Float>? = null
@@ -72,7 +67,7 @@ class BoardInteraction(
                 val (x2, y2) = position
                 val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
 
-                if ((closest == null || distance < closest.second) && distance <= boardLayout.squareSize) {
+                if ((closest == null || distance < closest.second) && distance <= squareSize) {
                     closest = sq to distance
                 }
             }

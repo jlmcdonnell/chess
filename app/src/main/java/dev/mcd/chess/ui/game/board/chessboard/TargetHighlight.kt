@@ -18,14 +18,12 @@ import androidx.compose.ui.res.stringResource
 import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.R
 import dev.mcd.chess.ui.LocalBoardInteraction
-import dev.mcd.chess.ui.LocalBoardTheme
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 
 context(BoardLayout)
 @Composable
 fun TargetHighlight() {
-    val boardTheme = LocalBoardTheme.current
     val target by LocalBoardInteraction.current.targets().collectAsState(Square.NONE)
 
     if (target != Square.NONE) {
@@ -41,7 +39,7 @@ fun TargetHighlight() {
                 .offset(offset.x.toDp(), offset.y.toDp())
                 .size(squareSizeDp * 2)
                 .clip(CircleShape)
-                .background(boardTheme.targetSquareHighlight),
+                .background(BoardTheme.targetSquareHighlight),
         )
     }
 }
