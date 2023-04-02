@@ -29,5 +29,6 @@
     <string name="white_resigned">White resigned</string>
     <string name="black_resigned">Black resigned</string>
     <string name="dismiss">Dismiss</string>
+    <string name="flip_board">Flip board</string>
 
 </resources>

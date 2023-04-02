@@ -3,6 +3,7 @@ package dev.mcd.chess.ui.game
 import androidx.compose.foundation.layout.Row
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.EmojiFlags
+import androidx.compose.material.icons.rounded.FlipCameraAndroid
 import androidx.compose.material.icons.rounded.Redo
 import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material3.Icon
@@ -19,6 +20,7 @@ fun GameOptions(
     terminated: Boolean,
     onUndoClicked: () -> Unit,
     onRedoClicked: () -> Unit,
+    onFlipBoard: () -> Unit,
 ) {
     Row(modifier) {
         if (!terminated) {
@@ -31,6 +33,7 @@ fun GameOptions(
                 )
             }
         }
+        FlipBoard(onFlipBoard)
         UndoMove(onUndoClicked)
         RedoMove(onRedoClicked)
     }
@@ -52,6 +55,16 @@ fun RedoMove(onClick: () -> Unit) {
         Icon(
             imageVector = Icons.Rounded.Redo,
             contentDescription = stringResource(R.string.redo_move),
+        )
+    }
+}
+
+@Composable
+fun FlipBoard(onClick: () -> Unit) {
+    IconButton(onClick) {
+        Icon(
+            imageVector = Icons.Rounded.FlipCameraAndroid,
+            contentDescription = stringResource(R.string.flip_board),
         )
     }
 }

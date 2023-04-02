@@ -10,7 +10,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -34,6 +37,8 @@ fun GameView(
 ) {
     val sessionManager = LocalGameSession.current
     val boardInteraction = remember(game.id) { BoardInteraction(game) }
+    var isLive by remember { mutableStateOf(game.isLive()) }
+    val interactionEnabled = remember(terminated, isLive) { !terminated && isLive }
 
     LaunchedEffect(game) {
         Timber.d("Game ID: ${game.id}")
@@ -41,6 +46,10 @@ fun GameView(
         boardInteraction.moves().collectLatest {
             onMove(it)
         }
+    }
+
+    LaunchedEffect(interactionEnabled) {
+        boardInteraction.enableInteraction(interactionEnabled)
     }
 
     sounds()
@@ -87,11 +96,14 @@ fun GameView(
             onResignClicked = { onResign() },
             onUndoClicked = {
                 game.undo()
-                boardInteraction.enableInteraction(false)
+                isLive = game.isLive()
             },
             onRedoClicked = {
                 game.redo()
-                boardInteraction.enableInteraction(game.isLive())
+                isLive = game.isLive()
+            },
+            onFlipBoard = {
+                boardInteraction.togglePerspective()
             },
         )
     }

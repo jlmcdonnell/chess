@@ -26,8 +26,8 @@ class GameSessionManagerTest {
             val board2 = Board()
             board2.loadFromFen(Constants.startStandardFENPosition)
 
-            val session1 = GameSession("1", player, Side.WHITE, player)
-            val session2 = GameSession("2", player, Side.WHITE, player)
+            val session1 = GameSession("1", player, player, Side.WHITE)
+            val session2 = GameSession("2", player, player, Side.WHITE)
 
             session1.setBoard(board1)
             session2.setBoard(board2)

@@ -7,9 +7,15 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.layout.boundsInParent
 import androidx.compose.ui.test.SemanticsMatcher
+import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -32,8 +38,9 @@ import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.runBlocking
-import org.junit.Assert.fail
+import org.junit.Assert.assertEquals
 import org.junit.Rule
 import org.junit.Test
 
@@ -45,13 +52,7 @@ class GameViewTest {
     @get:Rule
     val gameRule = createGameSessionRule()
 
-    private fun ComposeContentTestRule.setupChessBoard(game: GameSession = gameRule.game) {
-        mainClock.autoAdvance = false
-        setContent {
-            TestChessBoard(game)
-        }
-        mainClock.advanceTimeByFrame()
-    }
+    private val terminationState = MutableStateFlow(false)
 
     @Test
     fun piecesRespondToBoardMoves(): Unit = runBlocking {
@@ -301,16 +302,52 @@ class GameViewTest {
     }
 
     @Test
-    private fun moveAfterTermination() {
-        fail("Not implemented")
+    fun moveAfterTermination() = runBlocking {
+        with(composeRule) {
+            setupChessBoard()
+            terminationState.emit(true)
+            dragMove(WHITE_PAWN, "e2e4")
+            assertNoPiece(WHITE_PAWN on E4)
+        }
     }
 
-    private suspend fun ComposeTestRule.move(move: String) {
+    @Test
+    fun flipBoard() = runBlocking {
+        fun SemanticsNodeInteraction.boundsInParent() = fetchSemanticsNode().layoutInfo.coordinates.boundsInParent()
+
+        with(composeRule) {
+            setupChessBoard()
+
+            val e2Layout = onPiece(WHITE_PAWN on E2).boundsInParent()
+            val e7Layout = onPiece(BLACK_PAWN on D7).boundsInParent()
+
+            flipBoard()
+
+            val e2LayoutFlipped = onPiece(WHITE_PAWN on E2).boundsInParent()
+            val e7LayoutFlipped = onPiece(BLACK_PAWN on D7).boundsInParent()
+
+            assertEquals(e7Layout, e2LayoutFlipped)
+            assertEquals(e2Layout, e7LayoutFlipped)
+        }
+    }
+
+    context(ComposeContentTestRule)
+    private fun setupChessBoard(game: GameSession = gameRule.game) {
+        mainClock.autoAdvance = false
+        setContent {
+            TestChessBoard(game)
+        }
+        mainClock.advanceTimeByFrame()
+    }
+
+    context(ComposeTestRule)
+    private suspend fun move(move: String) {
         gameRule.game.move(move)
         mainClock.advanceTimeBy(200)
     }
 
-    private fun ComposeTestRule.dragMove(piece: Piece, move: String) {
+    context(ComposeTestRule)
+    private fun dragMove(piece: Piece, move: String) {
         dragMove(
             piece,
             Square.valueOf(move.substring(0, 2).uppercase()),
@@ -318,8 +355,9 @@ class GameViewTest {
         )
     }
 
-    private fun ComposeTestRule.dragMove(piece: Piece, from: Square, to: Square) {
-        onNode(SemanticsMatcher.expectValue(PieceSquareKey, piece on from))
+    context(ComposeTestRule)
+    private fun dragMove(piece: Piece, from: Square, to: Square) {
+        onPiece(piece on from)
             .performTouchInput {
                 down(from.position())
                 moveTo(to.position())
@@ -328,34 +366,43 @@ class GameViewTest {
         mainClock.advanceTimeBy(500)
     }
 
-    private fun ComposeTestRule.undoMove() {
+    context(ComposeTestRule)
+    private fun undoMove() {
         onNode(hasContentDescription("Undo move")).performClick()
         mainClock.advanceTimeBy(500)
     }
 
-    private fun ComposeTestRule.assertPiece(vararg pieceSquare: SquarePieceTag) {
+    context(ComposeTestRule)
+    private fun flipBoard() {
+        onNode(hasContentDescription("Flip board")).performClick()
+        mainClock.advanceTimeBy(500)
+    }
+
+    context(ComposeTestRule)
+    private fun assertPiece(vararg pieceSquare: SquarePieceTag) {
+        pieceSquare.map { onPiece(it) }.onEach(SemanticsNodeInteraction::assertExists)
+    }
+
+
+    context(ComposeTestRule)
+    private fun assertNoPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.forEach {
-            onNode(SemanticsMatcher.expectValue(PieceSquareKey, it)).assertExists()
+            onPiece(it).assertDoesNotExist()
         }
     }
 
-    private fun ComposeTestRule.assertNoPiece(vararg pieceSquare: SquarePieceTag) {
-        pieceSquare.forEach {
-            onNode(SemanticsMatcher.expectValue(PieceSquareKey, it)).assertDoesNotExist()
-        }
+    context(ComposeTestRule)
+    private fun onPiece(tag: SquarePieceTag): SemanticsNodeInteraction {
+        return onNode(SemanticsMatcher.expectValue(PieceSquareKey, tag))
     }
 
     private infix fun Piece.on(square: Square): SquarePieceTag = SquarePieceTag(square, this)
 
-    private fun squareSize(): Float {
-        return composeRule.onNodeWithContentDescription("Board")
+    private fun Square.position(): Offset {
+        val squareSize = composeRule.onNodeWithContentDescription("Board")
             .fetchSemanticsNode()
             .layoutInfo
             .width / 8f
-    }
-
-    private fun Square.position(): Offset {
-        val squareSize = squareSize()
         BoardLayout(
             squareSizeDp = squareSize.dp,
             squareSize = squareSize,
@@ -370,9 +417,13 @@ class GameViewTest {
     @Composable
     private fun TestChessBoard(game: GameSession) {
         val sessionManager = LocalGameSession.current
+        var terminated by remember { mutableStateOf(false) }
 
         LaunchedEffect(Unit) {
             sessionManager.updateSession(game)
+            terminationState.collect {
+                terminated = it
+            }
         }
 
         ChessTheme {
@@ -384,7 +435,7 @@ class GameViewTest {
                             runBlocking { game.move(it.toString()) }
                         },
                         onResign = {},
-                        terminated = false,
+                        terminated = terminated,
                         sounds = {},
                     )
                 }

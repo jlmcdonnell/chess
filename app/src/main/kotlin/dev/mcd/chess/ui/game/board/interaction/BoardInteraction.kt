@@ -126,6 +126,10 @@ class BoardInteraction(
         perspective.value = side
     }
 
+    fun togglePerspective() {
+        perspective.value = if (perspective.value == Side.WHITE) Side.BLACK else Side.WHITE
+    }
+
     fun highlightMovesFrom(): Flow<Square> = highlightMoveChanges
 
     private fun releaseTarget() {
