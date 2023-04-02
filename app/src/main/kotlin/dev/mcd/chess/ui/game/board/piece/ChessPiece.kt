@@ -39,9 +39,7 @@ import kotlinx.coroutines.withContext
 
 context(BoardLayout)
 @Composable
-fun ChessPiece(
-    initialState: ChessPieceState,
-) {
+fun ChessPiece(initialState: ChessPieceState) {
     val gameManager = LocalGameSession.current
     val boardInteraction = LocalBoardInteraction.current
 
@@ -65,17 +63,10 @@ fun ChessPiece(
     val animatedSize by animateDpAsState(currentSize.toDp(), label = "Piece Size")
 
     val position = remember(state, pan, dragging) {
-        if (dragging) {
-            Offset(
-                x = (pan.x - animatedSize.value / 2f) + state.squareOffset.x,
-                y = (pan.y - animatedSize.value * 2f) + state.squareOffset.y,
-            )
-        } else {
-            Offset(
-                x = pan.x + state.squareOffset.x,
-                y = pan.y + state.squareOffset.y,
-            )
-        }
+        Offset(
+            x = pan.x - (if (dragging) (animatedSize.value / 2f) else 0f) + state.squareOffset.x,
+            y = pan.y - (if (dragging) (animatedSize.value * 2f) else 0f) + state.squareOffset.y,
+        )
     }
 
     val animatedPan by animateOffsetAsState(

@@ -17,9 +17,8 @@ fun Modifier.calculateBoardLayout(
         onGloballyPositioned {
             density.run {
                 val squareSize = it.size.width.div(8).toFloat()
-                val squareSizeDp = squareSize.toDp()
                 BoardLayout(
-                    squareSizeDp = squareSizeDp,
+                    squareSizeDp = squareSize.toDp(),
                     squareSize = squareSize,
                     perspective = perspective,
                     squarePositions = Square.values().associateWith { square ->

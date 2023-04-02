@@ -25,12 +25,12 @@ fun Pieces() {
 
     pieces.forEachIndexed { index, piece ->
         if (piece != Piece.NONE) {
-            val initialSquare = Square.squareAt(index)
-            val history = game!!.history()
-            val state = calculatePieceState(piece, initialSquare, history)
-
             ChessPiece(
-                initialState = state,
+                initialState = calculatePieceState(
+                    piece = piece,
+                    initialSquare = Square.squareAt(index),
+                    history = game?.history() ?: emptyList(),
+                ),
             )
         }
     }
@@ -46,8 +46,6 @@ private fun calculatePieceState(
         square = initialSquare,
         squareOffset = initialSquare.topLeft(),
         piece = piece,
-        captured = false,
-        moves = Stack(),
     ),
 ) { state, move ->
     if (state.square.relevantToMove(move)) {

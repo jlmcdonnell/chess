@@ -84,7 +84,7 @@ private fun drawFileLabels(
 ) {
     if (
         (perspective == Side.WHITE && square.rank.ordinal == 0) ||
-        (perspective == Side.BLACK && square.rank.ordinal == 8)
+        (perspective == Side.BLACK && square.rank.ordinal == 7)
     ) {
         val style = if (square.isLightSquare) squareLabelStyleLight else squareLabelStyleDark
         val label = square.file.notation.lowercase()
