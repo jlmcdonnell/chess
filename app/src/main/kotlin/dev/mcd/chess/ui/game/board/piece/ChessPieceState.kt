@@ -11,5 +11,5 @@ data class ChessPieceState(
     var squareOffset: Offset,
     var piece: Piece,
     var captured: Boolean,
-    val moves: Stack<Move> = Stack(),
+    val moves: Stack<Move>,
 )

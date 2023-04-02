@@ -5,23 +5,6 @@ import dev.mcd.chess.common.game.DirectionalMove
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
-/**
- *      _                         _
- *     |_|                       |_|
- *     | |         /^^^\         | |
- *    _| |_      (| "o" |)      _| |_
- *  _| | | | _    (_---_)    _ | | | |_
- * | | | | |' |    _| |_    | `| | | | |
- * \          /   /     \   \          /
- *  \        /  / /(. .)\ \  \        /
- *    \    /  / /  | . |  \ \  \    /
- *      \  \/ /    ||-||    \ \/  /
- *        \_/      || ||      \_/
- *                 () ()
- *                 || ||
- *                ooO Ooo
- */
-
 object UpdateChessPieceState {
 
     context(BoardLayout)

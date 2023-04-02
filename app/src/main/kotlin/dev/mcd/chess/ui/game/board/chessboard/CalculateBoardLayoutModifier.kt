@@ -5,8 +5,10 @@ import androidx.compose.ui.composed
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import com.github.bhlangonijr.chesslib.Side
+import com.github.bhlangonijr.chesslib.Square
+import dev.mcd.chess.ui.extension.center
 
-fun Modifier.boardLayout(
+fun Modifier.calculateBoardLayout(
     perspective: Side,
     onLayout: (BoardLayout) -> Unit,
 ): Modifier {
@@ -20,6 +22,9 @@ fun Modifier.boardLayout(
                     squareSizeDp = squareSizeDp,
                     squareSize = squareSize,
                     perspective = perspective,
+                    squarePositions = Square.values().associateWith { square ->
+                        square.center(perspective == Side.WHITE, squareSize)
+                    },
                 ).let(onLayout)
             }
         }

@@ -331,6 +331,28 @@ class GameViewTest {
         }
     }
 
+    @Test
+    fun flipBoardAndUndo() = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                setPiece(WHITE_KING, E1)
+                setPiece(BLACK_KING, E8)
+                setPiece(WHITE_PAWN, E2)
+            }
+            gameRule.game.setBoard(board)
+            setupChessBoard()
+
+            move("e2e4")
+
+            flipBoard()
+            undoMove()
+
+            assertPiece(WHITE_PAWN on E2)
+        }
+    }
+
+
     context(ComposeContentTestRule)
     private fun setupChessBoard(game: GameSession = gameRule.game) {
         mainClock.autoAdvance = false

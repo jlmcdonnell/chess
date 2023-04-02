@@ -122,10 +122,6 @@ class BoardInteraction(
 
     fun perspective(): Flow<Side> = perspective
 
-    fun setPerspective(side: Side) {
-        perspective.value = side
-    }
-
     fun togglePerspective() {
         perspective.value = if (perspective.value == Side.WHITE) Side.BLACK else Side.WHITE
     }

@@ -19,6 +19,10 @@ fun Square.topLeft(): Offset {
 
 context (BoardLayout)
 fun Square.center(): Offset {
+    return center(isWhite, squareSize)
+}
+
+fun Square.center(isWhite: Boolean, squareSize: Float): Offset {
     return if (isWhite) {
         val x = file.ordinal * squareSize + squareSize / 2
         val y = (7 - rank.ordinal) * squareSize + squareSize / 2

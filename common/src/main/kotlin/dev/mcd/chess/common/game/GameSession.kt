@@ -1,6 +1,7 @@
 package dev.mcd.chess.common.game
 
 import com.github.bhlangonijr.chesslib.Board
+import com.github.bhlangonijr.chesslib.MoveBackup
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
@@ -18,15 +19,18 @@ open class GameSession(
     val selfSide: Side = Side.WHITE,
 ) {
     private lateinit var board: Board
+    private lateinit var startingPieces: List<Piece>
 
     private val moves = MutableStateFlow<DirectionalMove?>(null)
 
     val moveCount: Int get() = board.moveCounter
 
-    private val history = Stack<Move>()
+    private val history = Stack<MoveBackup>()
 
     suspend fun setBoard(board: Board) {
         this.board = board
+        this.startingPieces = board.boardToArray().toList()
+
         board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, undo = false)) }
     }
 
@@ -44,16 +48,21 @@ open class GameSession(
     fun undo() {
         if (board.backup.size > 0) {
             val lastMove = board.backup.last()
-            history.push(board.undoMove())
+            board.undoMove()
+            history.push(lastMove)
             moves.tryEmit(DirectionalMove(lastMove, undo = true))
         }
     }
 
     fun redo() {
         if (history.size > 0) {
-            board.doMove(history.pop())
+            board.doMove(history.pop().move)
             moves.tryEmit(DirectionalMove(board.backup.last, undo = false))
         }
+    }
+
+    fun piecesAtVariationStart(): List<Piece> {
+        return startingPieces
     }
 
     fun pieces(): List<Piece> {
@@ -92,4 +101,6 @@ open class GameSession(
         .filter { it != Piece.NONE }
 
     fun fen() = board.fen!!
+
+    fun history(): List<MoveBackup> = board.backup
 }
