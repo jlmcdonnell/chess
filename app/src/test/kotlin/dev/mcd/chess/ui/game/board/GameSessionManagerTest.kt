@@ -17,7 +17,7 @@ class GameSessionManagerTest {
     @Test
     fun captures() {
         runBlocking {
-            val player = HumanPlayer("", PlayerImage.None, 0)
+            val player = HumanPlayer("", PlayerImage.Default, 0)
             val manager = GameSessionManager()
 
             val board1 = Board()

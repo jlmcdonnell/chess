@@ -11,7 +11,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.common.player.Player
-import dev.mcd.chess.common.player.PlayerImage.None
+import dev.mcd.chess.common.player.PlayerImage.Default
 import dev.mcd.chess.ui.player.PlayerImageView
 
 @Composable
@@ -23,7 +23,7 @@ fun PlayerStrip(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PlayerImageView(player?.image ?: None)
+        PlayerImageView(player?.image ?: Default)
         Spacer(modifier = Modifier.width(12.dp))
         player?.let {
             Column {

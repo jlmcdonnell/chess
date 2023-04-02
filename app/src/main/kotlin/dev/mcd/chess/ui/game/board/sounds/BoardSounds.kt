@@ -16,6 +16,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.ui.LocalGameSession
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
@@ -29,6 +30,12 @@ fun BoardSounds() {
                 with(BoardSoundHandler) {
                     init(context)
                     notify()
+                    launch {
+                        awaitMoves(session)
+                    }
+                    launch {
+                        awaitTermination(session)
+                    }
                     awaitMoves(session)
                 }
             }
@@ -63,13 +70,17 @@ private object BoardSoundHandler {
         }
     }
 
+    suspend fun awaitTermination(session: GameSession) {
+        withContext(Dispatchers.Default) {
+            session.awaitTermination()
+            notify()
+        }
+    }
+
     suspend fun awaitMoves(session: GameSession) {
         withContext(Dispatchers.Default) {
             session.moves().collectLatest { (move, _) ->
-                if (session.termination() != null) {
-                    notifyPlayer.seekTo(0)
-                    notifyPlayer.start()
-                } else if (move.capturedPiece != Piece.NONE) {
+                if (move.capturedPiece != Piece.NONE) {
                     capturePlayer.seekTo(0)
                     capturePlayer.start()
                 } else {

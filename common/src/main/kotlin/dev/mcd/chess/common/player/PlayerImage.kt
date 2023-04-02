@@ -1,6 +1,7 @@
 package dev.mcd.chess.common.player
 
 sealed interface PlayerImage {
-    object None : PlayerImage
+    object Default : PlayerImage
+    object Bot : PlayerImage
     class Url(val url: String) : PlayerImage
 }

@@ -86,7 +86,7 @@ class OnlineGameViewModel @Inject constructor(
                     }
                 }
 
-                clientSession()?.channel?.resign()
+                clientSession()?.resign()
 
                 if (andNavigateBack) {
                     postSideEffect(SideEffect.NavigateBack)

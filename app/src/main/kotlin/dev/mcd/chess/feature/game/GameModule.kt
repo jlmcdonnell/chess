@@ -5,7 +5,11 @@ import dagger.Module
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.feature.game.data.GameSessionRepositoryImpl
+import dev.mcd.chess.feature.game.data.usecase.StartBotGameImpl
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
+import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
+import dev.mcd.chess.feature.game.domain.usecase.MoveForBotImpl
+import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
 import javax.inject.Singleton
 
 @Module
@@ -14,4 +18,10 @@ abstract class GameModule {
     @Binds
     @Singleton
     abstract fun gameSessionRepo(impl: GameSessionRepositoryImpl): GameSessionRepository
+
+    @Binds
+    abstract fun startBotGame(impl: StartBotGameImpl): StartBotGame
+
+    @Binds
+    abstract fun moveForBot(impl: MoveForBotImpl): MoveForBot
 }

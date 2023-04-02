@@ -7,6 +7,8 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.BuildConfig
 import dev.mcd.chess.feature.common.data.AppPreferencesImpl
+import dev.mcd.chess.feature.common.domain.Translations
+import dev.mcd.chess.feature.common.data.TranslationsImpl
 import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.common.domain.Environment
 import dev.mcd.chess.online.domain.AuthStore
@@ -21,6 +23,10 @@ abstract class CommonModule {
     @Binds
     @Singleton
     abstract fun appPrefs(impl: AppPreferencesImpl): AppPreferences
+
+    @Binds
+    @Singleton
+    abstract fun translations(impl: TranslationsImpl): Translations
 
     companion object {
         @Provides

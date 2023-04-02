@@ -96,12 +96,12 @@ internal class JoinOnlineGameImpl @Inject constructor(
             id = gameId,
             self = HumanPlayer(
                 name = userId,
-                image = PlayerImage.None,
+                image = PlayerImage.Default,
                 rating = 0,
             ),
             opponent = HumanPlayer(
                 name = opponentId,
-                image = PlayerImage.None,
+                image = PlayerImage.Default,
                 rating = 0,
             ),
             selfSide = if (userId == whitePlayer) Side.WHITE else Side.BLACK,

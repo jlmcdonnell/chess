@@ -78,7 +78,6 @@ class BoardInteraction(
 
     fun dropPiece(piece: Piece, square: Square): DropPieceResult {
         if (enableInteraction) {
-            Timber.d("dropPiece $piece square=$square target=$target")
             if (target.value == Square.NONE) return DropPieceResult.None
 
             var result: DropPieceResult = DropPieceResult.None
@@ -88,9 +87,7 @@ class BoardInteraction(
                 val promotions = session.promotions(move)
 
                 if (move in session.legalMoves()) {
-                    if (moves.tryEmit(move)) {
-                        Timber.d("dropPiece emit move: $this")
-                    }
+                    moves.tryEmit(move)
                     result = DropPieceResult.Moved(square, target.value)
                     clearHighlightMoves()
                 } else if (promotions.isNotEmpty()) {

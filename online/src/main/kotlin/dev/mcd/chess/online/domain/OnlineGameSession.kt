@@ -10,4 +10,10 @@ open class OnlineGameSession(
     opponent: Player,
     selfSide: Side,
     val channel: OnlineGameChannel,
-) : GameSession(id, self, opponent, selfSide)
+) : GameSession(id, self, opponent, selfSide) {
+
+    override suspend fun resign() {
+        channel.resign()
+        super.resign()
+    }
+}

@@ -11,8 +11,8 @@ import org.junit.runner.Description
 import org.junit.runners.model.Statement
 
 fun createGameSessionRule(
-    white: HumanPlayer = HumanPlayer("white", PlayerImage.None, 0),
-    black: HumanPlayer = HumanPlayer("black", PlayerImage.None, 0),
+    white: HumanPlayer = HumanPlayer("white", PlayerImage.Default, 0),
+    black: HumanPlayer = HumanPlayer("black", PlayerImage.Default, 0),
     board: Board = Board(),
 ): GameSessionRule {
     return GameSessionRule(white, black, board)

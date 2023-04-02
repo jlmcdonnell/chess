@@ -3,8 +3,6 @@ package dev.mcd.chess.ui.screen.botgame
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.github.bhlangonijr.chesslib.Board
-import com.github.bhlangonijr.chesslib.Constants
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -13,16 +11,14 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.common.player.HumanPlayer
-import dev.mcd.chess.common.player.PlayerImage
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
-import kotlinx.coroutines.delay
+import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
+import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -30,16 +26,17 @@ import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
-import java.util.UUID
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.math.max
+import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
     private val engine: ChessEngine,
     private val gameSessionRepository: GameSessionRepository,
     private val state: SavedStateHandle,
+    private val startBotGame: StartBotGame,
+    private val moveForBot: MoveForBot,
 ) : ViewModel(), ContainerHost<BotGameViewModel.State, BotGameViewModel.SideEffect> {
 
     private lateinit var bot: Bot
@@ -54,14 +51,14 @@ class BotGameViewModel @Inject constructor(
         viewModelScope.launch {
             gameSessionRepository.activeGame()
                 .filterNotNull()
-                .collectLatest { session ->
+                .collectLatest { game ->
                     intent {
                         reduce {
-                            State.Game(
-                                game = session,
-                                terminated = false,
-                            )
+                            State.Game(game, terminated = false)
                         }
+                    }
+                    intent {
+                        handleTermination(game.awaitTermination())
                     }
                 }
         }
@@ -76,30 +73,12 @@ class BotGameViewModel @Inject constructor(
 
     fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull()
-            if (game != null) {
-                runCatching {
-                    suspendCancellableCoroutine { continuation ->
-                        intent {
-                            postSideEffect(
-                                SideEffect.ConfirmResignation(
-                                    onConfirm = { continuation.resume(Unit) },
-                                    onDismiss = { continuation.cancel() },
-                                ),
-                            )
-                        }
-                    }
-                    endGame(game)
-                    if (andNavigateBack) {
-                        postSideEffect(SideEffect.NavigateBack)
-                    }
-                }.onFailure {
-                    Timber.d("Will not resign")
-                    if (andNavigateBack) {
-                        postSideEffect(SideEffect.NavigateBack)
-                    }
+            gameSessionRepository.activeGame().firstOrNull()?.run {
+                if (confirmResignation()) {
+                    resign()
                 }
-            } else if (andNavigateBack) {
+            }
+            if (andNavigateBack) {
                 postSideEffect(SideEffect.NavigateBack)
             }
         }
@@ -107,75 +86,42 @@ class BotGameViewModel @Inject constructor(
 
     fun onPlayerMove(move: Move) {
         intent {
-            val game = gameSessionRepository.activeGame().firstOrNull() ?: run {
-                return@intent
-            }
-            Timber.d("onPlayerMove: $move")
-            if (game.move(move.toString()) == MoveResult.Moved) {
-                val termination = game.termination()
-                if (termination == null) {
-                    tryMoveBot(game)
+            gameSessionRepository.activeGame().firstOrNull()?.run {
+                if (move(move.toString()) == MoveResult.Moved) {
+                    moveForBot()
                 } else {
-                    endGame(game)
+                    Timber.e("Illegal Move: $move")
                 }
-            } else {
-                endGame(game)
             }
-        }
-    }
-
-    private suspend fun tryMoveBot(game: GameSession) {
-        Timber.d("tryMoveBot")
-        val delayedMoveTime = System.currentTimeMillis() + (500 + (0..1000).random())
-        val stockfishMoveSan = engine.getMove(game.fen(), level = bot.level, depth = bot.depth)
-        Timber.d("Moving $stockfishMoveSan")
-        delay(max(0, delayedMoveTime - System.currentTimeMillis()))
-        game.move(stockfishMoveSan)
-
-        if (game.termination() != null) {
-            endGame(game)
         }
     }
 
     private fun startGame() {
         intent {
-            engine.awaitReady()
-
-            Timber.d("Engine ready")
-
-            val board = Board().apply {
-                loadFromFen(Constants.startStandardFENPosition)
-            }
-            val game = GameSession(
-                id = UUID.randomUUID().toString(),
-                self = HumanPlayer(
-                    name = "You",
-                    rating = 900,
-                    image = PlayerImage.None,
-                ),
-                selfSide = side,
-                opponent = bot,
-            )
-            game.setBoard(board)
-            gameSessionRepository.updateActiveGame(game)
-
-            if (board.sideToMove != game.selfSide) {
-                tryMoveBot(game)
-            }
+            startBotGame(side, bot)
         }
     }
 
-    private fun endGame(game: GameSession) {
+    private fun handleTermination(reason: TerminationReason) {
         intent {
             gameSessionRepository.updateActiveGame(null)
-
             reduce {
                 (state as? State.Game)?.copy(terminated = true) ?: state
             }
+            postSideEffect(SideEffect.AnnounceTermination(reason))
+        }
+    }
 
-            val termination = game.termination() ?: TerminationReason(resignation = side)
-
-            postSideEffect(SideEffect.AnnounceTermination(termination))
+    private suspend fun confirmResignation(): Boolean {
+        return suspendCoroutine { continuation ->
+            intent {
+                postSideEffect(
+                    SideEffect.ConfirmResignation(
+                        onConfirm = { continuation.resume(true) },
+                        onDismiss = { continuation.resume(false) },
+                    ),
+                )
+            }
         }
     }
 
