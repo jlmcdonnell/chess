@@ -7,9 +7,7 @@ pluginManagement {
         maven {
             setUrl("https://androidx.dev/snapshots/builds/9664109/artifacts/repository")
         }
-        gradlePluginPortal() {
-            include("org.jlleitschuh.gradle.ktlint")
-        }
+        gradlePluginPortal()
     }
 }
 dependencyResolutionManagement {

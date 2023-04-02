@@ -45,7 +45,6 @@ android {
         jvmToolchain(BuildSettings.jdkVersion)
     }
 
-    // Opt in to kotlin context receivers
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
         freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
