@@ -20,11 +20,13 @@ import dev.mcd.chess.R
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.rememberBoardColors
 
 context(BoardLayout)
 @Composable
 fun TargetHighlight() {
     val target by LocalBoardInteraction.current.targets().collectAsState(Square.NONE)
+    val boardColors = rememberBoardColors()
 
     if (target != Square.NONE) {
         val offset by animateOffsetAsState(
@@ -39,7 +41,7 @@ fun TargetHighlight() {
                 .offset(offset.x.toDp(), offset.y.toDp())
                 .size(squareSizeDp * 2)
                 .clip(CircleShape)
-                .background(BoardTheme.targetSquareHighlight),
+                .background(boardColors.targetSquareHighlight),
         )
     }
 }

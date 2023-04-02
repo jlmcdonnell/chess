@@ -31,5 +31,6 @@
     <string name="dismiss">Dismiss</string>
     <string name="flip_board">Flip board</string>
     <string name="player_you">You</string>
+    <string name="set_color_scheme">Colour scheme</string>
 
 </resources>

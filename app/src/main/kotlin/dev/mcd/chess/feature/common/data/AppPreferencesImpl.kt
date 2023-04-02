@@ -8,7 +8,9 @@ import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.common.player.UserId
 import dev.mcd.chess.feature.common.domain.AppPreferences
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore("prefs")
@@ -21,6 +23,7 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Contex
     private val clickToMove = booleanPreferencesKey("click-to-move")
     private val tokenKey = stringPreferencesKey("token")
     private val userKey = stringPreferencesKey("user")
+    private val colorSchemeKey = stringPreferencesKey("color-scheme")
 
     override suspend fun setHost(host: String) {
         store.edit { it[hostKey] = host }
@@ -54,6 +57,18 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Contex
 
     override suspend fun token(): String? {
         return store.data.first()[tokenKey]
+    }
+
+    override suspend fun colorSchemeUpdates(): Flow<String?> {
+        return store.data.map { it[colorSchemeKey] }
+    }
+
+    override suspend fun colorScheme(): String? {
+        return store.data.first()[colorSchemeKey]
+    }
+
+    override suspend fun setColorScheme(colorScheme: String) {
+        store.edit { it[colorSchemeKey] = colorScheme }
     }
 
     override suspend fun clear() {

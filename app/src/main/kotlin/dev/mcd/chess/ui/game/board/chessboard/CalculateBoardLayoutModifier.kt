@@ -16,7 +16,7 @@ fun Modifier.calculateBoardLayout(
         val density = LocalDensity.current
         onGloballyPositioned {
             density.run {
-                val squareSize = it.size.width.div(8).toFloat()
+                val squareSize = it.size.width / 8f
                 BoardLayout(
                     squareSizeDp = squareSize.toDp(),
                     squareSize = squareSize,

@@ -10,14 +10,17 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.testTag
+import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
+import dev.mcd.chess.ui.rememberBoardColors
 
 context(BoardLayout)
 @Composable
 fun MoveHighlight() {
     val lastMove by LocalGameSession.current.moveUpdates().collectAsState(null)
+    val boardColors = rememberBoardColors()
 
     lastMove?.let { (moveBackup, undo) ->
 
@@ -31,7 +34,7 @@ fun MoveHighlight() {
         val moveFromOffset = from.topLeft()
         val moveToOffset = to.topLeft()
         val (fromColor, toColor) = listOf(from, to).map {
-            if (it.isLightSquare) BoardTheme.lastMoveHighlightOnLight else BoardTheme.lastMoveHighlightOnDark
+            if (it.isLightSquare) boardColors.lastMoveHighlightOnLight else boardColors.lastMoveHighlightOnDark
         }
 
         Box(

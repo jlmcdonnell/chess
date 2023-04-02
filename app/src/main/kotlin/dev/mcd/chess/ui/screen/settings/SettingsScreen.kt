@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
@@ -17,27 +19,36 @@ import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.material3.CenterAlignedTopAppBar
 import androidx.compose.material3.ElevatedAssistChip
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ElevatedFilterChip
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
+import dev.mcd.chess.feature.common.domain.AppColorScheme
+import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
+import dev.mcd.chess.ui.game.board.chessboard.Squares
+import dev.mcd.chess.ui.game.board.chessboard.calculateBoardLayout
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -63,21 +74,87 @@ fun SettingsScreen(
 
         val state by viewModel.collectAsState()
 
-        Column(
+        LazyColumn(
             Modifier
                 .padding(padding)
                 .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
-            if (state.showDebug) {
-                DebugSettings(
-                    prefillHosts = state.prefillHosts,
-                    currentHost = state.host,
-                    onUpdateHost = { viewModel.updateHost(it) },
-                    onClearAuthData = { viewModel.clearAuthData() },
+            item {
+                ColorSchemeSelection(
+                    colorScheme = state.colorScheme,
+                    onColorSchemeChanged = { viewModel.updateColorScheme(it) },
                 )
+            }
+            item {
+                if (state.showDebug) {
+                    Spacer(modifier = Modifier.height(24.dp))
+                    DebugSettings(
+                        prefillHosts = state.prefillHosts,
+                        currentHost = state.host,
+                        onUpdateHost = { viewModel.updateHost(it) },
+                        onClearAuthData = { viewModel.clearAuthData() },
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+fun ColorSchemeSelection(
+    colorScheme: AppColorScheme,
+    onColorSchemeChanged: (AppColorScheme) -> Unit,
+) {
+    var boardLayout by remember { mutableStateOf(BoardLayout()) }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+    ) {
+        Text(
+            modifier = Modifier.padding(24.dp),
+            text = stringResource(R.string.set_color_scheme),
+        )
+        LazyRow(
+            modifier = Modifier.padding(horizontal = 24.dp),
+            horizontalArrangement = spacedBy(12.dp),
+        ) {
+            items(AppColorScheme.values()) { scheme ->
+                ColorSchemeChip(
+                    colorScheme = scheme,
+                    isSelected = scheme == colorScheme,
+                    onClick = { onColorSchemeChanged(scheme) },
+                )
+            }
+        }
+
+        Spacer(modifier = Modifier.height(24.dp))
+
+        ElevatedCard(
+            modifier = Modifier
+                .size(200.dp)
+                .calculateBoardLayout(Side.WHITE) { boardLayout = it }
+                .clip(MaterialTheme.shapes.extraLarge),
+        ) {
+            boardLayout.run {
+                Squares(drawLabels = false)
+            }
+        }
+    }
+}
+
+@Composable
+fun ColorSchemeChip(
+    colorScheme: AppColorScheme,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
+    ElevatedFilterChip(
+        modifier = Modifier.height(48.dp),
+        label = { Text(text = colorScheme.name) },
+        selected = isSelected,
+        onClick = onClick,
+    )
 }
 
 @Composable

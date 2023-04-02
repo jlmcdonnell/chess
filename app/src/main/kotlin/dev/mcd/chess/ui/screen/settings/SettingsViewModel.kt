@@ -3,6 +3,7 @@ package dev.mcd.chess.ui.screen.settings
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
+import dev.mcd.chess.feature.common.domain.AppColorScheme
 import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.common.domain.Environment
 import org.orbitmvi.orbit.ContainerHost
@@ -23,13 +24,26 @@ class SettingsViewModel @Inject constructor(
                 Environment.Production.apiUrl,
                 "http://10.0.2.2:8080",
             )
+
+            val colorScheme = appPreferences.colorScheme()?.let {
+                AppColorScheme.valueOf(it)
+            } ?: AppColorScheme.default()
+
             reduce {
                 state.copy(
                     host = host,
                     prefillHosts = prefillHosts,
                     showDebug = BuildConfig.DEBUG,
+                    colorScheme = colorScheme,
                 )
             }
+        }
+    }
+
+    fun updateColorScheme(colorScheme: AppColorScheme) {
+        intent {
+            appPreferences.setColorScheme(colorScheme.name)
+            reduce { state.copy(colorScheme = colorScheme) }
         }
     }
 
@@ -53,5 +67,6 @@ class SettingsViewModel @Inject constructor(
         val host: String = "",
         val prefillHosts: List<String> = emptyList(),
         val showDebug: Boolean = false,
+        val colorScheme: AppColorScheme = AppColorScheme.default(),
     )
 }
