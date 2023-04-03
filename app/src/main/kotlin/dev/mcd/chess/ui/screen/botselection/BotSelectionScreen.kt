@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
-import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.player.PlayerImageView
@@ -94,7 +93,7 @@ fun BotSelectionScreen(
 
             LazyColumn {
                 items(DefaultBots.bots(), { it.slug }) { bot ->
-                    BotItem(bot = bot) {
+                    BotItem(botName = bot.name) {
                         onBotSelected(bot.slug, selectedSide.name)
                     }
                 }
@@ -106,7 +105,7 @@ fun BotSelectionScreen(
 @Composable
 private fun BotItem(
     modifier: Modifier = Modifier,
-    bot: Bot,
+    botName: String,
     onClick: () -> Unit,
 ) {
     ElevatedCard(
@@ -121,10 +120,10 @@ private fun BotItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            PlayerImageView(image = bot.image)
+            PlayerImageView(bot = true)
             Spacer(modifier = Modifier.width(24.dp))
             Text(
-                text = bot.name,
+                text = botName,
                 style = MaterialTheme.typography.bodyLarge,
             )
         }

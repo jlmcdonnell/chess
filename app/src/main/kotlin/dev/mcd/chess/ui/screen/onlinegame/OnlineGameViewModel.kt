@@ -1,8 +1,10 @@
 package dev.mcd.chess.ui.screen.onlinegame
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
@@ -143,7 +145,13 @@ class OnlineGameViewModel @Inject constructor(
 
     private fun handleTermination(reason: TerminationReason) {
         intent {
-            postSideEffect(AnnounceTermination(reason))
+            postSideEffect(
+                AnnounceTermination(
+                    sideMated = reason.sideMated,
+                    draw = reason.draw,
+                    resignation = reason.resignation,
+                ),
+            )
         }
     }
 
@@ -176,8 +184,11 @@ class OnlineGameViewModel @Inject constructor(
             val onDismiss: () -> Unit,
         ) : SideEffect
 
+        @Stable
         data class AnnounceTermination(
-            val reason: TerminationReason,
+            val sideMated: Side? = null,
+            val draw: Boolean = false,
+            val resignation: Side? = null,
         ) : SideEffect
 
         object NavigateBack : SideEffect

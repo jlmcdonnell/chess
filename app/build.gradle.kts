@@ -48,6 +48,11 @@ android {
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
         freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+        if (project.hasProperty("enableComposeCompilerReports")) {
+            val metricsDir = "${project.buildDir.absolutePath}/compose_metrics"
+            freeCompilerArgs += listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$metricsDir")
+            freeCompilerArgs += listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsDir")
+        }
     }
 
     buildFeatures {
@@ -57,6 +62,7 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = Versions.composeCompiler
+        useLiveLiterals = false
     }
 }
 

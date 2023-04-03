@@ -16,12 +16,13 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
-import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.ui.theme.ChessTheme
 
 @Composable
 fun GameTermination(
-    reason: TerminationReason,
+    sideMated: Side? = null,
+    draw: Boolean = false,
+    resignation: Side? = null,
     onDismiss: () -> Unit,
     onRestart: (() -> Unit)?,
 ) {
@@ -35,7 +36,11 @@ fun GameTermination(
                 .padding(top = 16.dp, start = 16.dp, end = 16.dp)
                 .fillMaxWidth(),
         ) {
-            Reason(reason)
+            Reason(
+                sideMated = sideMated,
+                draw = draw,
+                resignation = resignation,
+            )
             Row(modifier = Modifier.align(Alignment.End)) {
                 onRestart?.let {
                     TextButton(
@@ -56,14 +61,18 @@ fun GameTermination(
 }
 
 @Composable
-private fun Reason(reason: TerminationReason) {
+private fun Reason(
+    sideMated: Side? = null,
+    draw: Boolean = false,
+    resignation: Side? = null,
+) {
     val text = when {
-        reason.draw -> stringResource(R.string.game_ended_by_draw)
-        reason.sideMated == Side.WHITE -> stringResource(R.string.black_won_by_checkmate)
-        reason.sideMated == Side.BLACK -> stringResource(R.string.white_won_by_checkmate)
-        reason.resignation == Side.WHITE -> stringResource(R.string.white_resigned)
-        reason.resignation == Side.BLACK -> stringResource(R.string.black_resigned)
-        else -> throw Error("Unhandled reason: $reason")
+        draw -> stringResource(R.string.game_ended_by_draw)
+        sideMated == Side.WHITE -> stringResource(R.string.black_won_by_checkmate)
+        sideMated == Side.BLACK -> stringResource(R.string.white_won_by_checkmate)
+        resignation == Side.WHITE -> stringResource(R.string.white_resigned)
+        resignation == Side.BLACK -> stringResource(R.string.black_resigned)
+        else -> throw Error("Unhandled reason")
     }
     Text(text = text)
 }
@@ -74,11 +83,6 @@ private fun GameTerminationPreview() {
     ChessTheme {
         Box(modifier = Modifier.padding(24.dp)) {
             GameTermination(
-                reason = TerminationReason(
-                    draw = true,
-                    sideMated = null,
-                    resignation = null,
-                ),
                 onDismiss = {},
                 onRestart = null,
             )

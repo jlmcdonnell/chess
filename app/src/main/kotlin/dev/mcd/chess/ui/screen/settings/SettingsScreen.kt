@@ -90,8 +90,7 @@ fun SettingsScreen(
                 if (state.showDebug) {
                     Spacer(modifier = Modifier.height(24.dp))
                     DebugSettings(
-                        prefillHosts = state.prefillHosts,
-                        currentHost = state.host,
+                        debugModel = state.debugModel,
                         onUpdateHost = { viewModel.updateHost(it) },
                         onClearAuthData = { viewModel.clearAuthData() },
                     )
@@ -159,13 +158,12 @@ fun ColorSchemeChip(
 
 @Composable
 fun DebugSettings(
-    prefillHosts: List<String>,
-    currentHost: String,
+    debugModel: SettingsViewModel.DebugModel,
     onUpdateHost: (String) -> Unit,
     onClearAuthData: () -> Unit,
 ) {
     var debugApiHost by remember {
-        mutableStateOf(TextFieldValue(text = currentHost))
+        mutableStateOf(TextFieldValue(text = debugModel.host))
     }
 
     val context = LocalContext.current
@@ -200,7 +198,7 @@ fun DebugSettings(
         modifier = Modifier.padding(horizontal = 24.dp),
         horizontalArrangement = spacedBy(12.dp),
     ) {
-        items(prefillHosts) { host ->
+        items(debugModel.prefillHosts) { host ->
             HostChip(
                 host = host,
                 onClick = {

@@ -26,7 +26,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.R
-import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.ResignationDialog
@@ -48,7 +48,7 @@ fun OnlineGameScreen(
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding)) {
             val state by viewModel.collectAsState()
-            var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
+            var showTermination by remember { mutableStateOf<AnnounceTermination?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
             BackHandler {
@@ -58,7 +58,7 @@ fun OnlineGameScreen(
 
             viewModel.collectSideEffect { effect ->
                 when (effect) {
-                    is AnnounceTermination -> showTerminationReason = effect.reason
+                    is AnnounceTermination -> showTermination = effect
                     is ConfirmResignation -> showResignation = effect
                     is NavigateBack -> navigateBack()
                 }
@@ -79,7 +79,7 @@ fun OnlineGameScreen(
 
             when (val s = state) {
                 is InGame -> GameView(
-                    game = s.session,
+                    gameHolder = StableHolder(s.session),
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,
                 )
@@ -94,12 +94,14 @@ fun OnlineGameScreen(
                 )
             }
 
-            showTerminationReason?.let { reason ->
+            showTermination?.let { (sideMated, draw, resignation) ->
                 Spacer(modifier = Modifier.height(24.dp))
                 GameTermination(
-                    reason = reason,
+                    sideMated = sideMated,
+                    draw = draw,
+                    resignation = resignation,
                     onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null },
+                    onDismiss = { showTermination = null },
                 )
             }
         }

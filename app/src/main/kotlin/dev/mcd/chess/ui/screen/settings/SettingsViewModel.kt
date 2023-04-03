@@ -1,5 +1,6 @@
 package dev.mcd.chess.ui.screen.settings
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.ViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.BuildConfig
@@ -31,8 +32,10 @@ class SettingsViewModel @Inject constructor(
 
             reduce {
                 state.copy(
-                    host = host,
-                    prefillHosts = prefillHosts,
+                    debugModel = DebugModel(
+                        host = host,
+                        prefillHosts = prefillHosts,
+                    ),
                     showDebug = BuildConfig.DEBUG,
                     colorScheme = colorScheme,
                 )
@@ -50,7 +53,7 @@ class SettingsViewModel @Inject constructor(
     fun updateHost(host: String) {
         intent {
             appPreferences.setHost(host)
-            reduce { state.copy(host = host) }
+            reduce { state.copy(debugModel = state.debugModel.copy(host = host)) }
         }
     }
 
@@ -63,10 +66,16 @@ class SettingsViewModel @Inject constructor(
 
     object SideEffect
 
+    @Stable
     data class State(
-        val host: String = "",
-        val prefillHosts: List<String> = emptyList(),
+        val debugModel: DebugModel = DebugModel(),
         val showDebug: Boolean = false,
         val colorScheme: AppColorScheme = AppColorScheme.default(),
+    )
+
+    @Stable
+    data class DebugModel(
+        val host: String = "",
+        val prefillHosts: List<String> = emptyList(),
     )
 }

@@ -31,11 +31,9 @@ import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.withContext
 
 context(BoardLayout)
 @Composable
@@ -49,7 +47,6 @@ fun ChessPiece(initialState: ChessPieceState) {
     var state by remember { mutableStateOf(initialState) }
 
     LaunchedEffect(Unit) {
-        withContext(Dispatchers.Default) {
             gameManager.moveUpdates()
                 .filter { (move, _) -> state.square.relevantToMove(move) }
                 .collectLatest { directionalMove ->
@@ -57,7 +54,6 @@ fun ChessPiece(initialState: ChessPieceState) {
                     pan = Offset.Zero
                     currentSize = squareSize
                 }
-        }
     }
 
     val animatedSize by animateDpAsState(currentSize.toDp(), label = "Piece Size")

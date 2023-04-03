@@ -10,18 +10,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
+import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import dev.mcd.chess.ui.game.board.sounds.BoardSounds
@@ -30,11 +28,12 @@ import timber.log.Timber
 
 @Composable
 fun GameView(
-    game: GameSession,
+    gameHolder: StableHolder<GameSession>,
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
     sounds: @Composable (() -> Unit) = { BoardSounds() },
 ) {
+    val (game) = gameHolder
     val sessionManager = LocalGameSession.current
     val boardInteraction = remember(game.id) { BoardInteraction(game) }
 
@@ -53,7 +52,8 @@ fun GameView(
             modifier = Modifier
                 .padding(horizontal = 12.dp)
                 .padding(top = 16.dp, bottom = 8.dp),
-            player = game.opponent,
+            playerName = game.opponent.name,
+            isBot = game.opponent is Bot,
         )
         CapturedPieces(
             modifier = Modifier.padding(horizontal = 12.dp),
@@ -82,7 +82,8 @@ fun GameView(
         ) {
             PlayerStrip(
                 modifier = Modifier,
-                player = game.self,
+                playerName = game.self.name,
+                isBot = false,
             )
             GameOptions(
                 modifier = Modifier.align(Alignment.CenterEnd),

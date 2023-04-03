@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Android
-import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.Person
 import androidx.compose.material3.Icon
@@ -17,15 +15,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.R
-import dev.mcd.chess.common.player.PlayerImage
 
 @Composable
-fun PlayerImageView(image: PlayerImage) {
-    val vector = if (image is PlayerImage.Bot) {
+fun PlayerImageView(bot: Boolean) {
+    val vector = if (bot) {
         Icons.Rounded.Memory
     } else {
         Icons.Rounded.Person
     }
+    Icons.Rounded.Memory
     Icon(
         modifier = Modifier
             .clip(CircleShape)

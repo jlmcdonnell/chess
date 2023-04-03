@@ -12,6 +12,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.ResignationDialog
@@ -31,7 +32,7 @@ fun BotGameScreen(
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding)) {
             val state by viewModel.collectAsState()
-            var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
+            var showTermination by remember { mutableStateOf<AnnounceTermination?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
             BackHandler {
@@ -40,7 +41,7 @@ fun BotGameScreen(
 
             viewModel.collectSideEffect { effect ->
                 when (effect) {
-                    is AnnounceTermination -> showTerminationReason = effect.reason
+                    is AnnounceTermination -> showTermination = effect
                     is ConfirmResignation -> showResignation = effect
                     is NavigateBack -> navigateBack()
                 }
@@ -61,7 +62,7 @@ fun BotGameScreen(
 
             when (val s = state) {
                 is Game -> GameView(
-                    game = s.game,
+                    gameHolder = s.gameHolder,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,
                 )
@@ -69,11 +70,13 @@ fun BotGameScreen(
                 is Loading -> Unit
             }
 
-            showTerminationReason?.let { reason ->
+            showTermination?.let { (sideMated, draw, resignation) ->
                 GameTermination(
-                    reason = reason,
+                    sideMated = sideMated,
+                    draw = draw,
+                    resignation = resignation,
                     onRestart = { viewModel.onRestart() },
-                    onDismiss = { showTerminationReason = null },
+                    onDismiss = { showTermination = null },
                 )
             }
         }

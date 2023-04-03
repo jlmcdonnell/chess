@@ -90,7 +90,6 @@ fun ChooseModeScreen(
     }
 }
 
-context(ColumnScope)
 @Composable
 private fun PlayComputerButton(
     onClick: () -> Unit,

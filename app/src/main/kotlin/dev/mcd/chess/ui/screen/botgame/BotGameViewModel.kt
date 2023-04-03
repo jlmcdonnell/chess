@@ -1,5 +1,6 @@
 package dev.mcd.chess.ui.screen.botgame
 
+import androidx.compose.runtime.Stable
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -15,6 +16,7 @@ import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
+import dev.mcd.chess.ui.compose.StableHolder
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -54,7 +56,7 @@ class BotGameViewModel @Inject constructor(
                 .collectLatest { game ->
                     intent {
                         reduce {
-                            State.Game(game)
+                            State.Game(StableHolder(game))
                         }
                     }
                     intent {
@@ -105,7 +107,13 @@ class BotGameViewModel @Inject constructor(
     private fun handleTermination(reason: TerminationReason) {
         intent {
             gameSessionRepository.updateActiveGame(null)
-            postSideEffect(SideEffect.AnnounceTermination(reason))
+            postSideEffect(
+                SideEffect.AnnounceTermination(
+                    sideMated = reason.sideMated,
+                    draw = reason.draw,
+                    resignation = reason.resignation,
+                ),
+            )
         }
     }
 
@@ -126,7 +134,7 @@ class BotGameViewModel @Inject constructor(
         object Loading : State
 
         data class Game(
-            val game: GameSession,
+            val gameHolder: StableHolder<GameSession>,
         ) : State
     }
 
@@ -136,8 +144,11 @@ class BotGameViewModel @Inject constructor(
             val onDismiss: () -> Unit,
         ) : SideEffect
 
+        @Stable
         data class AnnounceTermination(
-            val reason: TerminationReason,
+            val sideMated: Side? = null,
+            val draw: Boolean = false,
+            val resignation: Side? = null,
         ) : SideEffect
 
         object NavigateBack : SideEffect

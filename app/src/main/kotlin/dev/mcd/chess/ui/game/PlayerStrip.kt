@@ -10,28 +10,25 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import dev.mcd.chess.common.player.Player
-import dev.mcd.chess.common.player.PlayerImage.Default
 import dev.mcd.chess.ui.player.PlayerImageView
 
 @Composable
 fun PlayerStrip(
     modifier: Modifier = Modifier,
-    player: Player? = null,
+    playerName: String,
+    isBot: Boolean,
 ) {
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        PlayerImageView(player?.image ?: Default)
+        PlayerImageView(bot = isBot)
         Spacer(modifier = Modifier.width(12.dp))
-        player?.let {
-            Column {
-                Text(
-                    text = player.name,
-                    style = MaterialTheme.typography.titleMedium,
-                )
-            }
+        Column {
+            Text(
+                text = playerName,
+                style = MaterialTheme.typography.titleMedium,
+            )
         }
     }
 }

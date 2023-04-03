@@ -14,7 +14,6 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.piece.ChessPiece
 import dev.mcd.chess.ui.game.board.piece.ChessPieceState
 import dev.mcd.chess.ui.game.board.piece.UpdateChessPieceState
-import java.util.Stack
 
 context(BoardLayout)
 @Composable

@@ -17,7 +17,7 @@ object UpdateChessPieceState {
         val newState = state.copy()
 
         if (undo) {
-            if (state.moves.empty() || state.moves.peek() != move) {
+            if (state.moves.empty() || state.moves.peek() != move.toString()) {
                 return state
             }
 
@@ -40,7 +40,7 @@ object UpdateChessPieceState {
                 newState.moves.pop()
             }
         } else {
-            if (!state.moves.empty() && state.moves.peek() == move) {
+            if (!state.moves.empty() && state.moves.peek() == move.toString()) {
                 return state
             }
             if (!state.captured) {
@@ -58,7 +58,7 @@ object UpdateChessPieceState {
                 }
             }
             if (newState != state) {
-                newState.moves.push(moveBackup.move)
+                newState.moves.push(moveBackup.move.toString())
             }
         }
 
