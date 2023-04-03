@@ -51,11 +51,9 @@ fun OnlineGameScreen(
             var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
-            if (state is InGame && (state as? InGame)?.terminated == false) {
-                BackHandler {
-                    Timber.d("Back pressed")
-                    viewModel.onResign(andNavigateBack = true)
-                }
+            BackHandler {
+                Timber.d("Back pressed")
+                viewModel.onResign(andNavigateBack = true)
             }
 
             viewModel.collectSideEffect { effect ->
@@ -84,7 +82,6 @@ fun OnlineGameScreen(
                     game = s.session,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,
-                    terminated = s.terminated,
                 )
 
                 is FindingGame -> FindingGameView(s.username, navigateBack)

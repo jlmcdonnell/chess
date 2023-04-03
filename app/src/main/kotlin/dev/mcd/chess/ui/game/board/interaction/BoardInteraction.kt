@@ -12,7 +12,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filter
-import timber.log.Timber
 import kotlin.math.pow
 import kotlin.math.sqrt
 
@@ -129,7 +128,7 @@ class BoardInteraction(
         target.value = Square.NONE
     }
 
-    fun enableInteraction(enableInteraction: Boolean) {
+    fun setInteractionEnabled(enableInteraction: Boolean) {
         this.enableInteraction = enableInteraction
         if (!enableInteraction) {
             releaseTarget()

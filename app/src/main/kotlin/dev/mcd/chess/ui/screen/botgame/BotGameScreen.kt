@@ -34,10 +34,8 @@ fun BotGameScreen(
             var showTerminationReason by remember { mutableStateOf<TerminationReason?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
-            if (state is Game && (state as? Game)?.terminated == false) {
-                BackHandler {
-                    viewModel.onResign(andNavigateBack = true)
-                }
+            BackHandler {
+                viewModel.onResign(andNavigateBack = true)
             }
 
             viewModel.collectSideEffect { effect ->
@@ -66,7 +64,6 @@ fun BotGameScreen(
                     game = s.game,
                     onMove = viewModel::onPlayerMove,
                     onResign = viewModel::onResign,
-                    terminated = s.terminated,
                 )
 
                 is Loading -> Unit

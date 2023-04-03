@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.ReusableContent
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,13 +33,10 @@ fun GameView(
     game: GameSession,
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
-    terminated: Boolean,
     sounds: @Composable (() -> Unit) = { BoardSounds() },
 ) {
     val sessionManager = LocalGameSession.current
     val boardInteraction = remember(game.id) { BoardInteraction(game) }
-    var isLive by remember { mutableStateOf(game.isLive()) }
-    val interactionEnabled = remember(terminated, isLive) { !terminated && isLive }
 
     LaunchedEffect(game) {
         Timber.d("Game ID: ${game.id}")
@@ -48,24 +46,21 @@ fun GameView(
         }
     }
 
-    LaunchedEffect(interactionEnabled) {
-        boardInteraction.enableInteraction(interactionEnabled)
-    }
-
     sounds()
 
-    PlayerStrip(
-        modifier = Modifier
-            .padding(horizontal = 12.dp)
-            .padding(top = 16.dp, bottom = 8.dp),
-        player = game.opponent,
-    )
-    CapturedPieces(
-        modifier = Modifier.padding(horizontal = 12.dp),
-        side = game.selfSide,
-    )
-    Spacer(Modifier.height(4.dp))
     CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
+        PlayerStrip(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .padding(top = 16.dp, bottom = 8.dp),
+            player = game.opponent,
+        )
+        CapturedPieces(
+            modifier = Modifier.padding(horizontal = 12.dp),
+            side = game.selfSide,
+        )
+        Spacer(Modifier.height(4.dp))
+
         ReusableContent(game.id) {
             ChessBoard(
                 modifier = Modifier
@@ -74,37 +69,25 @@ fun GameView(
                 gameId = game.id,
             )
         }
-    }
-    Spacer(Modifier.height(4.dp))
-    CapturedPieces(
-        modifier = Modifier.padding(horizontal = 12.dp),
-        side = game.selfSide.flip(),
-    )
-    Box(
-        modifier = Modifier
-            .padding(horizontal = 12.dp)
-            .fillMaxWidth(),
-        contentAlignment = Alignment.CenterStart,
-    ) {
-        PlayerStrip(
-            modifier = Modifier,
-            player = game.self,
+        Spacer(Modifier.height(4.dp))
+        CapturedPieces(
+            modifier = Modifier.padding(horizontal = 12.dp),
+            side = game.selfSide.flip(),
         )
-        GameOptions(
-            modifier = Modifier.align(Alignment.CenterEnd),
-            terminated = terminated,
-            onResignClicked = { onResign() },
-            onUndoClicked = {
-                game.undo()
-                isLive = game.isLive()
-            },
-            onRedoClicked = {
-                game.redo()
-                isLive = game.isLive()
-            },
-            onFlipBoard = {
-                boardInteraction.togglePerspective()
-            },
-        )
+        Box(
+            modifier = Modifier
+                .padding(horizontal = 12.dp)
+                .fillMaxWidth(),
+            contentAlignment = Alignment.CenterStart,
+        ) {
+            PlayerStrip(
+                modifier = Modifier,
+                player = game.self,
+            )
+            GameOptions(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onResignClicked = { onResign() },
+            )
+        }
     }
 }

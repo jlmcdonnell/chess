@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
+import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.online.domain.OnlineGameSession
@@ -15,9 +16,9 @@ import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame.Event
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.postSideEffect
@@ -26,6 +27,7 @@ import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
+import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class OnlineGameViewModel @Inject constructor(
@@ -45,10 +47,7 @@ class OnlineGameViewModel @Inject constructor(
                 .collectLatest { session ->
                     intent {
                         reduce {
-                            State.InGame(
-                                session = session,
-                                terminated = false,
-                            )
+                            State.InGame(session = session)
                         }
                     }
                 }
@@ -74,38 +73,38 @@ class OnlineGameViewModel @Inject constructor(
 
     fun onResign(andNavigateBack: Boolean = false) {
         intent {
-            runCatching {
-                suspendCancellableCoroutine { continuation ->
-                    intent {
-                        postSideEffect(
-                            SideEffect.ConfirmResignation(
-                                onConfirm = { continuation.resume(Unit) },
-                                onDismiss = { continuation.cancel() },
-                            ),
-                        )
-                    }
+            gameSessionRepository.activeGame().firstOrNull()?.run {
+                if (confirmResignation()) {
+                    resign()
                 }
-
-                clientSession()?.resign()
-
-                if (andNavigateBack) {
-                    postSideEffect(SideEffect.NavigateBack)
-                }
-            }.onFailure {
-                Timber.e("onResign", it)
+            }
+            if (andNavigateBack) {
+                postSideEffect(SideEffect.NavigateBack)
             }
         }
     }
 
     fun onPlayerMove(move: Move) {
         intent {
-            val session = clientSession() ?: return@intent
+            gameSessionRepository.activeGame().firstOrNull()?.run {
+                if (move(move.toString()) == MoveResult.Moved) {
+                    clientSession()?.channel?.move(move)
+                } else {
+                    Timber.e("Illegal Move: $move")
+                }
+            }
+        }
+    }
 
-            val terminated = state is State.InGame && (state as? State.InGame)?.terminated == true
-            if (!terminated) {
-                Timber.d("Moving for player: $move")
-                session.move(move.toString())
-                session.channel.move(move)
+    private suspend fun confirmResignation(): Boolean {
+        return suspendCoroutine { continuation ->
+            intent {
+                postSideEffect(
+                    SideEffect.ConfirmResignation(
+                        onConfirm = { continuation.resume(true) },
+                        onDismiss = { continuation.resume(false) },
+                    ),
+                )
             }
         }
     }
@@ -144,9 +143,6 @@ class OnlineGameViewModel @Inject constructor(
 
     private fun handleTermination(reason: TerminationReason) {
         intent {
-            reduce {
-                (state as? State.InGame)?.copy(terminated = true) ?: state
-            }
             postSideEffect(AnnounceTermination(reason))
         }
     }
@@ -163,7 +159,6 @@ class OnlineGameViewModel @Inject constructor(
     sealed interface State {
         data class InGame(
             val session: OnlineGameSession,
-            val terminated: Boolean = false,
         ) : State
 
         data class FindingGame(

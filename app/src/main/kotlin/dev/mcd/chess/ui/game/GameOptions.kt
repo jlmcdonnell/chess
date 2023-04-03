@@ -9,21 +9,35 @@ import androidx.compose.material.icons.rounded.Undo
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import dev.mcd.chess.R
+import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.ui.LocalBoardInteraction
+import dev.mcd.chess.ui.LocalGameSession
 
 @Composable
 fun GameOptions(
     modifier: Modifier = Modifier,
     onResignClicked: () -> Unit,
-    terminated: Boolean,
-    onUndoClicked: () -> Unit,
-    onRedoClicked: () -> Unit,
-    onFlipBoard: () -> Unit,
 ) {
+    val boardInteraction = LocalBoardInteraction.current
+    val game by LocalGameSession.current.sessionUpdates().collectAsState(GameSession())
+    var isLive by remember { mutableStateOf(game.isLive()) }
+    val interactionEnabled = remember(game.termination(), isLive) { game.termination() == null && isLive }
+
+    LaunchedEffect(interactionEnabled) {
+        boardInteraction.setInteractionEnabled(interactionEnabled)
+    }
+
     Row(modifier) {
-        if (!terminated) {
+        if (game.termination() == null) {
             IconButton(
                 onClick = { onResignClicked() },
             ) {
@@ -33,9 +47,17 @@ fun GameOptions(
                 )
             }
         }
-        FlipBoard(onFlipBoard)
-        UndoMove(onUndoClicked)
-        RedoMove(onRedoClicked)
+        FlipBoard {
+            boardInteraction.togglePerspective()
+        }
+        UndoMove {
+            game.undo()
+            isLive = game.isLive()
+        }
+        RedoMove {
+            game.redo()
+            isLive = game.isLive()
+        }
     }
 }
 

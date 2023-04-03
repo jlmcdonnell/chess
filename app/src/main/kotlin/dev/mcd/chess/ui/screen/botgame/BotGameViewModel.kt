@@ -54,7 +54,7 @@ class BotGameViewModel @Inject constructor(
                 .collectLatest { game ->
                     intent {
                         reduce {
-                            State.Game(game, terminated = false)
+                            State.Game(game)
                         }
                     }
                     intent {
@@ -105,9 +105,6 @@ class BotGameViewModel @Inject constructor(
     private fun handleTermination(reason: TerminationReason) {
         intent {
             gameSessionRepository.updateActiveGame(null)
-            reduce {
-                (state as? State.Game)?.copy(terminated = true) ?: state
-            }
             postSideEffect(SideEffect.AnnounceTermination(reason))
         }
     }
@@ -130,7 +127,6 @@ class BotGameViewModel @Inject constructor(
 
         data class Game(
             val game: GameSession,
-            val terminated: Boolean = false,
         ) : State
     }
 
