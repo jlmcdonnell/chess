@@ -42,13 +42,28 @@ class EngineTestingViewModel @Inject constructor(
     }
 
     fun getMove() = intent {
-        val move = engine.getMove(Constants.startStandardFENPosition, 0, 1)
+        val move = engine.getMove(Constants.startStandardFENPosition, 0, 15)
         postSideEffect(move)
     }
 }
 
 @Composable
-fun EngineTesting(
+fun EngineTesting() {
+    var restart by remember { mutableStateOf(false) }
+
+    LaunchedEffect(restart) {
+        restart = false
+    }
+
+    if (!restart) {
+        EngineTest {
+            restart = true
+        }
+    }
+}
+
+@Composable
+fun EngineTest(
     vm: EngineTestingViewModel = hiltViewModel(),
     onRestart: () -> Unit,
 ) {

@@ -34,7 +34,7 @@ class StockfishEngineTest {
     @Test
     fun `Start and emit ready`() = runBlocking {
         every { bridge.readLine() } returns "Stockfish" andThenJust Awaits
-        every { bridge.main() } returns Unit
+        every { bridge.main(threadCount = 1) } returns Unit
 
         CoroutineScope(Dispatchers.Default).launch {
             adapter.startAndWait()
@@ -42,7 +42,7 @@ class StockfishEngineTest {
 
         adapter.awaitReady()
 
-        verify(exactly = 1) { bridge.main() }
+        verify(exactly = 1) { bridge.main(threadCount = 1) }
     }
 
     @Test
@@ -59,7 +59,7 @@ class StockfishEngineTest {
         every { bridge.readLine() } returns StockfishEngine.INIT_TOKEN coAndThen {
             move.await()
         }
-        every { bridge.main() } returns Unit
+        every { bridge.main(threadCount = 1) } returns Unit
 
         CoroutineScope(Dispatchers.Default).launch {
             adapter.startAndWait()

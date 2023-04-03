@@ -29,7 +29,7 @@ int pipes[2][2];
 
 extern "C"
 JNIEXPORT void JNICALL
-Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz) {
+Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, jobject thiz, int threadCount) {
     pipe(pipes[PARENT_READ_PIPE]);
     pipe(pipes[PARENT_WRITE_PIPE]);
 
@@ -49,7 +49,7 @@ Java_dev_mcd_chess_engine_stockfish_data_AndroidStockfishJni_main(JNIEnv *env, j
     Position::init();
     Bitbases::init();
     Endgames::init();
-    Threads.set(size_t(Options["Threads"]));
+    Threads.set(threadCount);
     Search::clear(); // After threads are up
     Eval::NNUE::init();
     UCI::loop();

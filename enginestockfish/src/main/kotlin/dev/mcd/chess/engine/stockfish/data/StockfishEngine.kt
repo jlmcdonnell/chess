@@ -35,7 +35,7 @@ internal class StockfishEngine(
         awaitState<State.Uninitialized>()
         CoroutineScope(coroutineContext).launch {
             launch(engineContext) {
-                bridge.main()
+                bridge.main(threadCount = DEFAULT_THREAD_COUNT)
             }
 
             launch(engineContext) {
@@ -111,5 +111,6 @@ internal class StockfishEngine(
     companion object {
         internal const val INIT_TOKEN = "Stockfish"
         internal const val BEST_MOVE_TOKEN = "bestmove"
+        private const val DEFAULT_THREAD_COUNT = 4
     }
 }
