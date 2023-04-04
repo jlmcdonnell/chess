@@ -26,7 +26,7 @@ open class GameSession(
     private val history = Stack<MoveBackup>()
     private val terminationReason = MutableStateFlow<TerminationReason?>(null)
 
-    val moveCount: Int get() = board.moveCounter
+    val moveCount: Int get() = board.backup.size
 
     suspend fun setBoard(board: Board) {
         this.board = board
@@ -44,14 +44,18 @@ open class GameSession(
     }
 
     open suspend fun move(move: String): MoveResult {
-        val moved = board.doMove(move)
-        return if (moved) {
-            val moveBackup = board.backup.last
-            moves.emit(DirectionalMove(moveBackup, undo = false))
-            updateTermination()
-            MoveResult.Moved
+        return if (termination() != null) {
+            MoveResult.GameTerminated
         } else {
-            MoveResult.MoveIllegal
+            val moved = board.doMove(move)
+            if (moved) {
+                val moveBackup = board.backup.last
+                moves.emit(DirectionalMove(moveBackup, undo = false))
+                updateTermination()
+                MoveResult.Moved
+            } else {
+                MoveResult.MoveIllegal
+            }
         }
     }
 

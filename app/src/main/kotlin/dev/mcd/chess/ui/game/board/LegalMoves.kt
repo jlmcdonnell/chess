@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -60,41 +59,39 @@ fun LegalMoves() {
         }
     }
 
-    ReusableContent(highlightMovesFrom) {
-        highlightMoves.forEach { (square, pieceOnSquare) ->
-            val offset = square.topLeft()
-            if (pieceOnSquare) {
-                Canvas(
-                    modifier = Modifier
-                        .offset(
-                            x = offset.x.toDp(),
-                            y = offset.y.toDp(),
-                        )
-                        .size(squareSizeDp),
-                ) {
-                    val border = size.width / 8f
-                    drawArc(
-                        color = boardColors.legalMoveHighlight,
-                        useCenter = true,
-                        topLeft = Offset(border / 2, border / 2),
-                        startAngle = 0f,
-                        sweepAngle = 360f,
-                        style = Stroke(width = border, cap = StrokeCap.Round),
-                        size = Size(size.width - border, size.height - border),
+    highlightMoves.forEach { (square, pieceOnSquare) ->
+        val offset = square.topLeft()
+        if (pieceOnSquare) {
+            Canvas(
+                modifier = Modifier
+                    .offset(
+                        x = offset.x.toDp(),
+                        y = offset.y.toDp(),
                     )
-                }
-            } else {
-                Box(
-                    modifier = Modifier
-                        .offset(
-                            x = offset.x.toDp() + squareSizeDp / 4,
-                            y = offset.y.toDp() + squareSizeDp / 4,
-                        )
-                        .clip(CircleShape)
-                        .size(squareSizeDp / 2)
-                        .background(boardColors.legalMoveHighlight),
+                    .size(squareSizeDp),
+            ) {
+                val border = size.width / 8f
+                drawArc(
+                    color = boardColors.legalMoveHighlight,
+                    useCenter = true,
+                    topLeft = Offset(border / 2, border / 2),
+                    startAngle = 0f,
+                    sweepAngle = 360f,
+                    style = Stroke(width = border, cap = StrokeCap.Round),
+                    size = Size(size.width - border, size.height - border),
                 )
             }
+        } else {
+            Box(
+                modifier = Modifier
+                    .offset(
+                        x = offset.x.toDp() + squareSizeDp / 4,
+                        y = offset.y.toDp() + squareSizeDp / 4,
+                    )
+                    .clip(CircleShape)
+                    .size(squareSizeDp / 2)
+                    .background(boardColors.legalMoveHighlight),
+            )
         }
     }
 }

@@ -6,6 +6,10 @@ import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
 context(BoardLayout)
 fun Square.topLeft(): Offset {
+    return topLeft(isWhite, squareSize)
+}
+
+fun Square.topLeft(isWhite: Boolean, squareSize: Float): Offset {
     return if (isWhite) {
         val x = file.ordinal * squareSize
         val y = (7 - rank.ordinal) * squareSize

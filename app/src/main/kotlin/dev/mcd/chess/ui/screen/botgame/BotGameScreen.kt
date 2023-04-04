@@ -11,8 +11,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
-import dev.mcd.chess.common.game.TerminationReason
-import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.GameTermination
 import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.ResignationDialog
@@ -32,6 +30,7 @@ fun BotGameScreen(
     Scaffold { padding ->
         Column(modifier = Modifier.padding(padding)) {
             val state by viewModel.collectAsState()
+
             var showTermination by remember { mutableStateOf<AnnounceTermination?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
 
@@ -61,12 +60,13 @@ fun BotGameScreen(
             }
 
             when (val s = state) {
-                is Game -> GameView(
-                    gameHolder = s.gameHolder,
-                    onMove = viewModel::onPlayerMove,
-                    onResign = viewModel::onResign,
-                )
-
+                is Game -> {
+                    GameView(
+                        gameHolder = s.gameHolder,
+                        onMove = viewModel::onPlayerMove,
+                        onResign = viewModel::onResign,
+                    )
+                }
                 is Loading -> Unit
             }
 

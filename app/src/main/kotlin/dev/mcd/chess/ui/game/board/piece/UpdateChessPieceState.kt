@@ -9,6 +9,7 @@ object UpdateChessPieceState {
 
     context(BoardLayout)
     operator fun invoke(
+        moveCount: Int,
         directionalMove: DirectionalMove,
         state: ChessPieceState,
     ): ChessPieceState {
@@ -40,7 +41,7 @@ object UpdateChessPieceState {
                 newState.moves.pop()
             }
         } else {
-            if (!state.moves.empty() && state.moves.peek() == move.toString()) {
+            if (moveCount == state.moveCount) {
                 return state
             }
             if (!state.captured) {
@@ -63,6 +64,7 @@ object UpdateChessPieceState {
         }
 
         newState.squareOffset = newState.square.topLeft()
+        newState.moveCount = moveCount
 
         return newState
     }

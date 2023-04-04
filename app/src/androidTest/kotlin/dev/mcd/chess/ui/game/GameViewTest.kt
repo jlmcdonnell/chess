@@ -7,10 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.boundsInParent
@@ -24,7 +20,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithTag
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
-import androidx.compose.ui.unit.dp
+import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
 import com.github.bhlangonijr.chesslib.Piece.*
 import com.github.bhlangonijr.chesslib.Side
@@ -33,12 +29,12 @@ import com.github.bhlangonijr.chesslib.Square.*
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
+import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.extension.topLeft
-import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -51,8 +47,6 @@ class GameViewTest {
 
     @get:Rule
     val gameRule = createGameSessionRule()
-
-    private val terminationState = MutableStateFlow(false)
 
     @Test
     fun piecesRespondToBoardMoves(): Unit = runBlocking {
@@ -305,7 +299,7 @@ class GameViewTest {
     fun moveAfterTermination() = runBlocking {
         with(composeRule) {
             setupChessBoard()
-            terminationState.emit(true)
+            gameRule.game.resign()
             dragMove(WHITE_PAWN, "e2e4")
             assertNoPiece(WHITE_PAWN on E4)
         }
@@ -332,6 +326,33 @@ class GameViewTest {
     }
 
     @Test
+    fun flipBoardAfterMoving() = runBlocking {
+        fun SemanticsNodeInteraction.boundsInParent() = fetchSemanticsNode().layoutInfo.coordinates.boundsInParent()
+
+        with(composeRule) {
+            setupChessBoard()
+
+            move("e2e3")
+            move("d7d6")
+            move("e3e4")
+            move("d6d5")
+            delay(2000)
+
+            val e4Layout = onPiece(WHITE_PAWN on E4).boundsInParent()
+            val d5Layout = onPiece(BLACK_PAWN on D5).boundsInParent()
+
+            flipBoard()
+            delay(2000)
+
+            val e4LayoutFlipped = onPiece(WHITE_PAWN on E4).boundsInParent()
+            val d5LayoutFlipped = onPiece(BLACK_PAWN on D5).boundsInParent()
+
+            assertEquals(e4Layout, d5LayoutFlipped)
+            assertEquals(d5Layout, e4LayoutFlipped)
+        }
+    }
+
+    @Test
     fun flipBoardAndUndo() = runBlocking {
         with(composeRule) {
             val board = gameRule.board.apply {
@@ -352,6 +373,35 @@ class GameViewTest {
         }
     }
 
+    @Test
+    fun pieceBeingCapturedWithSameLastMoveAsCapturingPieceGetsCaptured() = runBlocking {
+        with(composeRule) {
+            val board = Board().apply {
+                clear()
+                setPiece(BLACK_KING, E8)
+                setPiece(WHITE_KING, E4)
+                setPiece(BLACK_PAWN, E3)
+                sideToMove = Side.BLACK
+            }
+            gameRule.game.setBoard(board)
+            setupChessBoard()
+
+            move("e2")
+            move("Ke3")
+            move("Ke7")
+            move("Ke2")
+
+            assertNoPiece(BLACK_PAWN on E2)
+
+            repeat(times = 4) {
+                undoMove()
+            }
+
+            assertPiece(BLACK_KING on E8)
+            assertPiece(WHITE_KING on E4)
+            assertPiece(BLACK_PAWN on E3)
+        }
+    }
 
     context(ComposeContentTestRule)
     private fun setupChessBoard(game: GameSession = gameRule.game) {
@@ -359,7 +409,7 @@ class GameViewTest {
         setContent {
             TestChessBoard(game)
         }
-        mainClock.advanceTimeByFrame()
+        mainClock.advanceTimeBy(1000)
     }
 
     context(ComposeTestRule)
@@ -425,42 +475,32 @@ class GameViewTest {
             .fetchSemanticsNode()
             .layoutInfo
             .width / 8f
-        BoardLayout(
-            squareSizeDp = squareSize.dp,
-            squareSize = squareSize,
-            perspective = Side.WHITE,
-        ).run {
-            val (x, y) = topLeft()
-            return Offset(x + squareSize / 2, y + squareSize / 2)
-        }
+
+        val (x, y) = topLeft(isWhite = true, squareSize)
+        return Offset(x + squareSize / 2, y + squareSize / 2)
+    }
+}
+
+@Suppress("TestFunctionName")
+@Composable
+private fun TestChessBoard(game: GameSession) {
+    val sessionManager = LocalGameSession.current
+
+    LaunchedEffect(Unit) {
+        sessionManager.updateSession(game)
     }
 
-    @Suppress("TestFunctionName")
-    @Composable
-    private fun TestChessBoard(game: GameSession) {
-        val sessionManager = LocalGameSession.current
-        var terminated by remember { mutableStateOf(false) }
-
-        LaunchedEffect(Unit) {
-            sessionManager.updateSession(game)
-            terminationState.collect {
-                terminated = it
-            }
-        }
-
-        ChessTheme {
-            Surface(Modifier.fillMaxSize()) {
-                Column(Modifier.fillMaxSize()) {
-                    GameView(
-                        game = game,
-                        onMove = {
-                            runBlocking { game.move(it.toString()) }
-                        },
-                        onResign = {},
-                        terminated = terminated,
-                        sounds = {},
-                    )
-                }
+    ChessTheme {
+        Surface(Modifier.fillMaxSize()) {
+            Column(Modifier.fillMaxSize()) {
+                GameView(
+                    gameHolder = StableHolder(game),
+                    onMove = {
+                        runBlocking { game.move(it.toString()) }
+                    },
+                    onResign = {},
+                    sounds = {},
+                )
             }
         }
     }

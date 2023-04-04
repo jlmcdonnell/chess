@@ -6,6 +6,7 @@ import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
+import dev.mcd.chess.ui.extension.center
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
@@ -16,9 +17,8 @@ import kotlin.math.pow
 import kotlin.math.sqrt
 
 class BoardInteraction(
-    private val session: GameSession = GameSession(),
+    private val session: GameSession,
 ) {
-
     private val perspective = MutableStateFlow(session.selfSide)
     private val moves = MutableSharedFlow<Move>(replay = 1, extraBufferCapacity = 1, onBufferOverflow = BufferOverflow.DROP_OLDEST)
     private val target = MutableStateFlow(Square.NONE)
@@ -27,8 +27,10 @@ class BoardInteraction(
     private val selectPromotion = MutableStateFlow(emptyList<Move>())
     private var enableInteraction = true
 
-    fun updateSquarePositions(squarePositions: Map<Square, Offset>) {
-        this.squarePositions = squarePositions
+    fun updateSquarePositions(squareSizePx: Float) {
+        this.squarePositions = Square.values().associateWith { square ->
+            square.center(perspective.value == Side.WHITE, squareSizePx)
+        }
     }
 
     fun promote(move: Move) {
@@ -116,7 +118,9 @@ class BoardInteraction(
         return selectPromotion
     }
 
-    fun perspective(): Flow<Side> = perspective
+    fun perspectiveChanges(): Flow<Side> = perspective
+
+    fun perspective(): Side = perspective.value
 
     fun togglePerspective() {
         perspective.value = if (perspective.value == Side.WHITE) Side.BLACK else Side.WHITE

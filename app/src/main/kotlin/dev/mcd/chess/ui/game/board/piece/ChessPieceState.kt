@@ -12,5 +12,6 @@ data class ChessPieceState(
     var squareOffset: Offset,
     var piece: Piece,
     var captured: Boolean = false,
-    val moves: Stack<String> = Stack()
+    var moveCount: Int = -1,
+    val moves: Stack<String> = Stack(),
 )

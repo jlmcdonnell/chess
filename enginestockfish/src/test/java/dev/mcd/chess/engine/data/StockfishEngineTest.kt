@@ -65,7 +65,6 @@ class StockfishEngineTest {
             adapter.startAndWait()
         }
 
-        println("getMove")
         adapter.getMove("TEST", 0, 0)
     }
 }

@@ -46,9 +46,9 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
 import dev.mcd.chess.feature.common.domain.AppColorScheme
-import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
+import dev.mcd.chess.ui.extension.toPx
 import dev.mcd.chess.ui.game.board.chessboard.Squares
-import dev.mcd.chess.ui.game.board.chessboard.calculateBoardLayout
+import dev.mcd.chess.ui.game.board.chessboard.rememberBoardLayout
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -105,8 +105,6 @@ fun ColorSchemeSelection(
     colorScheme: AppColorScheme,
     onColorSchemeChanged: (AppColorScheme) -> Unit,
 ) {
-    var boardLayout by remember { mutableStateOf(BoardLayout()) }
-
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
@@ -132,10 +130,9 @@ fun ColorSchemeSelection(
         ElevatedCard(
             modifier = Modifier
                 .size(200.dp)
-                .calculateBoardLayout(Side.WHITE) { boardLayout = it }
                 .clip(MaterialTheme.shapes.extraLarge),
         ) {
-            boardLayout.run {
+            rememberBoardLayout(width = 200.dp.toPx(), Side.WHITE).run {
                 Squares(drawLabels = false)
             }
         }

@@ -52,4 +52,6 @@ class GameSessionManager {
     }
 
     fun previousMove(): Move? = sessionUpdates.value?.previousMove()
+
+    fun moveCount() = sessionUpdates.value?.moveCount
 }

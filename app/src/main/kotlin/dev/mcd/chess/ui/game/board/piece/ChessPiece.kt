@@ -20,13 +20,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.pointer.PointerEvent
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.zIndex
 import dev.mcd.chess.common.game.extension.relevantToMove
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
-import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
@@ -47,13 +45,14 @@ fun ChessPiece(initialState: ChessPieceState) {
     var state by remember { mutableStateOf(initialState) }
 
     LaunchedEffect(Unit) {
-            gameManager.moveUpdates()
-                .filter { (move, _) -> state.square.relevantToMove(move) }
-                .collectLatest { directionalMove ->
-                    state = UpdateChessPieceState(directionalMove, state)
-                    pan = Offset.Zero
-                    currentSize = squareSize
-                }
+        gameManager.moveUpdates()
+            .filter { (move, _) -> state.square.relevantToMove(move) }
+            .collectLatest { directionalMove ->
+                val moveCount = gameManager.moveCount() ?: 0
+                state = UpdateChessPieceState(moveCount, directionalMove, state)
+                pan = Offset.Zero
+                currentSize = squareSize
+            }
     }
 
     val animatedSize by animateDpAsState(currentSize.toDp(), label = "Piece Size")
@@ -115,7 +114,7 @@ fun ChessPiece(initialState: ChessPieceState) {
                     }
                 }
             },
-        painter = painterResource(id = state.piece.drawableResource()),
+        painter = getPainter(state.piece),
         contentDescription = state.square.name,
     )
 }

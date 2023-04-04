@@ -6,7 +6,6 @@ import android.media.AudioManager
 import android.media.MediaPlayer
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -24,20 +23,18 @@ fun BoardSounds() {
     val context = LocalContext.current
     val session by LocalGameSession.current.sessionUpdates().collectAsState(GameSession())
 
-    ReusableContent(session.id) {
-        if (session.id.isNotEmpty()) {
-            LaunchedEffect(session.id) {
-                with(BoardSoundHandler) {
-                    init(context)
-                    notify()
-                    launch {
-                        awaitMoves(session)
-                    }
-                    launch {
-                        awaitTermination(session)
-                    }
+    if (session.id.isNotEmpty()) {
+        LaunchedEffect(session.id) {
+            with(BoardSoundHandler) {
+                init(context)
+                notify()
+                launch {
                     awaitMoves(session)
                 }
+                launch {
+                    awaitTermination(session)
+                }
+                awaitMoves(session)
             }
         }
     }

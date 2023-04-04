@@ -47,48 +47,46 @@ fun GameView(
 
     sounds()
 
-    CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
-        PlayerStrip(
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .padding(top = 16.dp, bottom = 8.dp),
-            playerName = game.opponent.name,
-            isBot = game.opponent is Bot,
-        )
-        CapturedPieces(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            side = game.selfSide,
-        )
-        Spacer(Modifier.height(4.dp))
-
-        ReusableContent(game.id) {
+    ReusableContent(key = game.id) {
+        CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {
+            PlayerStrip(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .padding(top = 16.dp, bottom = 8.dp),
+                playerName = game.opponent.name,
+                isBot = game.opponent is Bot,
+            )
+            CapturedPieces(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                side = game.selfSide,
+            )
+            Spacer(Modifier.height(4.dp))
             ChessBoard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(ratio = 1f),
-                gameId = game.id,
             )
-        }
-        Spacer(Modifier.height(4.dp))
-        CapturedPieces(
-            modifier = Modifier.padding(horizontal = 12.dp),
-            side = game.selfSide.flip(),
-        )
-        Box(
-            modifier = Modifier
-                .padding(horizontal = 12.dp)
-                .fillMaxWidth(),
-            contentAlignment = Alignment.CenterStart,
-        ) {
-            PlayerStrip(
-                modifier = Modifier,
-                playerName = game.self.name,
-                isBot = false,
+            Spacer(Modifier.height(4.dp))
+            CapturedPieces(
+                modifier = Modifier.padding(horizontal = 12.dp),
+                side = game.selfSide.flip(),
             )
-            GameOptions(
-                modifier = Modifier.align(Alignment.CenterEnd),
-                onResignClicked = { onResign() },
-            )
+            Box(
+                modifier = Modifier
+                    .padding(horizontal = 12.dp)
+                    .fillMaxWidth(),
+                contentAlignment = Alignment.CenterStart,
+            ) {
+                PlayerStrip(
+                    modifier = Modifier,
+                    playerName = game.self.name,
+                    isBot = false,
+                )
+                GameOptions(
+                    modifier = Modifier.align(Alignment.CenterEnd),
+                    onResignClicked = { onResign() },
+                )
+            }
         }
     }
 }

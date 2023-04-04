@@ -22,6 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
+import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.extension.drawableResource
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
@@ -57,7 +58,7 @@ fun PromotionSelector(modifier: Modifier) {
 private fun PromotionSelectorPreview() {
     ChessTheme {
         Surface {
-            val boardInteraction = BoardInteraction()
+            val boardInteraction = BoardInteraction(GameSession())
             val promotionMoves = listOf(
                 Move("e7e8q", Side.WHITE),
                 Move("e7e8r", Side.WHITE),
