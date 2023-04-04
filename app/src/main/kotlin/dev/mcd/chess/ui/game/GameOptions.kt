@@ -26,6 +26,7 @@ import dev.mcd.chess.ui.LocalGameSession
 fun GameOptions(
     modifier: Modifier = Modifier,
     onResignClicked: () -> Unit,
+    allowResign: Boolean = true,
 ) {
     val boardInteraction = LocalBoardInteraction.current
     val game by LocalGameSession.current.sessionUpdates().collectAsState(GameSession())
@@ -37,7 +38,7 @@ fun GameOptions(
     }
 
     Row(modifier) {
-        if (game.termination() == null) {
+        if (game.termination() == null && allowResign) {
             IconButton(
                 onClick = { onResignClicked() },
             ) {

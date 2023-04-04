@@ -89,7 +89,7 @@ class BotGameViewModel @Inject constructor(
     fun onPlayerMove(move: Move) {
         intent {
             gameSessionRepository.activeGame().firstOrNull()?.run {
-                if (move(move.toString()) == MoveResult.Moved) {
+                if (isSelfTurn() && move(move.toString()) == MoveResult.Moved) {
                     moveForBot()
                 } else {
                     Timber.e("Illegal Move: $move")

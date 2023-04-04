@@ -6,12 +6,14 @@ import dev.mcd.chess.online.data.mapper.gameMessage
 import dev.mcd.chess.online.data.serializer.AuthResponseSerializer
 import dev.mcd.chess.online.data.serializer.GameStateMessageSerializer
 import dev.mcd.chess.online.data.serializer.LobbyInfoSerializer
+import dev.mcd.chess.online.data.serializer.PuzzleSerializer
 import dev.mcd.chess.online.data.serializer.domain
 import dev.mcd.chess.online.domain.ChessApi
 import dev.mcd.chess.online.domain.OnlineGameChannel
 import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.online.domain.entity.GameMessage
 import dev.mcd.chess.online.domain.entity.LobbyInfo
+import dev.mcd.chess.online.domain.entity.Puzzle
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.websocket.webSocket
@@ -60,7 +62,7 @@ internal class ChessApiImpl constructor(
                 urlString = "$websocketUrl/game/find",
                 request = {
                     bearerAuth(authToken)
-                }
+                },
             ) {
                 for (frame in incoming) {
                     if (frame is Frame.Text) {
@@ -97,14 +99,14 @@ internal class ChessApiImpl constructor(
     override suspend fun joinGame(
         authToken: String,
         id: GameId,
-        block: suspend OnlineGameChannel.() -> Unit
+        block: suspend OnlineGameChannel.() -> Unit,
     ) {
         withContext(Dispatchers.IO) {
             client.webSocket(
                 urlString = "$websocketUrl/game/join/$id",
                 request = {
                     bearerAuth(authToken)
-                }
+                },
             ) {
                 runCatching {
                     val incomingMessages = Channel<GameMessage>(1, BufferOverflow.DROP_OLDEST)
@@ -146,6 +148,22 @@ internal class ChessApiImpl constructor(
                     parameter("excludeUser", excludeUser)
                 }
             }.body<LobbyInfoSerializer>().domain()
+        }
+    }
+
+    override suspend fun getRandomPuzzle(): Puzzle {
+        return withContext(Dispatchers.IO) {
+            client.get {
+                url("$apiUrl/puzzles/random")
+            }.body<PuzzleSerializer>().domain()
+        }
+    }
+
+    override suspend fun getPuzzle(id: String): Puzzle {
+        return withContext(Dispatchers.IO) {
+            client.get {
+                url("$apiUrl/puzzles/id/$id")
+            }.body<PuzzleSerializer>().domain()
         }
     }
 }

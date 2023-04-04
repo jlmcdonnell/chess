@@ -31,7 +31,10 @@ import dev.mcd.chess.ui.extension.topLeft
 
 context(BoardLayout)
 @Composable
-fun Squares(drawLabels: Boolean = true) {
+fun Squares(
+    modifier: Modifier = Modifier,
+    drawLabels: Boolean = true,
+) {
     val textMeasurer = rememberTextMeasurer()
     val appColors = LocalAppColors.current.boardColors
 
@@ -49,7 +52,7 @@ fun Squares(drawLabels: Boolean = true) {
 
     val boardDesc = stringResource(R.string.board)
     Canvas(
-        Modifier
+        modifier
             .fillMaxSize()
             .semantics { contentDescription = boardDesc },
     ) {

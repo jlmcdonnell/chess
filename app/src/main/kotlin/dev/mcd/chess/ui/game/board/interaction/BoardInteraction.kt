@@ -128,10 +128,6 @@ class BoardInteraction(
 
     fun highlightMovesFrom(): Flow<Square> = highlightMoveChanges
 
-    private fun releaseTarget() {
-        target.value = Square.NONE
-    }
-
     fun setInteractionEnabled(enableInteraction: Boolean) {
         this.enableInteraction = enableInteraction
         if (!enableInteraction) {
@@ -139,5 +135,9 @@ class BoardInteraction(
             highlightMoveChanges.tryEmit(Square.NONE)
             selectPromotion.tryEmit(emptyList())
         }
+    }
+
+    private fun releaseTarget() {
+        target.value = Square.NONE
     }
 }

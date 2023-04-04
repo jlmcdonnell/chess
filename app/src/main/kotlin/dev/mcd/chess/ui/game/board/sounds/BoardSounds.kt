@@ -19,7 +19,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 @Composable
-fun BoardSounds() {
+fun BoardSounds(enableNotify: Boolean = true) {
     val context = LocalContext.current
     val session by LocalGameSession.current.sessionUpdates().collectAsState(GameSession())
 
@@ -27,12 +27,14 @@ fun BoardSounds() {
         LaunchedEffect(session.id) {
             with(BoardSoundHandler) {
                 init(context)
-                notify()
-                launch {
-                    awaitMoves(session)
+                if (enableNotify) {
+                    notify()
+                    launch {
+                        awaitTermination(session)
+                    }
                 }
                 launch {
-                    awaitTermination(session)
+                    awaitMoves(session)
                 }
                 awaitMoves(session)
             }

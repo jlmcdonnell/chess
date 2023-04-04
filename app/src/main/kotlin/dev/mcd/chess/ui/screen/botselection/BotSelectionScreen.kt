@@ -41,7 +41,7 @@ import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.R
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.ui.extension.drawableResource
-import dev.mcd.chess.ui.player.PlayerImageView
+import dev.mcd.chess.ui.player.BotImageView
 
 @Composable
 fun BotSelectionScreen(
@@ -120,7 +120,7 @@ private fun BotItem(
                 .fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            PlayerImageView(bot = true)
+            BotImageView()
             Spacer(modifier = Modifier.width(24.dp))
             Text(
                 text = botName,

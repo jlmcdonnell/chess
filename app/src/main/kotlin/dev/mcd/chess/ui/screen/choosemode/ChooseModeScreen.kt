@@ -3,7 +3,6 @@ package dev.mcd.chess.ui.screen.choosemode
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +13,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
+import androidx.compose.material.icons.rounded.Extension
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -41,6 +41,7 @@ import org.orbitmvi.orbit.compose.collectSideEffect
 fun ChooseModeScreen(
     onPlayOnline: () -> Unit,
     onPlayBot: () -> Unit,
+    onSolvePuzzle: () -> Unit,
     onNavigateSettings: () -> Unit,
     onNavigateExistingGame: (GameId) -> Unit,
     viewModel: ChooseModeViewModel = hiltViewModel(),
@@ -85,6 +86,8 @@ fun ChooseModeScreen(
                 )
                 Spacer(modifier = Modifier.height(24.dp))
                 PlayComputerButton(onClick = onPlayBot)
+                Spacer(modifier = Modifier.height(24.dp))
+                SolvePuzzleButton(onClick = onSolvePuzzle)
             }
         }
     }
@@ -112,6 +115,34 @@ private fun PlayComputerButton(
             Spacer(modifier = Modifier.width(24.dp))
             Text(
                 text = stringResource(id = R.string.play_computer),
+                style = MaterialTheme.typography.titleMedium,
+            )
+        }
+    }
+}
+
+@Composable
+private fun SolvePuzzleButton(
+    onClick: () -> Unit,
+) {
+    ElevatedCard(
+        modifier = Modifier.fillMaxWidth(),
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { onClick() }
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            Icon(
+                modifier = Modifier.size(42.dp),
+                painter = rememberVectorPainter(image = Icons.Rounded.Extension),
+                contentDescription = stringResource(R.string.solve_puzzle),
+            )
+            Spacer(modifier = Modifier.width(24.dp))
+            Text(
+                text = stringResource(id = R.string.solve_puzzle),
                 style = MaterialTheme.typography.titleMedium,
             )
         }

@@ -10,6 +10,8 @@ import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBotImpl
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
+import dev.mcd.chess.feature.puzzle.data.usecase.CreatePuzzleSessionImpl
+import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
 import javax.inject.Singleton
 
 @Module
@@ -24,4 +26,7 @@ abstract class GameModule {
 
     @Binds
     abstract fun moveForBot(impl: MoveForBotImpl): MoveForBot
+
+    @Binds
+    abstract fun createPuzzleSession(impl: CreatePuzzleSessionImpl): CreatePuzzleSession
 }

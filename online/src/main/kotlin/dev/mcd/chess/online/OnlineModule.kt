@@ -10,6 +10,7 @@ import dev.mcd.chess.online.data.usecase.FindGameImpl
 import dev.mcd.chess.online.data.usecase.GetGameForUserImpl
 import dev.mcd.chess.online.data.usecase.GetLobbyInfoImpl
 import dev.mcd.chess.online.data.usecase.GetOrCreateUserImpl
+import dev.mcd.chess.online.data.usecase.GetRandomPuzzleImpl
 import dev.mcd.chess.online.data.usecase.JoinOnlineGameImpl
 import dev.mcd.chess.online.domain.ChessApi
 import dev.mcd.chess.online.domain.EndpointProvider
@@ -17,6 +18,7 @@ import dev.mcd.chess.online.domain.usecase.FindGame
 import dev.mcd.chess.online.domain.usecase.GetGameForUser
 import dev.mcd.chess.online.domain.usecase.GetLobbyInfo
 import dev.mcd.chess.online.domain.usecase.GetOrCreateUser
+import dev.mcd.chess.online.domain.usecase.GetRandomPuzzle
 import dev.mcd.chess.online.domain.usecase.JoinOnlineGame
 import io.ktor.client.HttpClient
 import io.ktor.client.engine.okhttp.OkHttp
@@ -47,6 +49,9 @@ abstract class OnlineModule {
 
     @Binds
     internal abstract fun getLobbyInfo(impl: GetLobbyInfoImpl): GetLobbyInfo
+
+    @Binds
+    internal abstract fun getRandomPuzzle(impl: GetRandomPuzzleImpl): GetRandomPuzzle
 
     companion object {
         @Provides

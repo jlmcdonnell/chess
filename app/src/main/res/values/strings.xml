@@ -9,9 +9,10 @@
     <string name="undo_move">Undo move</string>
     <string name="board">Board</string>
     <string name="target_highlight_desc">Target Highlight</string>
-    <string name="default_player_image_desc">Default player image</string>
+    <string name="default_player_image_desc">player image</string>
     <string name="play_computer">Play Computer</string>
     <string name="play_online">Play Online</string>
+    <string name="solve_puzzle">Solve Puzzle</string>
     <string name="waiting">%1$s waiting</string>
     <string name="playing_as">Playing as %1$s</string>
     <string name="finding_game">Finding Game</string>
@@ -19,6 +20,8 @@
     <string name="authenticating">Authenticating</string>
     <string name="api_host">API Host</string>
     <string name="restart">Restart</string>
+    <string name="retry">Retry</string>
+    <string name="next">Next</string>
     <string name="clear_auth_data">Clear Auth Data</string>
     <string name="yes">Yes</string>
     <string name="no">No</string>
@@ -31,6 +34,11 @@
     <string name="dismiss">Dismiss</string>
     <string name="flip_board">Flip board</string>
     <string name="player_you">You</string>
+    <string name="player_puzzle">Puzzle</string>
     <string name="set_color_scheme">Colour scheme</string>
+    <string name="correct">Correct</string>
+    <string name="incorrect">Incorrect</string>
+    <string name="finding_puzzle">Finding Puzzle</string>
+    <string name="puzzle_rating">Puzzle rating %1$s</string>
 
 </resources>

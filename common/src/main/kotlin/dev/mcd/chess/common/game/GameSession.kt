@@ -63,11 +63,15 @@ open class GameSession(
         terminationReason.emit(TerminationReason(resignation = selfSide))
     }
 
-    fun undo() {
+    fun isSelfTurn() = selfSide == board.sideToMove
+
+    fun undo(eraseHistory: Boolean = false) {
         if (board.backup.size > 0) {
             val lastMove = board.backup.last()
             board.undoMove()
-            history.push(lastMove)
+            if (!eraseHistory) {
+                history.push(lastMove)
+            }
             moves.tryEmit(DirectionalMove(lastMove, undo = true))
         }
     }

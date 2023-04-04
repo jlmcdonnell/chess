@@ -17,12 +17,12 @@ import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
-import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
+import dev.mcd.chess.ui.game.board.interaction.GameSettings
 import dev.mcd.chess.ui.game.board.sounds.BoardSounds
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
@@ -34,6 +34,7 @@ fun GameView(
     onResign: () -> Unit,
     sounds: @Composable (() -> Unit) = { BoardSounds() },
     boardWidth: @Composable () -> Float = { LocalView.current.width.toFloat() },
+    settings: GameSettings = GameSettings(),
 ) {
     val (game) = gameHolder
     val sessionManager = LocalGameSession.current
@@ -55,25 +56,28 @@ fun GameView(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
                     .padding(top = 16.dp, bottom = 8.dp),
-                playerName = game.opponent.name,
-                isBot = game.opponent is Bot,
+                player = game.opponent,
             )
-            CapturedPieces(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                side = game.selfSide,
-            )
-            Spacer(Modifier.height(4.dp))
+            if (settings.showCapturedPieces) {
+                CapturedPieces(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    side = game.selfSide,
+                )
+                Spacer(Modifier.height(4.dp))
+            }
             ChessBoard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(ratio = 1f),
                 boardWidth = boardWidth(),
             )
-            Spacer(Modifier.height(4.dp))
-            CapturedPieces(
-                modifier = Modifier.padding(horizontal = 12.dp),
-                side = game.selfSide.flip(),
-            )
+            if (settings.showCapturedPieces) {
+                Spacer(Modifier.height(4.dp))
+                CapturedPieces(
+                    modifier = Modifier.padding(horizontal = 12.dp),
+                    side = game.selfSide.flip(),
+                )
+            }
             Box(
                 modifier = Modifier
                     .padding(horizontal = 12.dp)
@@ -82,12 +86,12 @@ fun GameView(
             ) {
                 PlayerStrip(
                     modifier = Modifier,
-                    playerName = game.self.name,
-                    isBot = false,
+                    player = game.self,
                 )
                 GameOptions(
                     modifier = Modifier.align(Alignment.CenterEnd),
                     onResignClicked = { onResign() },
+                    allowResign = settings.allowResign,
                 )
             }
         }
