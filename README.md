@@ -7,6 +7,7 @@
   - Move history
 - Game sounds
 - [Stockfish 15](https://stockfishchess.org/) embedded to enable play against bots
+- Puzzle mode, using 3.2 million puzzles from the [Lichess open database](https://database.lichess.org/#puzzles)
 - [Chesslib](https://github.com/bhlangonijr/chesslib) used for movement & game rules
 - Online mode [built with Ktor](https://github.com/jlmcdonnell/chess-server)
 - Piece assets taken from https://chess.com's 'Icy Sea' theme, and sounds taken from https://github.com/lichess-org/lila
