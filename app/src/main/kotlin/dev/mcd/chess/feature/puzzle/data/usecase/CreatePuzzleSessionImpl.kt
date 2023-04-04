@@ -15,6 +15,8 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
+import java.util.Stack
+import java.util.UUID
 import javax.inject.Inject
 
 class CreatePuzzleSessionImpl @Inject constructor(
@@ -23,20 +25,23 @@ class CreatePuzzleSessionImpl @Inject constructor(
 ) : CreatePuzzleSession {
 
     override suspend operator fun invoke(puzzle: Puzzle): Pair<PuzzleInput, Flow<PuzzleOutput>> {
-        var moves = puzzle.moves.toMutableList()
+        val moves = Stack<String>().apply {
+            addAll(puzzle.moves.reversed())
+        }
         val session = initSession(puzzle)
         val channel = Channel<String>()
+        println(moves)
 
         val input = object : PuzzleInput {
             override suspend fun close() {
                 channel.close()
             }
+
             override suspend fun move(move: String) {
                 channel.send(move)
             }
 
             override suspend fun retry() {
-                moves = puzzle.moves.toMutableList()
                 session.undo(eraseHistory = true)
             }
         }
@@ -49,8 +54,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
 
             try {
                 for (move in channel) {
-                    val output = moveForPlayer(session, puzzle, moves, move)
-                    send(output)
+                    send(moveForPlayer(session, puzzle, moves, move))
                 }
             } finally {
                 close()
@@ -60,14 +64,17 @@ class CreatePuzzleSessionImpl @Inject constructor(
         return input to out
     }
 
-    private suspend fun moveForPlayer(session: GameSession, puzzle: Puzzle, moves: MutableList<String>, move: String): PuzzleOutput {
+    private suspend fun moveForPlayer(session: GameSession, puzzle: Puzzle, moves: Stack<String>, move: String): PuzzleOutput {
+        if (moves.isEmpty()) return PuzzleOutput.NoMovesLeft
         if (!session.isSelfTurn()) return PuzzleOutput.NotUserTurn
-        val nextMove = moves.removeFirstOrNull() ?: return PuzzleOutput.NoMovesLeft
+
+        val nextMove = moves.peek()
 
         if (session.move(move) != MoveResult.Moved) {
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
         }
         return if (move == nextMove) {
+            moves.pop()
             if (moves.isEmpty()) {
                 PuzzleOutput.Completed
             } else {
@@ -78,8 +85,10 @@ class CreatePuzzleSessionImpl @Inject constructor(
         }
     }
 
-    private suspend fun moveForOpponent(session: GameSession, puzzle: Puzzle, moves: MutableList<String>): PuzzleOutput {
-        val nextMove = moves.removeFirstOrNull() ?: return PuzzleOutput.NoMovesLeft
+    private suspend fun moveForOpponent(session: GameSession, puzzle: Puzzle, moves: Stack<String>): PuzzleOutput {
+        if (moves.isEmpty()) return PuzzleOutput.NoMovesLeft
+
+        val nextMove = moves.peek()
         delay(200)
         if (session.move(nextMove) != MoveResult.Moved) {
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
@@ -87,6 +96,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
         return if (moves.isEmpty()) {
             PuzzleOutput.Completed
         } else {
+            moves.pop()
             PuzzleOutput.MoveCorrect
         }
     }
@@ -97,7 +107,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
             loadFromFen(puzzle.fen)
         }
         return GameSession(
-            id = puzzle.puzzleId,
+            id = "${puzzle.puzzleId}:${UUID.randomUUID()}",
             self = HumanPlayer(
                 name = translations.playerYou,
             ),

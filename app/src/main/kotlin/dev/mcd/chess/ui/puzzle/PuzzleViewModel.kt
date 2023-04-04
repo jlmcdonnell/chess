@@ -7,6 +7,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInput
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
+import dev.mcd.chess.online.domain.entity.Puzzle
 import dev.mcd.chess.online.domain.usecase.GetRandomPuzzle
 import kotlinx.coroutines.flow.collectLatest
 import org.orbitmvi.orbit.ContainerHost
@@ -22,22 +23,12 @@ class PuzzleViewModel @Inject constructor(
     private val createPuzzleSession: CreatePuzzleSession,
 ) : ViewModel(), ContainerHost<PuzzleViewModel.State, PuzzleViewModel.SideEffect> {
 
-    override val container = container<State, SideEffect>(State()) {
-        startPuzzle()
-    }
-
     private var puzzleInput: PuzzleInput? = null
 
-    private fun startPuzzle() = intent {
-        runCatching {
+    override val container = container<State, SideEffect>(State()) {
+        intent {
             reduce {
-                state.copy(
-                    loading = true,
-                    completed = false,
-                    session = null,
-                    failed = false,
-                    puzzleRating = 0,
-                )
+                state.copy(loading = true)
             }
 
             val puzzle = getRandomPuzzle()
@@ -47,7 +38,12 @@ class PuzzleViewModel @Inject constructor(
                     puzzleRating = puzzle.rating,
                 )
             }
+            startPuzzle(puzzle)
+        }
+    }
 
+    private fun startPuzzle(puzzle: Puzzle) = intent {
+        runCatching {
             val (input, puzzleOutput) = createPuzzleSession(puzzle)
             puzzleInput = input
             puzzleOutput.collectLatest {
@@ -79,7 +75,26 @@ class PuzzleViewModel @Inject constructor(
     fun onNextPuzzle() {
         intent {
             puzzleInput?.close()
-            startPuzzle()
+            reduce {
+                state.copy(
+                    loading = true,
+                )
+            }
+            runCatching {
+                val puzzle = getRandomPuzzle()
+                reduce {
+                    state.copy(
+                        loading = false,
+                        completed = false,
+                        failed = false,
+                        puzzleRating = puzzle.rating,
+                    )
+                }
+                startPuzzle(puzzle)
+            }.onFailure {
+                Timber.e(it, "Retrieving puzzle")
+                reduce { state.copy(loading = false) }
+            }
         }
     }
 

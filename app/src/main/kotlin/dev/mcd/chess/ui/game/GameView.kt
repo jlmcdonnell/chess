@@ -63,16 +63,15 @@ fun GameView(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     side = game.selfSide,
                 )
-                Spacer(Modifier.height(4.dp))
             }
             ChessBoard(
                 modifier = Modifier
+                    .padding(vertical = 4.dp)
                     .fillMaxWidth()
                     .aspectRatio(ratio = 1f),
                 boardWidth = boardWidth(),
             )
             if (settings.showCapturedPieces) {
-                Spacer(Modifier.height(4.dp))
                 CapturedPieces(
                     modifier = Modifier.padding(horizontal = 12.dp),
                     side = game.selfSide.flip(),

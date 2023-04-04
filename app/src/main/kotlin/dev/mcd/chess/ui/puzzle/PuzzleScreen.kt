@@ -7,10 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
-import androidx.compose.material.icons.rounded.CheckCircleOutline
 import androidx.compose.material.icons.rounded.Checklist
-import androidx.compose.material.icons.rounded.FactCheck
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -66,11 +63,11 @@ fun PuzzleScreen(
                     sounds = { BoardSounds(enableNotify = false) },
                 )
             }
-            if (state.loading) {
+            if (state.loading && !state.completed) {
                 Loading(stringResource(id = R.string.finding_puzzle))
             }
             if (state.completed) {
-                PuzzleCompleted(rating = state.puzzleRating) {
+                PuzzleCompleted(rating = state.puzzleRating, loading = state.loading) {
                     puzzleViewModel.onNextPuzzle()
                 }
             } else if (state.failed) {
@@ -108,6 +105,7 @@ fun PuzzleFailed(onRetry: () -> Unit) {
 @Composable
 fun PuzzleCompleted(
     rating: Int,
+    loading: Boolean = false,
     onNext: () -> Unit,
 ) {
     ElevatedCard(
@@ -143,8 +141,9 @@ fun PuzzleCompleted(
             TextButton(
                 modifier = Modifier
                     .align(Alignment.End)
-                    .padding(end = 16.dp),
+                    .padding(horizontal = 16.dp, vertical = 6.dp),
                 onClick = onNext,
+                enabled = !loading,
             ) {
                 Text(stringResource(id = R.string.next))
             }
