@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Computer
 import androidx.compose.material.icons.rounded.Extension
+import androidx.compose.material.icons.rounded.Memory
 import androidx.compose.material.icons.rounded.PersonSearch
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material3.CenterAlignedTopAppBar
@@ -109,7 +110,7 @@ private fun PlayComputerButton(
         ) {
             Icon(
                 modifier = Modifier.size(42.dp),
-                painter = rememberVectorPainter(image = Icons.Rounded.Computer),
+                painter = rememberVectorPainter(image = Icons.Rounded.Memory),
                 contentDescription = stringResource(R.string.play_computer),
             )
             Spacer(modifier = Modifier.width(24.dp))
