@@ -132,7 +132,7 @@ fun ColorSchemeSelection(
                 .size(200.dp)
                 .clip(MaterialTheme.shapes.extraLarge),
         ) {
-            rememberBoardLayout(width = 200.dp.toPx(), Side.WHITE).run {
+            rememberBoardLayout(boardWidth = 200.dp.toPx(), Side.WHITE).run {
                 Squares(drawLabels = false)
             }
         }

@@ -15,10 +15,14 @@ import dev.mcd.chess.ui.game.board.PromotionSelector
 @Composable
 fun ChessBoard(
     modifier: Modifier = Modifier,
+    boardWidth: Float,
 ) {
     val boardInteraction = LocalBoardInteraction.current
     val perspective by boardInteraction.perspectiveChanges().collectAsState(boardInteraction.perspective())
-    val boardLayout = rememberBoardLayout(perspective = perspective)
+    val boardLayout = rememberBoardLayout(
+        perspective = perspective,
+        boardWidth = boardWidth,
+    )
 
     LaunchedEffect(boardLayout) {
         boardInteraction.updateSquarePositions(boardLayout.squareSize)

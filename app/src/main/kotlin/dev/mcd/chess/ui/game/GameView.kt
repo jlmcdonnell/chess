@@ -13,6 +13,7 @@ import androidx.compose.runtime.ReusableContent
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.dp
 import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
@@ -32,6 +33,7 @@ fun GameView(
     onMove: (Move) -> Unit,
     onResign: () -> Unit,
     sounds: @Composable (() -> Unit) = { BoardSounds() },
+    boardWidth: @Composable () -> Float = { LocalView.current.width.toFloat() },
 ) {
     val (game) = gameHolder
     val sessionManager = LocalGameSession.current
@@ -65,6 +67,7 @@ fun GameView(
                 modifier = Modifier
                     .fillMaxWidth()
                     .aspectRatio(ratio = 1f),
+                boardWidth = boardWidth(),
             )
             Spacer(Modifier.height(4.dp))
             CapturedPieces(

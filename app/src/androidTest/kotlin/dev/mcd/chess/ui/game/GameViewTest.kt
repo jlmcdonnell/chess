@@ -7,11 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.layout.boundsInParent
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
+import androidx.compose.ui.test.getBoundsInRoot
 import androidx.compose.ui.test.hasContentDescription
 import androidx.compose.ui.test.junit4.ComposeContentTestRule
 import androidx.compose.ui.test.junit4.ComposeTestRule
@@ -34,7 +39,6 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -307,18 +311,16 @@ class GameViewTest {
 
     @Test
     fun flipBoard() = runBlocking {
-        fun SemanticsNodeInteraction.boundsInParent() = fetchSemanticsNode().layoutInfo.coordinates.boundsInParent()
-
         with(composeRule) {
             setupChessBoard()
 
-            val e2Layout = onPiece(WHITE_PAWN on E2).boundsInParent()
-            val e7Layout = onPiece(BLACK_PAWN on D7).boundsInParent()
+            val e2Layout = onPiece(WHITE_PAWN on E2).getBoundsInRoot()
+            val e7Layout = onPiece(BLACK_PAWN on D7).getBoundsInRoot()
 
             flipBoard()
 
-            val e2LayoutFlipped = onPiece(WHITE_PAWN on E2).boundsInParent()
-            val e7LayoutFlipped = onPiece(BLACK_PAWN on D7).boundsInParent()
+            val e2LayoutFlipped = onPiece(WHITE_PAWN on E2).getBoundsInRoot()
+            val e7LayoutFlipped = onPiece(BLACK_PAWN on D7).getBoundsInRoot()
 
             assertEquals(e7Layout, e2LayoutFlipped)
             assertEquals(e2Layout, e7LayoutFlipped)
@@ -327,8 +329,6 @@ class GameViewTest {
 
     @Test
     fun flipBoardAfterMoving() = runBlocking {
-        fun SemanticsNodeInteraction.boundsInParent() = fetchSemanticsNode().layoutInfo.coordinates.boundsInParent()
-
         with(composeRule) {
             setupChessBoard()
 
@@ -336,19 +336,47 @@ class GameViewTest {
             move("d7d6")
             move("e3e4")
             move("d6d5")
-            delay(2000)
 
-            val e4Layout = onPiece(WHITE_PAWN on E4).boundsInParent()
-            val d5Layout = onPiece(BLACK_PAWN on D5).boundsInParent()
+            val e4Layout = onPiece(WHITE_PAWN on E4).getBoundsInRoot()
+            val d5Layout = onPiece(BLACK_PAWN on D5).getBoundsInRoot()
 
             flipBoard()
-            delay(2000)
 
-            val e4LayoutFlipped = onPiece(WHITE_PAWN on E4).boundsInParent()
-            val d5LayoutFlipped = onPiece(BLACK_PAWN on D5).boundsInParent()
+            val e4LayoutFlipped = onPiece(WHITE_PAWN on E4).getBoundsInRoot()
+            val d5LayoutFlipped = onPiece(BLACK_PAWN on D5).getBoundsInRoot()
 
-            assertEquals(e4Layout, d5LayoutFlipped)
             assertEquals(d5Layout, e4LayoutFlipped)
+            assertEquals(e4Layout, d5LayoutFlipped)
+        }
+    }
+
+    @Test
+    fun flipAndUnflipAfterMoving() = runBlocking {
+
+        with(composeRule) {
+            val board = Board().apply {
+                setPiece(WHITE_KING, E1)
+                setPiece(BLACK_KING, E8)
+                setPiece(WHITE_PAWN, E2)
+                setPiece(BLACK_PAWN, D7)
+            }
+            gameRule.game.setBoard(board)
+            setupChessBoard()
+
+            move("e2e4")
+            move("d7d5")
+
+            val e4Layout = onPiece(WHITE_PAWN on E4).getBoundsInRoot()
+            val d5Layout = onPiece(BLACK_PAWN on D5).getBoundsInRoot()
+
+            flipBoard()
+            flipBoard()
+
+            val e4LayoutUnflipped = onPiece(WHITE_PAWN on E4).getBoundsInRoot()
+            val d5LayoutUnflipped = onPiece(BLACK_PAWN on D5).getBoundsInRoot()
+
+            assertEquals(d5Layout, d5LayoutUnflipped)
+            assertEquals(e4Layout, e4LayoutUnflipped)
         }
     }
 
@@ -477,7 +505,7 @@ class GameViewTest {
             .width / 8f
 
         val (x, y) = topLeft(isWhite = true, squareSize)
-        return Offset(x + squareSize / 2, y + squareSize / 2)
+        return Offset(x + squareSize / 2f, y + squareSize / 2f)
     }
 }
 
@@ -485,6 +513,7 @@ class GameViewTest {
 @Composable
 private fun TestChessBoard(game: GameSession) {
     val sessionManager = LocalGameSession.current
+    var size by remember { mutableStateOf<Float?>(null) }
 
     LaunchedEffect(Unit) {
         sessionManager.updateSession(game)
@@ -492,15 +521,24 @@ private fun TestChessBoard(game: GameSession) {
 
     ChessTheme {
         Surface(Modifier.fillMaxSize()) {
-            Column(Modifier.fillMaxSize()) {
-                GameView(
-                    gameHolder = StableHolder(game),
-                    onMove = {
-                        runBlocking { game.move(it.toString()) }
+            Column(
+                Modifier
+                    .fillMaxSize()
+                    .onGloballyPositioned {
+                        size = it.size.width.toFloat()
                     },
-                    onResign = {},
-                    sounds = {},
-                )
+            ) {
+                size?.let {
+                    GameView(
+                        gameHolder = StableHolder(game),
+                        onMove = {
+                            runBlocking { game.move(it.toString()) }
+                        },
+                        onResign = {},
+                        sounds = {},
+                        boardWidth = { size!! },
+                    )
+                }
             }
         }
     }

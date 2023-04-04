@@ -40,16 +40,16 @@ private fun calculatePieceState(
     piece: Piece,
     initialSquare: Square,
     history: List<MoveBackup>,
-) = history.fold(
+) = history.foldIndexed(
     initial = ChessPieceState(
         square = initialSquare,
         squareOffset = initialSquare.topLeft(),
         piece = piece,
-        moveCount = history.size - 1,
+        moveCount = -1,
     ),
-) { state, move ->
+) { index, state, move ->
     if (state.square.relevantToMove(move)) {
         val directionalMove = DirectionalMove(move, undo = false)
-        UpdateChessPieceState(moveCount = history.size, directionalMove, state)
+        UpdateChessPieceState(moveCount = index, directionalMove, state)
     } else state
 }
