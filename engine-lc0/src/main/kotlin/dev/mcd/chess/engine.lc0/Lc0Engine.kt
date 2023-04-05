@@ -64,7 +64,6 @@ internal class Lc0Engine @Inject constructor(
             try {
                 awaitCancellation()
             } finally {
-                bridge.writeLine(EngineCommand.Quit.string())
                 job.cancel()
                 moveToState(State.Uninitialized)
             }

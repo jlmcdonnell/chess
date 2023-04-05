@@ -44,7 +44,7 @@ class EngineTestingViewModel @Inject constructor(
     }
 
     fun getMove() = intent {
-        val move = engine.getMove(Constants.startStandardFENPosition, 0, 1)
+        val move = engine.getMove(Constants.startStandardFENPosition, 1)
         postSideEffect(move)
     }
 }
