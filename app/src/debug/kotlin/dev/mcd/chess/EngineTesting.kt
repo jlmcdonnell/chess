@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import com.github.bhlangonijr.chesslib.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.engine.lc0.Lc0
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -30,6 +31,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EngineTestingViewModel @Inject constructor(
+    @Lc0
     val engine: ChessEngine,
 ) : ViewModel(), ContainerHost<Unit, String> {
 
@@ -42,7 +44,7 @@ class EngineTestingViewModel @Inject constructor(
     }
 
     fun getMove() = intent {
-        val move = engine.getMove(Constants.startStandardFENPosition, 0, 15)
+        val move = engine.getMove(Constants.startStandardFENPosition, 0, 1)
         postSideEffect(move)
     }
 }

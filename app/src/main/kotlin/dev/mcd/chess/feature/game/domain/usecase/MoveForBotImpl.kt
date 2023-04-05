@@ -2,6 +2,7 @@ package dev.mcd.chess.feature.game.domain.usecase
 
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.common.player.Bot
+import dev.mcd.chess.engine.stockfish.Stockfish
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -9,6 +10,7 @@ import kotlin.math.max
 
 class MoveForBotImpl @Inject constructor(
     private val gameSessionRepository: GameSessionRepository,
+    @Stockfish
     private val engine: ChessEngine,
 ) : MoveForBot {
 

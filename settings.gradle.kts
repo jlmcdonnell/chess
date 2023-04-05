@@ -22,7 +22,8 @@ rootProject.name = "Chess"
 include(
     "app",
     "common",
-    "enginestockfish",
+    "engine-stockfish",
+    "engine-lc0",
     "online",
     "baselineprofile",
 )

@@ -10,6 +10,5 @@ class App : Application() {
         super.onCreate()
         initTimber()
         initChessEngine()
-        initExceptionHandler()
     }
 }

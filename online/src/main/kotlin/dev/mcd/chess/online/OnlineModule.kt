@@ -87,7 +87,7 @@ abstract class OnlineModule {
                 install(HttpTimeout)
                 install(Logging) {
                     this.logger = logger
-                    this.level = LogLevel.BODY
+                    this.level = LogLevel.NONE
                 }
             }
         }

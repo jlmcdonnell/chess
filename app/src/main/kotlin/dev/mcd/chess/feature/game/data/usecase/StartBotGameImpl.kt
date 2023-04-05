@@ -8,6 +8,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
+import dev.mcd.chess.engine.stockfish.Stockfish
 import dev.mcd.chess.feature.common.domain.Translations
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
@@ -17,6 +18,7 @@ import java.util.UUID
 import javax.inject.Inject
 
 class StartBotGameImpl @Inject constructor(
+    @Stockfish
     private val engine: ChessEngine,
     private val gameSessionRepository: GameSessionRepository,
     private val moveForBot: MoveForBot,

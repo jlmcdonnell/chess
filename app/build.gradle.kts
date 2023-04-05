@@ -73,7 +73,8 @@ kapt {
 dependencies {
     with(Versions) {
         // Projects
-        implementation(project(":enginestockfish"))
+        implementation(project(":engine-stockfish"))
+        implementation(project(":engine-lc0"))
         implementation(project(":common"))
         implementation(project(":online"))
         "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
