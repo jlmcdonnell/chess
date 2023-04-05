@@ -22,7 +22,7 @@
 - Analysis mode
 - Save and view games
 - ECO opening classification
-- Use own pieces and sounds
+- Use own pieces and sounds (Dana??!!)
 
 ## Screenshots
 
