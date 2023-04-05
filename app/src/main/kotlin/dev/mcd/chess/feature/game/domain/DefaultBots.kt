@@ -7,38 +7,33 @@ object DefaultBots {
     fun bots() = listOf(
         Bot(
             slug = "level-1",
-            name = "Blunderbot",
+            name = "Pawn Pioneer",
             image = PlayerImage.Bot,
             depth = 1,
-            level = 0,
         ),
         Bot(
             slug = "level-2",
             name = "The Bishop of Banterbury",
             image = PlayerImage.Bot,
-            depth = 2,
-            level = 0,
+            depth = 3,
         ),
         Bot(
             slug = "level-3",
             name = "Knight Rider",
             image = PlayerImage.Bot,
-            depth = 2,
-            level = 3,
+            depth = 5,
         ),
         Bot(
             slug = "level-4",
-            name = "Endgame Eddie",
+            name = "Rook Rampage",
             image = PlayerImage.Bot,
-            depth = 5,
-            level = 20,
+            depth = 8,
         ),
         Bot(
             slug = "level-5",
             name = "Checkmate Chad",
             image = PlayerImage.Bot,
-            depth = 15,
-            level = 20,
+            depth = 13,
         ),
     )
 

@@ -61,14 +61,13 @@ internal class StockfishEngine(
         }
     }
 
-    override suspend fun getMove(fen: String, level: Int, depth: Int): String {
+    override suspend fun getMove(fen: String, depth: Int): String {
         return withContext(engineContext) {
             awaitState<State.Ready>()
             val moveCompletable = CompletableDeferred<String>()
             moveToState(State.Moving(moveCompletable))
 
             listOf(
-                EngineCommand.SetSkillLevel(level),
                 EngineCommand.SetPosition(fen),
                 EngineCommand.Go(depth),
             ).forEach {

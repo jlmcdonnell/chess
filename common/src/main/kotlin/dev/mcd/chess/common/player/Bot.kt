@@ -5,5 +5,4 @@ class Bot(
     override val image: PlayerImage,
     val slug: String,
     val depth: Int,
-    val level: Int,
 ) : Player

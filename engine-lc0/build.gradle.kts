@@ -57,7 +57,7 @@ tasks.named("preBuild").configure {
 dependencies {
     with(Versions) {
         api(project(":common"))
-
+        api("com.jakewharton.timber:timber:$timber")
         api("com.google.dagger:hilt-android:$hilt")
         kapt("com.google.dagger:hilt-compiler:$hilt")
     }

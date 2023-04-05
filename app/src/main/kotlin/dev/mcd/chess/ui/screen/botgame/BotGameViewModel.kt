@@ -12,7 +12,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.engine.stockfish.Stockfish
+import dev.mcd.chess.engine.lc0.Lc0
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
@@ -35,7 +35,7 @@ import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
-    @Stockfish
+    @Lc0
     private val engine: ChessEngine,
     private val gameSessionRepository: GameSessionRepository,
     private val state: SavedStateHandle,
