@@ -1,16 +1,21 @@
 ## Features
 
 - Chess board UI built with Jetpack Compose
-  - Drag & drop interaction
-  - Movement animation
-  - Legal move highlighting
-  - Move history
+- Drag & drop interaction
+- Movement animation
+- Legal move highlighting
+- Move history & perspective switching
 - Game sounds
-- [Stockfish 15](https://stockfishchess.org/) embedded to enable play against bots
-- Puzzle mode, using 3.2 million puzzles from the [Lichess open database](https://database.lichess.org/#puzzles)
-- [Chesslib](https://github.com/bhlangonijr/chesslib) used for movement & game rules
+- [Stockfish 15](https://stockfishchess.org/) included for upcoming analysis mode
+- [Lczero](https://lczero.org/) included for play against human-like bots using weights provided by [Maia Chess](https://maiachess.com/) 
 - Online mode [built with Ktor](https://github.com/jlmcdonnell/chess-server)
-- Piece assets taken from https://chess.com's 'Icy Sea' theme, and sounds taken from https://github.com/lichess-org/lila
+- Puzzle mode, 3.2 million puzzles from the [Lichess open database](https://database.lichess.org/#puzzles)
+
+## Acknowledgements
+
+- [Chesslib](https://github.com/bhlangonijr/chesslib) used for movement & game rules
+- Piece assets temporarily borrowed from https://chess.com's 'Icy Sea' theme
+- Sounds used from https://github.com/lichess-org/lila
 
 ## Roadmap
 
