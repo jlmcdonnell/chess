@@ -31,14 +31,19 @@ class PuzzleViewModel @Inject constructor(
                 state.copy(loading = true)
             }
 
-            val puzzle = getRandomPuzzle()
-            reduce {
-                state.copy(
-                    loading = false,
-                    puzzleRating = puzzle.rating,
-                )
+            runCatching {
+                val puzzle = getRandomPuzzle()
+                reduce {
+                    state.copy(
+                        loading = false,
+                        puzzleRating = puzzle.rating,
+                    )
+                }
+                startPuzzle(puzzle)
+            }.onFailure {
+                Timber.e(it, "Retrieving puzzle")
+                reduce { state.copy(loading = false) }
             }
-            startPuzzle(puzzle)
         }
     }
 

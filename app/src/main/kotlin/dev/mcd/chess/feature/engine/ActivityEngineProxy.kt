@@ -5,6 +5,7 @@ import android.content.Context
 import android.content.Context.BIND_AUTO_CREATE
 import android.content.Intent
 import android.content.ServiceConnection
+import android.os.DeadObjectException
 import android.os.IBinder
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
@@ -79,7 +80,11 @@ class ActivityEngineProxy : EngineProxy {
 
     override suspend fun getMove(fen: String, depth: Int): String {
         awaitState<Ready>().run {
-            return binder.bestMove(fen, depth)
+            try {
+                return binder.bestMove(fen, depth)
+            } catch (exception: DeadObjectException) {
+                throw EngineProxyException.EngineKilledException
+            }
         }
     }
 

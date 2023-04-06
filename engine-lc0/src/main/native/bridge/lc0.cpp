@@ -74,21 +74,19 @@ Java_dev_mcd_chess_engine_lc0_Lc0JniImpl_main(JNIEnv *env, jobject thiz, jstring
     const char *argv[] = {
             "lc0",
             weightsPathString.c_str(),
+            "--threads=3",
     };
+    int args = sizeof(argv) / sizeof(argv[0]);
     try {
         Numa::Init();
         Numa::BindThread(0);
         InitializeMagicBitboards();
         CommandLine::RegisterMode("uci", "(default) Act as UCI engine");
-        CommandLine::Init(2, argv);
+        CommandLine::Init(args, argv);
         CommandLine::ConsumeCommand("uci");
 
-        std::vector<std::string> args = CommandLine::Arguments();
-
         EngineLoop loop;
-        debug("Running loop");
         loop.RunLoop();
-        debug("loop exit");
     } catch (std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }

@@ -18,6 +18,8 @@ import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
 import dev.mcd.chess.ui.compose.StableHolder
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
@@ -98,7 +100,13 @@ class BotGameViewModel @Inject constructor(
         intent {
             gameSessionRepository.activeGame().firstOrNull()?.run {
                 if (isSelfTurn() && move(move.toString()) == MoveResult.Moved) {
-                    moveForBot()
+                    CoroutineScope(Dispatchers.Default).launch {
+                        runCatching {
+                            moveForBot()
+                        }.onFailure {
+                            Timber.e(it, "Moving for bot")
+                        }
+                    }
                 } else {
                     Timber.e("Illegal Move: $move")
                 }

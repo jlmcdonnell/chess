@@ -15,25 +15,25 @@ object DefaultBots {
             slug = "level-2",
             name = "The Bishop of Banterbury",
             image = PlayerImage.Bot,
-            depth = 3,
+            depth = 2,
         ),
         Bot(
             slug = "level-3",
             name = "Knight Rider",
             image = PlayerImage.Bot,
-            depth = 5,
+            depth = 3,
         ),
         Bot(
             slug = "level-4",
             name = "Rook Rampage",
             image = PlayerImage.Bot,
-            depth = 8,
+            depth = 4,
         ),
         Bot(
             slug = "level-5",
             name = "Checkmate Chad",
             image = PlayerImage.Bot,
-            depth = 13,
+            depth = 7,
         ),
     )
 
