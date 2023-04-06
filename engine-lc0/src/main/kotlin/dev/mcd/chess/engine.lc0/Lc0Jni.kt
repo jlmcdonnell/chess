@@ -6,7 +6,6 @@ internal interface Lc0Jni {
     fun readLine(): String?
     fun readError(): String?
     fun writeLine(cmd: String)
-    fun redirectIO()
 }
 
 internal class Lc0JniImpl : Lc0Jni {
@@ -19,7 +18,6 @@ internal class Lc0JniImpl : Lc0Jni {
     external override fun readLine(): String
     external override fun readError(): String
     private external fun write(command: String): Boolean
-    external override fun redirectIO()
 
     override fun writeLine(cmd: String) {
         write("$cmd\n")

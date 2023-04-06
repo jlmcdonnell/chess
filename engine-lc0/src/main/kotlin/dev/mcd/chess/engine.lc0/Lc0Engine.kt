@@ -34,7 +34,6 @@ internal class Lc0Engine @Inject constructor(
         context.assets.open("weights/maia-1100.pb").copyTo(
             weightsFile.outputStream(),
         )
-
         bridge.init()
     }
 

@@ -28,6 +28,10 @@ android {
         }
     }
 
+    buildFeatures {
+        aidl = true
+    }
+
     buildTypes {
         val release = getByName("release") {
             isMinifyEnabled = true

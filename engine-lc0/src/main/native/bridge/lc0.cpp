@@ -56,8 +56,6 @@ JNIEXPORT void JNICALL
 Java_dev_mcd_chess_engine_lc0_Lc0JniImpl_main(JNIEnv *env, jobject thiz, jstring weightsPath) {
     using namespace lczero;
 
-    debug("Lc0JniImpl_main");
-
     pipe(pipes[PARENT_READ_PIPE]);
     pipe(pipes[PARENT_WRITE_PIPE]);
     pipe(pipes[PARENT_ERROR_PIPE]);
@@ -65,6 +63,8 @@ Java_dev_mcd_chess_engine_lc0_Lc0JniImpl_main(JNIEnv *env, jobject thiz, jstring
     dup2(CHILD_READ_FD, STDIN_FILENO);
     dup2(CHILD_WRITE_FD, STDOUT_FILENO);
     dup2(CHILD_ERROR_FD, STDERR_FILENO);
+
+    debug("Lc0JniImpl_main");
 
     const char *weightsPathChars = env->GetStringUTFChars(weightsPath, 0);
     debug("Weights path: %s", weightsPathChars);
@@ -92,14 +92,6 @@ Java_dev_mcd_chess_engine_lc0_Lc0JniImpl_main(JNIEnv *env, jobject thiz, jstring
     } catch (std::exception &e) {
         std::cerr << "Error: " << e.what() << std::endl;
     }
-
-    close(CHILD_READ_FD);
-    close(CHILD_WRITE_FD);
-    close(CHILD_ERROR_FD);
-
-    close(PARENT_READ_FD);
-    close(PARENT_WRITE_FD);
-    close(PARENT_ERROR_FD);
 
     debug("Lc0JniImpl_main done");
 }

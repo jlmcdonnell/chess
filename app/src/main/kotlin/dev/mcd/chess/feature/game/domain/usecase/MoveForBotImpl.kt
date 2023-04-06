@@ -1,8 +1,8 @@
 package dev.mcd.chess.feature.game.domain.usecase
 
-import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.activity.engine.BotEngine
 import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.engine.lc0.Lc0
+import dev.mcd.chess.feature.engine.EngineProxy
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import kotlinx.coroutines.delay
 import javax.inject.Inject
@@ -10,8 +10,8 @@ import kotlin.math.max
 
 class MoveForBotImpl @Inject constructor(
     private val gameSessionRepository: GameSessionRepository,
-    @Lc0
-    private val engine: ChessEngine,
+    @BotEngine
+    private val engine: EngineProxy,
 ) : MoveForBot {
 
     override suspend fun invoke() {

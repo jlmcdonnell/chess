@@ -7,17 +7,18 @@ import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.common.engine.ChessEngine
+import dev.mcd.chess.activity.engine.BotEngine
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
-import dev.mcd.chess.engine.lc0.Lc0
+import dev.mcd.chess.feature.engine.EngineProxy
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
 import dev.mcd.chess.ui.compose.StableHolder
+import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
@@ -35,8 +36,8 @@ import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
-    @Lc0
-    private val engine: ChessEngine,
+    @BotEngine
+    private val engine: EngineProxy,
     private val gameSessionRepository: GameSessionRepository,
     private val state: SavedStateHandle,
     private val startBotGame: StartBotGame,
@@ -49,7 +50,12 @@ class BotGameViewModel @Inject constructor(
     override val container = container<State, SideEffect>(State.Loading) {
         intent {
             repeatOnSubscription {
-                engine.startAndWait()
+                engine.start()
+                try {
+                    awaitCancellation()
+                } finally {
+                    engine.stop()
+                }
             }
         }
         viewModelScope.launch {
