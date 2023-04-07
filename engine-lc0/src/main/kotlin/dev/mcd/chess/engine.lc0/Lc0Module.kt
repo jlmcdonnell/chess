@@ -31,7 +31,7 @@ class Lc0Module {
     internal fun lc0Engine(
         bridge: Lc0Jni,
         @ApplicationContext context: Context,
-    ): ChessEngine {
+    ): ChessEngine<MaiaWeights, FenParam> {
         val coroutineContext = CoroutineName("Lc0") + Dispatchers.IO
         return Lc0Engine(bridge, context, coroutineContext)
     }

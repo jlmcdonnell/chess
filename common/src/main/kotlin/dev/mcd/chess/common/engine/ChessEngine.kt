@@ -1,8 +1,8 @@
 package dev.mcd.chess.common.engine
 
-interface ChessEngine {
-    fun init()
+interface ChessEngine<InitParams, MoveParams> {
+    fun init(params: InitParams)
     suspend fun awaitReady()
     suspend fun startAndWait()
-    suspend fun getMove(fen: String, depth: Int): String
+    suspend fun getMove(params: MoveParams): String
 }

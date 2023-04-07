@@ -19,11 +19,11 @@ import kotlin.coroutines.coroutineContext
 internal class StockfishEngine(
     private val bridge: StockfishJni,
     private val engineContext: CoroutineContext,
-) : ChessEngine {
+) : ChessEngine<Unit, FenAndDepth> {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
 
-    override fun init() {
+    override fun init(params: Unit) {
         bridge.init()
     }
 
@@ -61,7 +61,8 @@ internal class StockfishEngine(
         }
     }
 
-    override suspend fun getMove(fen: String, depth: Int): String {
+    override suspend fun getMove(params: FenAndDepth): String {
+        val (fen, depth) = params
         return withContext(engineContext) {
             awaitState<State.Ready>()
             val moveCompletable = CompletableDeferred<String>()

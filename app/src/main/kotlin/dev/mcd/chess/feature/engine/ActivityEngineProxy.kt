@@ -7,9 +7,11 @@ import android.content.Intent
 import android.content.ServiceConnection
 import android.os.DeadObjectException
 import android.os.IBinder
+import android.os.IInterface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import dev.mcd.chess.engine.EngineInterface
+import dev.mcd.chess.activity.engine.adapter.EngineBinderAdapter
+import dev.mcd.chess.engine.BotEngineInterface
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.ActivityBound
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Ready
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.UnboundToActivity
@@ -20,7 +22,9 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class ActivityEngineProxy : EngineProxy {
+class ActivityEngineProxy<P, B : IInterface, Adapter : EngineBinderAdapter<P, B>>(
+    private val adapter: Adapter,
+) : EngineProxy<P> {
 
     private val state = MutableStateFlow<State>(UnboundToActivity)
 
@@ -30,7 +34,7 @@ class ActivityEngineProxy : EngineProxy {
                 ifState<ActivityBound> {
                     state.tryEmit(
                         Ready(
-                            binder = EngineInterface.Stub.asInterface(service),
+                            binder = BotEngineInterface.Stub.asInterface(service),
                             engineIntent = engineIntent,
                             context = context,
                         ),
@@ -41,7 +45,7 @@ class ActivityEngineProxy : EngineProxy {
 
         override fun onServiceDisconnected(name: ComponentName?) {
             runBlocking {
-                ifState<Ready> {
+                ifState<Ready<B>> {
                     state.tryEmit(ActivityBound(engineIntent, context))
                 }
             }
@@ -71,17 +75,17 @@ class ActivityEngineProxy : EngineProxy {
     }
 
     override suspend fun stop() {
-        ifState<Ready> {
+        ifState<Ready<B>> {
             context.unbindService(connection)
             context.stopService(engineIntent)
             state.tryEmit(ActivityBound(engineIntent, context))
         }
     }
 
-    override suspend fun getMove(fen: String, depth: Int): String {
-        awaitState<Ready>().run {
+    override suspend fun getMove(params: P): String {
+        awaitState<Ready<B>>().run {
             try {
-                return binder.bestMove(fen, depth)
+                return adapter.move(params, binder)
             } catch (exception: DeadObjectException) {
                 throw EngineProxyException.EngineKilledException
             }
@@ -90,7 +94,7 @@ class ActivityEngineProxy : EngineProxy {
 
     context(ActivityBound)
     private suspend fun startEngine(intent: Intent) {
-        if (state.value !is Ready) {
+        if (state.value !is Ready<*>) {
             with(context as ComponentActivity) {
                 bindService(intent, connection, BIND_AUTO_CREATE)
                 lifecycleScope.launch {
@@ -120,10 +124,10 @@ class ActivityEngineProxy : EngineProxy {
             open val context: Context,
         ) : State
 
-        data class Ready(
+        data class Ready<T>(
             override val engineIntent: Intent,
             override val context: Context,
-            val binder: EngineInterface,
+            val binder: T,
         ) : ActivityBound(engineIntent, context)
     }
 }

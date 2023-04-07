@@ -6,6 +6,7 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import dev.mcd.chess.common.engine.ChessEngine
 import dev.mcd.chess.engine.stockfish.data.AndroidStockfishJni
+import dev.mcd.chess.engine.stockfish.data.FenAndDepth
 import dev.mcd.chess.engine.stockfish.data.StockfishEngine
 import dev.mcd.chess.engine.stockfish.data.StockfishJni
 import kotlinx.coroutines.CoroutineName
@@ -29,7 +30,7 @@ class StockfishModule {
     @Provides
     @Singleton
     @Stockfish
-    internal fun stockfishEngine(bridge: StockfishJni): ChessEngine {
+    internal fun stockfishEngine(bridge: StockfishJni): ChessEngine<Unit, FenAndDepth> {
         val context = CoroutineName("Stockfish") + Dispatchers.IO
         return StockfishEngine(bridge, context)
     }

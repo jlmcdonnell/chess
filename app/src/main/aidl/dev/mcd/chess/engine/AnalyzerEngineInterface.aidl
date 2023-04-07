@@ -1,6 +1,6 @@
 package dev.mcd.chess.engine;
 
 
-interface EngineInterface {
+interface AnalyzerEngineInterface {
     String bestMove(String fen, int depth);
 }

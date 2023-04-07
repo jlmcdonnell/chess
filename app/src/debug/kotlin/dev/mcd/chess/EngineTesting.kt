@@ -18,8 +18,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.ViewModel
 import com.github.bhlangonijr.chesslib.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dev.mcd.chess.common.engine.ChessEngine
-import dev.mcd.chess.engine.lc0.Lc0
+import dev.mcd.chess.engine.lc0.FenParam
+import dev.mcd.chess.feature.engine.BotEngineProxy
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.compose.collectSideEffect
@@ -31,20 +31,19 @@ import javax.inject.Inject
 
 @HiltViewModel
 class EngineTestingViewModel @Inject constructor(
-    @Lc0
-    val engine: ChessEngine,
+    val engine: BotEngineProxy,
 ) : ViewModel(), ContainerHost<Unit, String> {
 
     override val container: Container<Unit, String> = container(Unit) {
         intent {
             repeatOnSubscription {
-                engine.startAndWait()
+                engine.start()
             }
         }
     }
 
     fun getMove() = intent {
-        val move = engine.getMove(Constants.startStandardFENPosition, 1)
+        val move = engine.getMove(FenParam(Constants.startStandardFENPosition))
         postSideEffect(move)
     }
 }
@@ -69,20 +68,11 @@ fun EngineTest(
     vm: EngineTestingViewModel = hiltViewModel(),
     onRestart: () -> Unit,
 ) {
-    var ready by remember { mutableStateOf(false) }
     var move by remember { mutableStateOf("") }
 
     vm.collectSideEffect { move = it }
 
-    LaunchedEffect(Unit) {
-        vm.engine.awaitReady()
-        ready = true
-    }
-
-    val readyText = if (ready) "Engine ready" else "Engine not ready"
-
     Column {
-        Text(readyText)
         if (move.isNotBlank()) {
             Text(move)
         } else {

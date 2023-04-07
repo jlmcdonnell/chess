@@ -1,7 +1,7 @@
 package dev.mcd.chess.feature.engine
 
-interface EngineProxy {
+interface EngineProxy<MoveParams> {
     suspend fun start()
     suspend fun stop()
-    suspend fun getMove(fen: String, depth: Int): String
+    suspend fun getMove(params: MoveParams): String
 }

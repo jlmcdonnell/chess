@@ -6,14 +6,12 @@ import android.content.Intent
 import android.os.IBinder
 import android.os.Process
 import dev.mcd.chess.common.engine.ChessEngine
-import dev.mcd.chess.engine.EngineInterface
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 
-abstract class EngineService : Service() {
+abstract class EngineService<EngineInit, Move, Engine : ChessEngine<EngineInit, Move>> : Service() {
 
     private var engineJob: Job? = null
 
@@ -21,20 +19,14 @@ abstract class EngineService : Service() {
         super.onCreate()
         engineJob = CoroutineScope(Dispatchers.Default).launch {
             with(engine()) {
-                init()
+                init(initParams())
                 startAndWait()
             }
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder {
-        return object : EngineInterface.Stub() {
-            override fun bestMove(fen: String, depth: Int): String {
-                return runBlocking {
-                    engine().getMove(fen, depth)
-                }
-            }
-        }
+    override fun onBind(intent: Intent?): IBinder? {
+        TODO("Not yet implemented")
     }
 
     override fun onUnbind(intent: Intent?): Boolean {
@@ -49,10 +41,12 @@ abstract class EngineService : Service() {
         engineJob?.cancel()
     }
 
-    abstract fun engine(): ChessEngine
+    abstract fun initParams(): EngineInit
+
+    abstract fun engine(): ChessEngine<EngineInit, Move>
 
     companion object {
-        inline fun <reified T : EngineService> newIntent(context: Context): Intent {
+        inline fun <reified T : EngineService<*, *, *>> newIntent(context: Context): Intent {
             return Intent(context, T::class.java)
         }
     }

@@ -25,13 +25,13 @@ internal class Lc0Engine @Inject constructor(
     @ApplicationContext
     private val context: Context,
     private val engineContext: CoroutineContext,
-) : ChessEngine {
+) : ChessEngine<MaiaWeights, FenParam> {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
     private val weightsFile = File(context.dataDir, "maia-1100.pb")
 
-    override fun init() {
-        context.assets.open("weights/maia-1100.pb").copyTo(
+    override fun init(params: MaiaWeights) {
+        context.assets.open(params.asset).copyTo(
             weightsFile.outputStream(),
         )
         bridge.init()
@@ -69,18 +69,14 @@ internal class Lc0Engine @Inject constructor(
         }
     }
 
-    override suspend fun getMove(fen: String, depth: Int): String {
+    override suspend fun getMove(params: FenParam): String {
         return withContext(engineContext) {
             awaitState<State.Ready>()
             val moveCompletable = CompletableDeferred<String>()
             moveToState(State.Moving(moveCompletable))
 
-            listOf(
-                EngineCommand.SetPosition(fen),
-                EngineCommand.Go(depth),
-            ).forEach {
-                bridge.writeLine(it.string())
-            }
+            bridge.writeLine(EngineCommand.SetPosition(params.fen).string())
+            bridge.writeLine("go nodes 1")
 
             moveCompletable.await().also {
                 moveToState(State.Ready)

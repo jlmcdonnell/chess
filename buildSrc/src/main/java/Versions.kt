@@ -12,6 +12,7 @@ object Versions {
     val datastorePreferences = "1.0.0"
     val hilt = "2.45"
     val hiltNavigationCompose = "1.0.0"
+    val javaxInject = "1"
     val junit = "4.13.2"
     val junitExt = "1.1.5"
     val ktor = "2.2.4"
