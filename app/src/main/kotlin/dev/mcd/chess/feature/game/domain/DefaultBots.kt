@@ -2,38 +2,34 @@ package dev.mcd.chess.feature.game.domain
 
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.common.player.PlayerImage
+import dev.mcd.chess.engine.lc0.MaiaWeights
 
 object DefaultBots {
     fun bots() = listOf(
         Bot(
-            slug = "level-1",
+            slug = MaiaWeights.ELO_1100.name,
             name = "Pawn Pioneer",
             image = PlayerImage.Bot,
-            depth = 1,
         ),
         Bot(
-            slug = "level-2",
+            slug = MaiaWeights.ELO_1200.name,
             name = "The Bishop of Banterbury",
             image = PlayerImage.Bot,
-            depth = 2,
         ),
         Bot(
-            slug = "level-3",
+            slug = MaiaWeights.ELO_1300.name,
             name = "Knight Rider",
             image = PlayerImage.Bot,
-            depth = 3,
         ),
         Bot(
-            slug = "level-4",
+            slug = MaiaWeights.ELO_1400.name,
             name = "Rook Rampage",
             image = PlayerImage.Bot,
-            depth = 4,
         ),
         Bot(
-            slug = "level-5",
+            slug = MaiaWeights.ELO_1900.name,
             name = "Checkmate Chad",
             image = PlayerImage.Bot,
-            depth = 7,
         ),
     )
 

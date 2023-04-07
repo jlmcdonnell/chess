@@ -11,6 +11,7 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
+import dev.mcd.chess.engine.lc0.MaiaWeights
 import dev.mcd.chess.feature.engine.BotEngineProxy
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
@@ -50,7 +51,7 @@ class BotGameViewModel @Inject constructor(
     override val container = container<State, SideEffect>(State.Loading) {
         intent {
             repeatOnSubscription {
-                engine.start()
+                engine.start(MaiaWeights.valueOf(bot.slug))
                 try {
                     awaitCancellation()
                 } finally {

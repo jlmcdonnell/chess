@@ -1,7 +1,9 @@
 package dev.mcd.chess.activity.engine
 
+import android.content.Intent
 import android.os.Bundle
 import androidx.activity.ComponentActivity
+import dev.mcd.chess.engine.lc0.MaiaWeights
 import dev.mcd.chess.feature.engine.ActivityEngineProxy
 import dev.mcd.chess.feature.engine.AnalyzerEngineProxy
 import dev.mcd.chess.feature.engine.BotEngineProxy
@@ -22,8 +24,13 @@ abstract class EngineActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        analyzerProxy.bind<AnalyzerService>()
-        botProxy.bind<BotService>()
+        analyzerProxy.bind<Unit, AnalyzerService> {
+            AnalyzerService.newIntent(this)
+        }
+
+        botProxy.bind<MaiaWeights, BotService> { weight ->
+            BotService.newIntent(weight, this)
+        }
     }
 
     override fun onDestroy() {
@@ -32,14 +39,14 @@ abstract class EngineActivity : ComponentActivity() {
         botProxy.unbind()
     }
 
-    private inline fun <reified T : EngineService<*, *, *>> EngineProxy<*>.bind() {
-        val intent = EngineService.newIntent<T>(this@EngineActivity)
-        (this@bind as? ActivityEngineProxy<*, *, *>)?.bindActivity(this@EngineActivity, intent)
+    @Suppress("UNCHECKED_CAST")
+    private inline fun <reified Init, reified T : EngineService<*, *, *>> EngineProxy<*, *>.bind(noinline buildIntent: (Init) -> Intent) {
+        (this@bind as ActivityEngineProxy<Init, *, *, *>).bindActivity(this@EngineActivity, buildIntent)
     }
 
-    private fun EngineProxy<*>.unbind() {
+    private fun EngineProxy<*, *>.unbind() {
         runBlocking {
-            (this@unbind as ActivityEngineProxy<*, *, *>).unbindActivity()
+            (this@unbind as ActivityEngineProxy<*, *, *, *>).unbindActivity()
         }
     }
 }

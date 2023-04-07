@@ -1,9 +1,7 @@
 package dev.mcd.chess.service
 
 import android.app.Service
-import android.content.Context
 import android.content.Intent
-import android.os.IBinder
 import android.os.Process
 import dev.mcd.chess.common.engine.ChessEngine
 import kotlinx.coroutines.CoroutineScope
@@ -25,10 +23,6 @@ abstract class EngineService<EngineInit, Move, Engine : ChessEngine<EngineInit, 
         }
     }
 
-    override fun onBind(intent: Intent?): IBinder? {
-        TODO("Not yet implemented")
-    }
-
     override fun onUnbind(intent: Intent?): Boolean {
         stopSelf()
         return super.onUnbind(intent)
@@ -44,10 +38,4 @@ abstract class EngineService<EngineInit, Move, Engine : ChessEngine<EngineInit, 
     abstract fun initParams(): EngineInit
 
     abstract fun engine(): ChessEngine<EngineInit, Move>
-
-    companion object {
-        inline fun <reified T : EngineService<*, *, *>> newIntent(context: Context): Intent {
-            return Intent(context, T::class.java)
-        }
-    }
 }

@@ -1,10 +1,8 @@
 package dev.mcd.chess.ui.game
 
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
@@ -31,7 +29,7 @@ import timber.log.Timber
 fun GameView(
     gameHolder: StableHolder<GameSession>,
     onMove: (Move) -> Unit,
-    onResign: () -> Unit,
+    onResign: () -> Unit = {},
     sounds: @Composable (() -> Unit) = { BoardSounds() },
     boardWidth: @Composable () -> Float = { LocalView.current.width.toFloat() },
     settings: GameSettings = GameSettings(),
@@ -89,7 +87,7 @@ fun GameView(
                 )
                 GameOptions(
                     modifier = Modifier.align(Alignment.CenterEnd),
-                    onResignClicked = { onResign() },
+                    onResignClicked = onResign,
                     allowResign = settings.allowResign,
                 )
             }

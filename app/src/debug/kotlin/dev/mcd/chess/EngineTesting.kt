@@ -19,6 +19,7 @@ import androidx.lifecycle.ViewModel
 import com.github.bhlangonijr.chesslib.Constants
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.engine.lc0.FenParam
+import dev.mcd.chess.engine.lc0.MaiaWeights
 import dev.mcd.chess.feature.engine.BotEngineProxy
 import org.orbitmvi.orbit.Container
 import org.orbitmvi.orbit.ContainerHost
@@ -37,7 +38,7 @@ class EngineTestingViewModel @Inject constructor(
     override val container: Container<Unit, String> = container(Unit) {
         intent {
             repeatOnSubscription {
-                engine.start()
+                engine.start(MaiaWeights.ELO_1100)
             }
         }
     }

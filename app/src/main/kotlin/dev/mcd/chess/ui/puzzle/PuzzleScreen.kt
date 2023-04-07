@@ -58,8 +58,6 @@ fun PuzzleScreen(
                     onMove = { move ->
                         puzzleViewModel.onMove(move)
                     },
-                    onResign = {
-                    },
                     sounds = { BoardSounds(enableNotify = false) },
                 )
             }

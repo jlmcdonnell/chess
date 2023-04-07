@@ -1,5 +1,6 @@
 package dev.mcd.chess.service
 
+import android.content.Context
 import android.content.Intent
 import android.os.IBinder
 import dagger.hilt.android.AndroidEntryPoint
@@ -28,6 +29,12 @@ class AnalyzerService : EngineService<Unit, FenAndDepth, ChessEngine<Unit, FenAn
                     engine().getMove(FenAndDepth(fen, depth))
                 }
             }
+        }
+    }
+
+    companion object {
+        fun newIntent(context: Context): Intent {
+            return Intent(context, AnalyzerService::class.java)
         }
     }
 }

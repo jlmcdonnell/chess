@@ -11,8 +11,8 @@ import android.os.IInterface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
 import dev.mcd.chess.activity.engine.adapter.EngineBinderAdapter
-import dev.mcd.chess.engine.BotEngineInterface
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.ActivityBound
+import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Initializing
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Ready
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.UnboundToActivity
 import kotlinx.coroutines.awaitCancellation
@@ -22,21 +22,22 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 
-class ActivityEngineProxy<P, B : IInterface, Adapter : EngineBinderAdapter<P, B>>(
+class ActivityEngineProxy<Init, Move, Binder : IInterface, Adapter : EngineBinderAdapter<Move, Binder>>(
     private val adapter: Adapter,
-) : EngineProxy<P> {
+) : EngineProxy<Init, Move> {
 
     private val state = MutableStateFlow<State>(UnboundToActivity)
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(name: ComponentName?, service: IBinder) {
             runBlocking {
-                ifState<ActivityBound> {
+                ifState<Initializing<Init>> {
                     state.tryEmit(
                         Ready(
-                            binder = BotEngineInterface.Stub.asInterface(service),
-                            engineIntent = engineIntent,
+                            binder = adapter.castBinder(service),
+                            engineIntent = buildIntent(initParams),
                             context = context,
+                            buildIntent = buildIntent,
                         ),
                     )
                 }
@@ -45,45 +46,45 @@ class ActivityEngineProxy<P, B : IInterface, Adapter : EngineBinderAdapter<P, B>
 
         override fun onServiceDisconnected(name: ComponentName?) {
             runBlocking {
-                ifState<Ready<B>> {
-                    state.tryEmit(ActivityBound(engineIntent, context))
+                ifState<Ready<Init, Binder>> {
+                    state.tryEmit(ActivityBound(context, buildIntent))
                 }
             }
         }
     }
 
-    fun bindActivity(context: Context, engineIntent: Intent) {
+    fun bindActivity(context: Context, buildIntent: (Init) -> Intent) {
         state.tryEmit(
             ActivityBound(
                 context = context,
-                engineIntent = engineIntent,
+                buildIntent = buildIntent,
             ),
         )
     }
 
     suspend fun unbindActivity() {
-        ifState<ActivityBound> {
+        ifState<ActivityBound<Init>> {
             stop()
             state.emit(UnboundToActivity)
         }
     }
 
-    override suspend fun start() {
-        ifState<ActivityBound> {
-            startEngine(engineIntent)
+    override suspend fun start(initParams: Init) {
+        ifState<ActivityBound<Init>> {
+            startEngine(initParams, buildIntent(initParams))
         }
     }
 
     override suspend fun stop() {
-        ifState<Ready<B>> {
+        ifState<Ready<Init, Binder>> {
             context.unbindService(connection)
             context.stopService(engineIntent)
-            state.tryEmit(ActivityBound(engineIntent, context))
+            state.tryEmit(ActivityBound(context, buildIntent))
         }
     }
 
-    override suspend fun getMove(params: P): String {
-        awaitState<Ready<B>>().run {
+    override suspend fun getMove(params: Move): String {
+        awaitState<Ready<Init, Binder>>().run {
             try {
                 return adapter.move(params, binder)
             } catch (exception: DeadObjectException) {
@@ -92,11 +93,18 @@ class ActivityEngineProxy<P, B : IInterface, Adapter : EngineBinderAdapter<P, B>
         }
     }
 
-    context(ActivityBound)
-    private suspend fun startEngine(intent: Intent) {
-        if (state.value !is Ready<*>) {
+    context(ActivityBound<Init>)
+    private suspend fun startEngine(params: Init, intent: Intent) {
+        if (state.value !is Ready<*, *>) {
             with(context as ComponentActivity) {
                 bindService(intent, connection, BIND_AUTO_CREATE)
+                state.tryEmit(
+                    Initializing(
+                        context = context,
+                        buildIntent = buildIntent,
+                        initParams = params,
+                    ),
+                )
                 lifecycleScope.launch {
                     try {
                         awaitCancellation()
@@ -116,18 +124,25 @@ class ActivityEngineProxy<P, B : IInterface, Adapter : EngineBinderAdapter<P, B>
         (state.value as? T)?.apply { block() }
     }
 
-    sealed interface State {
+    private sealed interface State {
         object UnboundToActivity : State
 
-        open class ActivityBound(
-            open val engineIntent: Intent,
+        open class ActivityBound<Init>(
             open val context: Context,
+            open val buildIntent: (Init) -> Intent,
         ) : State
 
-        data class Ready<T>(
-            override val engineIntent: Intent,
+        open class Initializing<Init>(
+            context: Context,
+            buildIntent: (Init) -> Intent,
+            val initParams: Init,
+        ) : ActivityBound<Init>(context, buildIntent)
+
+        data class Ready<Init, Binder>(
             override val context: Context,
-            val binder: T,
-        ) : ActivityBound(engineIntent, context)
+            override val buildIntent: (Init) -> Intent,
+            val engineIntent: Intent,
+            val binder: Binder,
+        ) : ActivityBound<Init>(context, buildIntent)
     }
 }
