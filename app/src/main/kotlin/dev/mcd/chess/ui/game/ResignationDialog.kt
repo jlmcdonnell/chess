@@ -14,7 +14,7 @@ fun ResignationDialog(
 ) {
     AlertDialog(
         onDismissRequest = { onDismiss() },
-        title = { Text(stringResource(id = R.string.resign_confirm)) },
+        title = { Text(stringResource(id = R.string.resign)) },
         text = { Text(stringResource(R.string.confirm_resign)) },
         confirmButton = {
             TextButton(onClick = { onConfirm() }) {

@@ -8,6 +8,7 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.ui.extension.center
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -24,8 +25,9 @@ class BoardInteraction(
     private val target = MutableStateFlow(Square.NONE)
     private val highlightMoveChanges = MutableStateFlow(Square.NONE)
     private var squarePositions: Map<Square, Offset> = emptyMap()
-    private val selectPromotion = MutableStateFlow(emptyList<Move>())
     private var enableInteraction = true
+    private val selectPromotion = MutableStateFlow(emptyList<Move>())
+    private var promotionCompletable: CompletableDeferred<Move?>? = null
 
     fun updateSquarePositions(squareSizePx: Float) {
         this.squarePositions = Square.values().associateWith { square ->
@@ -35,16 +37,35 @@ class BoardInteraction(
 
     fun promote(move: Move) {
         if (enableInteraction) {
-            selectPromotion.value = emptyList()
-            moves.tryEmit(move)
-            releaseTarget()
+            promotionCompletable?.complete(move)
         }
     }
 
-    fun selectPromotion(moves: List<Move>) {
+    suspend fun selectPromotion(promotionMoves: List<Move>): Boolean {
         if (enableInteraction) {
-            selectPromotion.value = moves
+            promotionCompletable = CompletableDeferred()
+
+            selectPromotion.value = promotionMoves
+            val move = promotionCompletable!!.await()
+
+            releaseTarget()
+            clearHighlightMoves()
+            selectPromotion.value = emptyList()
+
+            if (move != null) {
+                moves.tryEmit(move)
+                return true
+            }
         }
+        return false
+    }
+
+    fun cancelPromotion() {
+        promotionCompletable?.complete(null)
+    }
+
+    fun displayPromotions(): Flow<List<Move>> {
+        return selectPromotion
     }
 
     fun highlightMoves(from: Square) {
@@ -91,17 +112,19 @@ class BoardInteraction(
                     moves.tryEmit(move)
                     result = DropPieceResult.Moved(square, target.value)
                     clearHighlightMoves()
+                    releaseTarget()
                 } else if (promotions.isNotEmpty()) {
-                    selectPromotion(promotions)
-                    result = DropPieceResult.Promoting
+                    result = DropPieceResult.SelectPromotion(promotions)
+                    clearHighlightMoves()
+                } else {
+                    releaseTarget()
+                    clearHighlightMoves()
                 }
-            }
-
-            if (result != DropPieceResult.Promoting) {
-                releaseTarget()
             }
             return result
         } else {
+            clearHighlightMoves()
+            releaseTarget()
             return DropPieceResult.None
         }
     }
@@ -112,10 +135,6 @@ class BoardInteraction(
 
     fun targets(): Flow<Square> {
         return target
-    }
-
-    fun selectPromotion(): Flow<List<Move>> {
-        return selectPromotion
     }
 
     fun perspectiveChanges(): Flow<Side> = perspective

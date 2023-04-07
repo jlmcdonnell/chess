@@ -32,6 +32,7 @@ import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.launch
 
 context(BoardLayout)
 @Composable
@@ -104,12 +105,26 @@ fun ChessPiece(initialState: ChessPieceState) {
                                 boardInteraction.updateDragPosition(dragPosition)
                             } while (event.changes.none { it.changedToUp() })
 
-                            if (boardInteraction.dropPiece(state.piece, state.square) == DropPieceResult.None) {
-                                pan = Offset.Zero
-                                currentSize = squareSize
-                                boardInteraction.clearHighlightMoves()
+                            when (val result = boardInteraction.dropPiece(state.piece, state.square)) {
+                                DropPieceResult.None -> {
+                                    pan = Offset.Zero
+                                    currentSize = squareSize
+                                    dragging = false
+                                }
+                                is DropPieceResult.SelectPromotion -> {
+                                    launch {
+                                        val promoted = boardInteraction.selectPromotion(result.promotions)
+                                        if (!promoted) {
+                                            pan = Offset.Zero
+                                            currentSize = squareSize
+                                        }
+                                        dragging = false
+                                    }
+                                }
+                                else -> {
+                                    dragging = false
+                                }
                             }
-                            dragging = false
                         }
                     }
                 }

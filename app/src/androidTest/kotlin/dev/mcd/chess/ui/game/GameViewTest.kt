@@ -39,6 +39,7 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -121,7 +122,7 @@ class GameViewTest {
         with(composeRule) {
             setupChessBoard()
 
-            dragMove(WHITE_PAWN, E2, E4)
+            dragPiece(WHITE_PAWN, E2, E4)
             assertPiece(WHITE_PAWN on E4)
 
             undoMove()
@@ -154,13 +155,13 @@ class GameViewTest {
         with(composeRule) {
             setupChessBoard()
 
-            dragMove(WHITE_PAWN, "e2e4")
+            dragPiece(WHITE_PAWN, "e2e4")
             move("e7e5")
-            dragMove(WHITE_QUEEN, "d1h5")
+            dragPiece(WHITE_QUEEN, "d1h5")
             move("g7g6")
-            dragMove(WHITE_QUEEN, "h5e5")
+            dragPiece(WHITE_QUEEN, "h5e5")
             move("f8e7")
-            dragMove(WHITE_QUEEN, "e5h8")
+            dragPiece(WHITE_QUEEN, "e5h8")
 
             undoMove()
 
@@ -214,6 +215,56 @@ class GameViewTest {
                 BLACK_PAWN on B7,
                 BLACK_PAWN on D7,
             )
+        }
+    }
+
+    @Test
+    fun promote(): Unit = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                sideToMove = Side.WHITE
+                setPiece(BLACK_KING, A8)
+                setPiece(WHITE_KING, E1)
+                setPiece(WHITE_PAWN, E7)
+            }
+            gameRule.game.setBoard(board)
+
+            setupChessBoard()
+
+            dragPiece(WHITE_PAWN, "e7e8")
+            onNodeWithContentDescription("e7e8n").performClick()
+            mainClock.advanceTimeBy(300)
+            assertPiece(WHITE_KNIGHT on E8)
+            onNodeWithContentDescription("e7e8n").assertDoesNotExist()
+        }
+    }
+
+    @Test
+    fun cancelPromotion(): Unit = runBlocking {
+        with(composeRule) {
+            val board = gameRule.board.apply {
+                clear()
+                sideToMove = Side.WHITE
+                setPiece(BLACK_KING, A8)
+                setPiece(WHITE_KING, E1)
+                setPiece(WHITE_PAWN, E7)
+            }
+            gameRule.game.setBoard(board)
+
+            setupChessBoard()
+
+            delay(2000)
+            dragPiece(WHITE_PAWN, "e7e8")
+            delay(2000)
+            onNodeWithTag("promotion-selector").performTouchInput {
+                down(Offset.Zero)
+                up()
+            }
+            mainClock.advanceTimeBy(300)
+            delay(2000)
+            assertPiece(WHITE_PAWN on E7)
+            onNodeWithTag("promotion-selector").assertDoesNotExist()
         }
     }
 
@@ -304,7 +355,7 @@ class GameViewTest {
         with(composeRule) {
             setupChessBoard()
             gameRule.game.resign()
-            dragMove(WHITE_PAWN, "e2e4")
+            dragPiece(WHITE_PAWN, "e2e4")
             assertNoPiece(WHITE_PAWN on E4)
         }
     }
@@ -447,8 +498,8 @@ class GameViewTest {
     }
 
     context(ComposeTestRule)
-    private fun dragMove(piece: Piece, move: String) {
-        dragMove(
+    private fun dragPiece(piece: Piece, move: String) {
+        dragPiece(
             piece,
             Square.valueOf(move.substring(0, 2).uppercase()),
             Square.valueOf(move.substring(2, 4).uppercase()),
@@ -456,7 +507,7 @@ class GameViewTest {
     }
 
     context(ComposeTestRule)
-    private fun dragMove(piece: Piece, from: Square, to: Square) {
+    private fun dragPiece(piece: Piece, from: Square, to: Square) {
         onPiece(piece on from)
             .performTouchInput {
                 down(from.position())

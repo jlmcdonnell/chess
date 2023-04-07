@@ -21,7 +21,7 @@ class StartBotGameImpl @Inject constructor(
 ) : StartBotGame {
     override suspend fun invoke(side: Side, bot: Bot) {
         val board = Board().apply {
-            loadFromFen(Constants.startStandardFENPosition)
+            loadFromFen("7k/4P3/8/8/8/8/8/4K3 w - - 0 1")
         }
         val game = GameSession(
             id = UUID.randomUUID().toString(),
