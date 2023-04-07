@@ -28,12 +28,21 @@ internal class Lc0Engine @Inject constructor(
 ) : ChessEngine<MaiaWeights, FenParam> {
 
     private val stateFlow = MutableStateFlow<State>(State.Uninitialized)
-    private val weightsFile = File(context.dataDir, "maia-1100.pb")
+    private lateinit var weightsFile: File
 
     override fun init(params: MaiaWeights) {
-        context.assets.open(params.asset).copyTo(
-            weightsFile.outputStream(),
-        )
+        val weightFileName = if (params.asset.contains('/')) {
+            params.asset.substring(params.asset.indexOf('/') + 1)
+        } else {
+            params.asset
+        }
+        weightsFile = File(context.dataDir, weightFileName)
+
+        if (!weightsFile.exists()) {
+            context.assets.open(params.asset).copyTo(
+                weightsFile.outputStream(),
+            )
+        }
         bridge.init()
     }
 

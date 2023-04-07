@@ -24,7 +24,7 @@ class BotService : EngineService<MaiaWeights, FenParam, ChessEngine<MaiaWeights,
 
     override fun engine() = engine
 
-    override fun initParams() = MaiaWeights.ELO_1100
+    override fun initParams() = weight ?: throw IllegalStateException("Weight not set (should be set via onBind)")
 
     override fun onBind(intent: Intent?): IBinder {
         if (weight != null) {
