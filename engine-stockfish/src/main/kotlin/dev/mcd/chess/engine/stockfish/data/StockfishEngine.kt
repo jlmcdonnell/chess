@@ -54,7 +54,7 @@ internal class StockfishEngine(
             try {
                 awaitCancellation()
             } finally {
-                bridge.writeLine(EngineCommand.Quit.string())
+                bridge.writeLine(EngineCommand.Quit.toString())
                 job.cancel()
                 moveToState(State.Uninitialized)
             }
@@ -70,9 +70,9 @@ internal class StockfishEngine(
 
             listOf(
                 EngineCommand.SetPosition(fen),
-                EngineCommand.Go(depth),
+                EngineCommand.GoDepth(depth),
             ).forEach {
-                bridge.writeLine(it.string())
+                bridge.writeLine(it.toString())
             }
 
             moveCompletable.await().also {

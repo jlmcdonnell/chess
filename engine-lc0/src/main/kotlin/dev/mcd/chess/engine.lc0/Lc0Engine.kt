@@ -75,8 +75,8 @@ internal class Lc0Engine @Inject constructor(
             val moveCompletable = CompletableDeferred<String>()
             moveToState(State.Moving(moveCompletable))
 
-            bridge.writeLine(EngineCommand.SetPosition(params.fen).string())
-            bridge.writeLine("go nodes 1")
+            bridge.writeLine(EngineCommand.SetPosition(params.fen).toString())
+            bridge.writeLine(EngineCommand.GoNodes.toString())
 
             moveCompletable.await().also {
                 moveToState(State.Ready)

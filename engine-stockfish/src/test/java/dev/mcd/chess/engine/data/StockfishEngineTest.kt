@@ -1,8 +1,8 @@
 package dev.mcd.chess.engine.data
 
-import dev.mcd.chess.common.engine.EngineCommand.Go
+import dev.mcd.chess.common.engine.EngineCommand.GoDepth
 import dev.mcd.chess.common.engine.EngineCommand.SetPosition
-import dev.mcd.chess.common.engine.EngineCommand.SetSkillLevel
+import dev.mcd.chess.engine.stockfish.data.FenAndDepth
 import dev.mcd.chess.engine.stockfish.data.StockfishEngine
 import dev.mcd.chess.engine.stockfish.data.StockfishJni
 import io.mockk.Awaits
@@ -49,9 +49,8 @@ class StockfishEngineTest {
     fun `Get move`(): Unit = runBlocking {
         val move = CompletableDeferred<String>()
 
-        every { bridge.writeLine(SetPosition("TEST").string()) } returns Unit
-        every { bridge.writeLine(SetSkillLevel(0).string()) } returns Unit
-        every { bridge.writeLine(Go(0).string()) } coAnswers {
+        every { bridge.writeLine(SetPosition("TEST").toString()) } returns Unit
+        every { bridge.writeLine(GoDepth(0).toString()) } coAnswers {
             move.complete("${StockfishEngine.BEST_MOVE_TOKEN} e2e4")
             Unit
         }
@@ -65,6 +64,6 @@ class StockfishEngineTest {
             adapter.startAndWait()
         }
 
-        adapter.getMove("TEST", 0, 0)
+        adapter.getMove(FenAndDepth("TEST", 0))
     }
 }
