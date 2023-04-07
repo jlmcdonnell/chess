@@ -39,7 +39,6 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.piece.PieceSquareKey
 import dev.mcd.chess.ui.game.board.piece.SquarePieceTag
 import dev.mcd.chess.ui.theme.ChessTheme
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
 import org.junit.Rule
@@ -254,15 +253,12 @@ class GameViewTest {
 
             setupChessBoard()
 
-            delay(2000)
             dragPiece(WHITE_PAWN, "e7e8")
-            delay(2000)
             onNodeWithTag("promotion-selector").performTouchInput {
                 down(Offset.Zero)
                 up()
             }
             mainClock.advanceTimeBy(300)
-            delay(2000)
             assertPiece(WHITE_PAWN on E7)
             onNodeWithTag("promotion-selector").assertDoesNotExist()
         }
