@@ -122,6 +122,5 @@ internal class Lc0Engine @Inject constructor(
 
     companion object {
         internal const val BEST_MOVE_TOKEN = "bestmove"
-        private const val DEFAULT_THREAD_COUNT = 4
     }
 }
