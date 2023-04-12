@@ -10,7 +10,7 @@ import android.os.IBinder
 import android.os.IInterface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import dev.mcd.chess.activity.engine.adapter.EngineBinderAdapter
+import dev.mcd.chess.feature.engine.binder.EngineBinderAdapter
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.ActivityBound
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Initializing
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Ready

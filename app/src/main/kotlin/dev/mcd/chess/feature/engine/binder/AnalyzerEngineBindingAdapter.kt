@@ -1,4 +1,4 @@
-package dev.mcd.chess.activity.engine.adapter
+package dev.mcd.chess.feature.engine.binder
 
 import android.os.IBinder
 import dev.mcd.chess.engine.AnalyzerEngineInterface

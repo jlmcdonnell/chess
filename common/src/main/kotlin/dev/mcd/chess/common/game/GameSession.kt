@@ -23,7 +23,7 @@ open class GameSession(
     private lateinit var startingPieces: List<Piece>
 
     private val moves = MutableStateFlow<DirectionalMove?>(null)
-    private val history = Stack<MoveBackup>()
+    private val undoneMoves = Stack<MoveBackup>()
     private val terminationReason = MutableStateFlow<TerminationReason?>(null)
 
     val moveCount: Int get() = board.backup.size
@@ -70,18 +70,20 @@ open class GameSession(
             val lastMove = board.backup.last()
             board.undoMove()
             if (!eraseHistory) {
-                history.push(lastMove)
+                undoneMoves.push(lastMove)
             }
             moves.tryEmit(DirectionalMove(lastMove, undo = true))
         }
     }
 
     fun redo() {
-        if (history.size > 0) {
-            board.doMove(history.pop().move)
+        if (undoneMoves.size > 0) {
+            board.doMove(undoneMoves.pop().move)
             moves.tryEmit(DirectionalMove(board.backup.last, undo = false))
         }
     }
+
+    fun undoneMoves(): Stack<MoveBackup> = undoneMoves
 
     fun piecesAtVariationStart(): List<Piece> {
         return startingPieces
@@ -91,7 +93,7 @@ open class GameSession(
         return board.boardToArray().toList()
     }
 
-    fun isLive() = history.size == 0
+    fun isLive() = undoneMoves.size == 0
 
     fun moves(): Flow<DirectionalMove> = moves.filterNotNull()
 

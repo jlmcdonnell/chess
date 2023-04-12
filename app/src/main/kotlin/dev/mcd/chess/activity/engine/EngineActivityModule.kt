@@ -4,9 +4,9 @@ import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
-import dev.mcd.chess.activity.engine.adapter.AnalyzerEngineBindingAdapter
-import dev.mcd.chess.activity.engine.adapter.BotEngineBindingAdapter
-import dev.mcd.chess.activity.engine.adapter.EngineBinderAdapter
+import dev.mcd.chess.feature.engine.binder.AnalyzerEngineBindingAdapter
+import dev.mcd.chess.feature.engine.binder.BotEngineBindingAdapter
+import dev.mcd.chess.feature.engine.binder.EngineBinderAdapter
 import dev.mcd.chess.engine.AnalyzerEngineInterface
 import dev.mcd.chess.engine.BotEngineInterface
 import dev.mcd.chess.engine.lc0.FenParam

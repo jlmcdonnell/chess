@@ -8,10 +8,10 @@ import dev.mcd.chess.common.player.PuzzleOpponent
 import dev.mcd.chess.feature.common.domain.Translations
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
+import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.DelaySettings
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInput
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
 import dev.mcd.chess.online.domain.entity.Puzzle
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
@@ -24,47 +24,38 @@ class CreatePuzzleSessionImpl @Inject constructor(
     private val translations: Translations,
 ) : CreatePuzzleSession {
 
-    override suspend operator fun invoke(puzzle: Puzzle): Pair<PuzzleInput, Flow<PuzzleOutput>> {
+    override suspend operator fun invoke(puzzle: Puzzle, settings: DelaySettings): Pair<PuzzleInput, Flow<PuzzleOutput>> {
         val moves = Stack<String>().apply {
             addAll(puzzle.moves.reversed())
         }
         val session = initSession(puzzle)
-        val channel = Channel<String>()
-        println(moves)
-
-        val input = object : PuzzleInput {
-            override suspend fun close() {
-                channel.close()
-            }
-
-            override suspend fun move(move: String) {
-                channel.send(move)
-            }
-
-            override suspend fun retry() {
-                session.undo(eraseHistory = true)
-            }
-        }
+        val puzzleInputChannel = PuzzleInputChannel(session)
 
         val out = channelFlow {
             send(PuzzleOutput.Started(session))
 
-            delay(1000)
+            delay(settings.beforePuzzleStartDelay)
             send(moveForOpponent(session, puzzle, moves))
 
             try {
-                for (move in channel) {
-                    send(moveForPlayer(session, puzzle, moves, move))
+                for (move in puzzleInputChannel.moves()) {
+                    send(moveForPlayer(session, puzzle, moves, move, settings))
                 }
             } finally {
                 close()
             }
         }
 
-        return input to out
+        return puzzleInputChannel to out
     }
 
-    private suspend fun moveForPlayer(session: GameSession, puzzle: Puzzle, moves: Stack<String>, move: String): PuzzleOutput {
+    private suspend fun moveForPlayer(
+        session: GameSession,
+        puzzle: Puzzle,
+        moves: Stack<String>,
+        move: String,
+        settings: DelaySettings,
+    ): PuzzleOutput {
         if (moves.isEmpty()) return PuzzleOutput.NoMovesLeft
         if (!session.isSelfTurn()) return PuzzleOutput.NotUserTurn
 
@@ -73,6 +64,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
         if (session.move(move) != MoveResult.Moved) {
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
         }
+        delay(settings.afterPlayerMoveDelay)
         return if (move == nextMove) {
             moves.pop()
             if (moves.isEmpty()) {
@@ -89,7 +81,6 @@ class CreatePuzzleSessionImpl @Inject constructor(
         if (moves.isEmpty()) return PuzzleOutput.NoMovesLeft
 
         val nextMove = moves.peek()
-        delay(200)
         if (session.move(nextMove) != MoveResult.Moved) {
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
         }

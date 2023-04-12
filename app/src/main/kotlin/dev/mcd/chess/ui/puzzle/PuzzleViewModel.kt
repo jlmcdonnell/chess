@@ -1,6 +1,7 @@
 package dev.mcd.chess.ui.puzzle
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameSession
@@ -9,7 +10,11 @@ import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInp
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
 import dev.mcd.chess.online.domain.entity.Puzzle
 import dev.mcd.chess.online.domain.usecase.GetRandomPuzzle
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.orbitmvi.orbit.ContainerHost
 import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
@@ -48,16 +53,20 @@ class PuzzleViewModel @Inject constructor(
     }
 
     private fun startPuzzle(puzzle: Puzzle) = intent {
-        runCatching {
-            val (input, puzzleOutput) = createPuzzleSession(puzzle)
-            puzzleInput = input
-            puzzleOutput.collectLatest {
-                handlePuzzleOutput(it)
-            }
-        }.onFailure {
-            Timber.e(it, "Retrieving puzzle")
-            reduce { state.copy(loading = false) }
-        }.getOrNull() ?: return@intent
+        viewModelScope.launch {
+            runCatching {
+                withContext(Dispatchers.Default) {
+                    val (input, puzzleOutput) = createPuzzleSession(puzzle)
+                    puzzleInput = input
+                    puzzleOutput.collectLatest {
+                        handlePuzzleOutput(it)
+                    }
+                }
+            }.onFailure {
+                Timber.e(it, "Retrieving puzzle")
+                reduce { state.copy(loading = false) }
+            }.getOrNull() ?: return@launch
+        }
     }
 
     fun onRetry() {
