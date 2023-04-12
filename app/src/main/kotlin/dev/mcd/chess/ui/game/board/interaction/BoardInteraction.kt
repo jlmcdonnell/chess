@@ -120,6 +120,8 @@ class BoardInteraction(
                     releaseTarget()
                     clearHighlightMoves()
                 }
+            } else {
+                releaseTarget()
             }
             return result
         } else {

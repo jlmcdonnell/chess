@@ -23,7 +23,7 @@ interface CreatePuzzleSession {
 
     data class DelaySettings(
         val beforePuzzleStartDelay: Long = 1000,
-        val afterPlayerMoveDelay: Long = 300,
+        val afterPlayerMoveDelay: Long = 175,
     )
 
     suspend operator fun invoke(puzzle: Puzzle, settings: DelaySettings = DelaySettings()): Pair<PuzzleInput, Flow<PuzzleOutput>>
