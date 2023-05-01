@@ -70,6 +70,10 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 kapt {
     correctErrorTypes = true
 }
@@ -120,7 +124,15 @@ dependencies {
         implementation("androidx.datastore:datastore-preferences:$datastorePreferences")
 
         // Test
-        testImplementation("junit:junit:$junit")
+        testImplementation("junit:junit:$junit4")
+
+        // Junit 5
+        testImplementation("org.junit.jupiter:junit-jupiter-api:$junit5")
+        testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:$junit5")
+        testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5")
+
+        testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
+
         testImplementation("app.cash.turbine:turbine:$turbine")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
         androidTestImplementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")

@@ -67,7 +67,7 @@ dependencies {
         api("com.google.dagger:hilt-android:$hilt")
         kapt("com.google.dagger:hilt-compiler:$hilt")
 
-        testImplementation("junit:junit:$junit")
+        testImplementation("junit:junit:$junit4")
         testImplementation("io.mockk:mockk:$mockk")
         testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
     }

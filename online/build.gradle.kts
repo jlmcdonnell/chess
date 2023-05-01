@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.kapt3.base.Kapt.kapt
-
 plugins {
     id("com.android.library")
     id("kotlinx-serialization")
@@ -43,6 +41,6 @@ dependencies {
         kapt("com.google.dagger:hilt-compiler:$hilt")
 
         testImplementation("io.ktor:ktor-client-cio:$ktor")
-        testImplementation("junit:junit:$junit")
+        testImplementation("junit:junit:$junit4")
     }
 }
