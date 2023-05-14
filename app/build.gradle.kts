@@ -26,6 +26,12 @@ android {
         vectorDrawables {
             useSupportLibrary = true
         }
+
+        buildConfigField(
+            type = "String",
+            name = "ONLINE_API_HOST",
+            value = "\"${AppConfig.ONLINE_API_HOST}\"",
+        )
     }
 
     buildFeatures {

@@ -33,11 +33,12 @@ abstract class CommonModule {
         @Singleton
         fun environment(appPreferences: AppPreferences): Environment {
             return runBlocking {
-                if (BuildConfig.DEBUG) {
-                    Environment.Debug(apiUrl = appPreferences.host())
+                val apiUrl = if (BuildConfig.DEBUG && appPreferences.host().isNotBlank()) {
+                    appPreferences.host()
                 } else {
-                    Environment.Production
+                    BuildConfig.ONLINE_API_HOST
                 }
+                Environment(apiUrl = apiUrl)
             }
         }
 
