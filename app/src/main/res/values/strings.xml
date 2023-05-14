@@ -34,7 +34,7 @@
     <string name="dismiss">Dismiss</string>
     <string name="flip_board">Flip board</string>
     <string name="player_you">You</string>
-    <string name="player_puzzle">Puzzle</string>
+    <string name="player_puzzle">Puzzle %s</string>
     <string name="set_color_scheme">Colour scheme</string>
     <string name="correct">Correct</string>
     <string name="incorrect">Incorrect</string>

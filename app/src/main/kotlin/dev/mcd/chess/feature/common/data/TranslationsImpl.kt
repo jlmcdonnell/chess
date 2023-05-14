@@ -11,6 +11,5 @@ class TranslationsImpl @Inject constructor(@ApplicationContext private val conte
     override val playerYou: String
         get() = context.getString(R.string.player_you)
 
-    override val playerPuzzle: String
-        get() = context.getString(R.string.player_puzzle)
+    override fun playerPuzzle(id: String): String = context.getString(R.string.player_puzzle, id)
 }

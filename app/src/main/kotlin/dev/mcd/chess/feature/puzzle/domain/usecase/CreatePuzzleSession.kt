@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface CreatePuzzleSession {
     sealed interface PuzzleOutput {
-        data class Started(val session: GameSession) : PuzzleOutput
+        data class Session(val session: GameSession) : PuzzleOutput
         object Completed : PuzzleOutput
         object Failed : PuzzleOutput
         object NotUserTurn : PuzzleOutput

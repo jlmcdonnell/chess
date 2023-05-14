@@ -10,7 +10,6 @@ import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInp
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
 import dev.mcd.chess.online.domain.entity.Puzzle
 import dev.mcd.chess.online.domain.usecase.GetRandomPuzzle
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -122,7 +121,7 @@ class PuzzleViewModel @Inject constructor(
     private fun handlePuzzleOutput(output: PuzzleOutput) {
         intent {
             when (output) {
-                is PuzzleOutput.Started -> {
+                is PuzzleOutput.Session -> {
                     reduce { state.copy(session = output.session) }
                 }
 

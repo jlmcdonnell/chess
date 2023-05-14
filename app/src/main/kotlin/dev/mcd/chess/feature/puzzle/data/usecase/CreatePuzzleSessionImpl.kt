@@ -32,7 +32,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
         val puzzleInputChannel = PuzzleInputChannel(session)
 
         val out = channelFlow {
-            send(PuzzleOutput.Started(session))
+            send(PuzzleOutput.Session(session))
 
             delay(settings.beforePuzzleStartDelay)
             send(moveForOpponent(session, puzzle, moves))
@@ -103,7 +103,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
                 name = translations.playerYou,
             ),
             opponent = PuzzleOpponent(
-                name = translations.playerPuzzle,
+                name = translations.playerPuzzle(puzzle.puzzleId),
             ),
             selfSide = board.sideToMove.flip(),
         ).also {
