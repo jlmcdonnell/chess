@@ -35,7 +35,6 @@ import org.orbitmvi.orbit.compose.collectAsState
 @Composable
 fun PuzzleScreen(
     puzzleViewModel: PuzzleViewModel = hiltViewModel(),
-    onNavigateBack: () -> Unit,
 ) {
     Scaffold {
         Column(

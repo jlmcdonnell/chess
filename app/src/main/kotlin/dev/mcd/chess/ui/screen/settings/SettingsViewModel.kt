@@ -16,13 +16,14 @@ import javax.inject.Inject
 @HiltViewModel
 class SettingsViewModel @Inject constructor(
     private val appPreferences: AppPreferences,
+    private val environment: Environment,
 ) : ViewModel(), ContainerHost<SettingsViewModel.State, SettingsViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(State()) {
         intent {
             val host = appPreferences.host()
             val prefillHosts = listOf(
-                Environment.Production.apiUrl,
+                environment.apiUrl,
                 "http://10.0.2.2:8080",
             )
 

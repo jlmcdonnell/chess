@@ -58,9 +58,7 @@ fun Routing() {
             }
         }
         composable("/puzzle") {
-            PuzzleScreen {
-                navController.popBackStack()
-            }
+            PuzzleScreen()
         }
         composable("/settings") {
             SettingsScreen {
