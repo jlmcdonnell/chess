@@ -69,6 +69,13 @@ class PuzzleViewModel @Inject constructor(
         }
     }
 
+    fun onSkip() {
+        intent {
+            puzzleInput?.close()
+        }
+        onNextPuzzle()
+    }
+
     fun onRetry() {
         intent {
             puzzleInput?.retry()

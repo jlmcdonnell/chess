@@ -19,6 +19,7 @@
     <string name="api_host">API Host</string>
     <string name="restart">Restart</string>
     <string name="retry">Retry</string>
+    <string name="skip">Skip</string>
     <string name="next">Next</string>
     <string name="clear_auth_data">Clear Auth Data</string>
     <string name="yes">Yes</string>
