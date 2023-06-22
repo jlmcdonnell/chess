@@ -1,6 +1,6 @@
 object Versions {
     val activityCompose = "1.7.0"
-    val androidGradlePlugin = "8.1.0-beta02"
+    val androidGradlePlugin = "8.1.0-beta05"
     val androidBenchmarkJunit = "1.2.0-alpha12"
     val androidProfileInstaller = "1.3.0"
     val baselineProfilePlugin = "1.2.0-SNAPSHOT"
