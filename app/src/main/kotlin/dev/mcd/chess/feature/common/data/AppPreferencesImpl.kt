@@ -15,8 +15,9 @@ import javax.inject.Inject
 
 private val Context.dataStore by preferencesDataStore("prefs")
 
-class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Context) :
-    AppPreferences {
+class AppPreferencesImpl @Inject constructor(
+    @ApplicationContext context: Context,
+) : AppPreferences {
 
     private val store = context.dataStore
     private val hostKey = stringPreferencesKey("debug-host")
@@ -24,6 +25,7 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Contex
     private val tokenKey = stringPreferencesKey("token")
     private val userKey = stringPreferencesKey("user")
     private val colorSchemeKey = stringPreferencesKey("color-scheme")
+    private val soundsEnabledKey = booleanPreferencesKey("sounds-enabled")
 
     override suspend fun setHost(host: String) {
         store.edit { it[hostKey] = host }
@@ -69,6 +71,14 @@ class AppPreferencesImpl @Inject constructor(@ApplicationContext context: Contex
 
     override suspend fun setColorScheme(colorScheme: String) {
         store.edit { it[colorSchemeKey] = colorScheme }
+    }
+
+    override suspend fun setSoundsEnabled(enabled: Boolean) {
+        store.edit { it[soundsEnabledKey] = enabled }
+    }
+
+    override suspend fun soundsEnabled(): Boolean {
+        return store.data.first()[soundsEnabledKey] ?: false
     }
 
     override suspend fun clear() {

@@ -12,7 +12,10 @@ interface AppPreferences : AuthStore {
     suspend fun colorSchemeUpdates(): Flow<String?>
     suspend fun colorScheme(): String?
     suspend fun setColorScheme(colorScheme: String)
+    suspend fun setSoundsEnabled(enabled: Boolean)
+    suspend fun soundsEnabled(): Boolean
     suspend fun clear()
+
     override suspend fun storeToken(token: String?)
     override suspend fun storeUserId(userId: UserId?)
     override suspend fun userId(): UserId?
