@@ -41,5 +41,6 @@
     <string name="finding_puzzle">Finding Puzzle</string>
     <string name="puzzle_rating">Puzzle rating %1$s</string>
     <string name="promotion_selector_desc">Promotion Selector</string>
+    <string name="board_sounds">Board Sounds</string>
 
 </resources>

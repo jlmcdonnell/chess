@@ -31,6 +31,8 @@ class SettingsViewModel @Inject constructor(
                 AppColorScheme.valueOf(it)
             } ?: AppColorScheme.default()
 
+            val soundsEnabled = appPreferences.soundsEnabled()
+
             reduce {
                 state.copy(
                     debugModel = DebugModel(
@@ -39,22 +41,30 @@ class SettingsViewModel @Inject constructor(
                     ),
                     showDebug = BuildConfig.DEBUG,
                     colorScheme = colorScheme,
+                    soundsEnabled = soundsEnabled,
                 )
             }
         }
     }
 
-    fun updateColorScheme(colorScheme: AppColorScheme) {
+    fun setColorScheme(colorScheme: AppColorScheme) {
         intent {
             appPreferences.setColorScheme(colorScheme.name)
             reduce { state.copy(colorScheme = colorScheme) }
         }
     }
 
-    fun updateHost(host: String) {
+    fun setHost(host: String) {
         intent {
             appPreferences.setHost(host)
             reduce { state.copy(debugModel = state.debugModel.copy(host = host)) }
+        }
+    }
+
+    fun setSoundsEnabled(soundsEnabled: Boolean) {
+        intent {
+            appPreferences.setSoundsEnabled(soundsEnabled)
+            reduce { state.copy(soundsEnabled = soundsEnabled) }
         }
     }
 
@@ -72,6 +82,7 @@ class SettingsViewModel @Inject constructor(
         val debugModel: DebugModel = DebugModel(),
         val showDebug: Boolean = false,
         val colorScheme: AppColorScheme = AppColorScheme.default(),
+        val soundsEnabled: Boolean = false,
     )
 
     @Stable
