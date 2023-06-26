@@ -24,7 +24,7 @@ class BaselineProfileGenerator {
             startActivityAndWait()
             device.findObject(text("Play Computer")).click()
             device.findObject(desc("BLACK")).click()
-            device.findObject(text("Blunderbot")).click()
+            device.findObject(text("Pawn Pioneer")).click()
             device.wait(hasObject(text("never")), 2500)
             device.findObject(desc("Undo move")).click()
             device.wait(hasObject(text("never")), 500)
