@@ -8,15 +8,12 @@ import com.github.bhlangonijr.chesslib.Side
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.common.player.PlayerImage
-import kotlinx.coroutines.runBlocking
-import org.junit.Assert.assertEquals
-import org.junit.Test
+import io.kotest.core.spec.style.StringSpec
+import io.kotest.matchers.shouldBe
 
-class GameSessionManagerTest {
-
-    @Test
-    fun captures() {
-        runBlocking {
+class GameSessionManagerTest : StringSpec(
+    {
+        "captures" {
             val player = HumanPlayer("", PlayerImage.Default, 0)
             val manager = GameSessionManager()
 
@@ -34,20 +31,20 @@ class GameSessionManagerTest {
 
             manager.updateSession(session1)
 
-            assertEquals(emptyList<Piece>(), session1.captures())
+            session1.captures() shouldBe emptyList()
 
             manager.captures().test {
                 "e4 e5 Qh5 g6 Qe5 Be7 Qh8".split(" ").onEach {
                     session1.move(it)
                 }
-                assertEquals(emptyList<Piece>(), awaitItem())
-                assertEquals(listOf(Piece.BLACK_PAWN), awaitItem())
-                assertEquals(listOf(Piece.BLACK_PAWN, Piece.BLACK_ROOK), awaitItem())
+                awaitItem() shouldBe emptyList()
+                awaitItem() shouldBe listOf(Piece.BLACK_PAWN)
+                awaitItem() shouldBe listOf(Piece.BLACK_PAWN, Piece.BLACK_ROOK)
 
                 manager.updateSession(session2)
 
-                assertEquals(emptyList<Piece>(), awaitItem())
+                awaitItem() shouldBe emptyList()
             }
         }
-    }
-}
+    },
+)
