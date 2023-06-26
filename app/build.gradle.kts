@@ -58,6 +58,9 @@ android {
     kotlinOptions {
         freeCompilerArgs += "-Xcontext-receivers"
         freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
+        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
+        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalStdlibApi"
+
         if (project.hasProperty("enableComposeCompilerReports")) {
             val metricsDir = "${project.buildDir.absolutePath}/compose_metrics"
             freeCompilerArgs += listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$metricsDir")
@@ -131,8 +134,8 @@ dependencies {
 
         testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
         testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotest")
-
         testImplementation("app.cash.turbine:turbine:$turbine")
+        testImplementation("io.mockk:mockk:$mockk")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
         androidTestImplementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
     }
