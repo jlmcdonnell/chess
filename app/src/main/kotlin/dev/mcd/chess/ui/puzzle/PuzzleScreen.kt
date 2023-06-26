@@ -14,7 +14,6 @@ import dev.mcd.chess.ui.LocalGameSession
 import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.GameView
 import dev.mcd.chess.ui.game.board.interaction.GameSettings
-import dev.mcd.chess.ui.game.board.sounds.BoardSounds
 import org.orbitmvi.orbit.compose.collectAsState
 
 @Composable
@@ -42,7 +41,6 @@ fun PuzzleScreen(
                     onMove = { move ->
                         puzzleViewModel.onMove(move)
                     },
-                    sounds = { BoardSounds(enableNotify = false) },
                 )
             }
             if (state.loading && !state.completed && !state.failed) {

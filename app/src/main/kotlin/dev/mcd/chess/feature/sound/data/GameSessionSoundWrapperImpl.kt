@@ -7,27 +7,33 @@ import dev.mcd.chess.feature.sound.domain.BoardSoundPlayer
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.coroutines.CoroutineContext
+import kotlin.coroutines.coroutineContext
 
 class GameSessionSoundWrapperImpl @Inject constructor(
     @GameSessionSounds
-    private val scope: CoroutineScope,
+    private val context: CoroutineContext,
     private val soundPlayer: BoardSoundPlayer,
 ) : GameSessionSoundWrapper {
-    override suspend fun attachSession(session: GameSession, settings: SoundSettings) {
-        if (settings.enabled) {
-            scope.launch {
-                launch {
+
+    override suspend fun attachSession(session: GameSession, settings: SoundSettings): Job {
+        return if (settings.enabled) {
+            CoroutineScope(coroutineContext).launch {
+                val sessionJob = Job()
+                launch(context + sessionJob) {
                     if (settings.enableNotify) {
                         soundPlayer.playNotify()
                         session.awaitTermination()
                         soundPlayer.playNotify()
+                        sessionJob.cancel()
                     }
                 }
-                launch {
+                launch(context + sessionJob) {
                     session.moves().collectLatest { (move, _) ->
                         if (move.capturedPiece != Piece.NONE) {
                             soundPlayer.playCapture()
@@ -37,6 +43,8 @@ class GameSessionSoundWrapperImpl @Inject constructor(
                     }
                 }
             }
+        } else {
+            Job().apply { complete() }
         }
     }
 }

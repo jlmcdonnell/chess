@@ -9,7 +9,6 @@ import dev.mcd.chess.feature.sound.data.BoardSoundPlayerImpl
 import dev.mcd.chess.feature.sound.domain.BoardSoundPlayer
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import kotlinx.coroutines.CoroutineName
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import javax.inject.Qualifier
 import javax.inject.Singleton
@@ -29,7 +28,7 @@ abstract class SoundModule {
     companion object {
         @Provides
         @GameSessionSounds
-        fun gameSessionSoundsScope() = CoroutineScope(Dispatchers.Default + CoroutineName("game-sounds"))
+        fun gameSessionContext() = CoroutineName("Sounds") + Dispatchers.Default
     }
 }
 

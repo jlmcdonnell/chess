@@ -12,11 +12,14 @@ import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.common.player.Bot
 import dev.mcd.chess.engine.lc0.MaiaWeights
+import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.engine.BotEngineProxy
 import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
+import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
+import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.ui.compose.StableHolder
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +46,8 @@ class BotGameViewModel @Inject constructor(
     private val state: SavedStateHandle,
     private val startBotGame: StartBotGame,
     private val moveForBot: MoveForBot,
+    private val soundWrapper: GameSessionSoundWrapper,
+    private val appPreferences: AppPreferences,
 ) : ViewModel(), ContainerHost<BotGameViewModel.State, BotGameViewModel.SideEffect> {
 
     private lateinit var bot: Bot
@@ -70,6 +75,13 @@ class BotGameViewModel @Inject constructor(
                     }
                     intent {
                         handleTermination(game.awaitTermination())
+                    }
+                    intent {
+                        val soundSettings = SoundSettings(
+                            enableNotify = true,
+                            enabled = appPreferences.soundsEnabled(),
+                        )
+                        soundWrapper.attachSession(game, soundSettings)
                     }
                 }
         }

@@ -21,7 +21,6 @@ import dev.mcd.chess.ui.compose.StableHolder
 import dev.mcd.chess.ui.game.board.chessboard.ChessBoard
 import dev.mcd.chess.ui.game.board.interaction.BoardInteraction
 import dev.mcd.chess.ui.game.board.interaction.GameSettings
-import dev.mcd.chess.ui.game.board.sounds.BoardSounds
 import kotlinx.coroutines.flow.collectLatest
 import timber.log.Timber
 
@@ -30,7 +29,6 @@ fun GameView(
     gameHolder: StableHolder<GameSession>,
     onMove: (Move) -> Unit,
     onResign: () -> Unit = {},
-    sounds: @Composable (() -> Unit) = { BoardSounds() },
     boardWidth: @Composable () -> Float = { LocalView.current.width.toFloat() },
     settings: GameSettings = GameSettings(),
 ) {
@@ -45,8 +43,6 @@ fun GameView(
             onMove(it)
         }
     }
-
-    sounds()
 
     ReusableContent(key = game.id) {
         CompositionLocalProvider(LocalBoardInteraction provides boardInteraction) {

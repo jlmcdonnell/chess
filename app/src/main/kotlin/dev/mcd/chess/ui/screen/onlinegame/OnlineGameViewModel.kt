@@ -10,7 +10,10 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameId
 import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
+import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
+import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
+import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.online.domain.OnlineGameSession
 import dev.mcd.chess.online.domain.usecase.FindGame
 import dev.mcd.chess.online.domain.usecase.GetOrCreateUser
@@ -38,6 +41,8 @@ class OnlineGameViewModel @Inject constructor(
     private val joinOnlineGame: JoinOnlineGame,
     private val getOrCreateUser: GetOrCreateUser,
     private val findGame: FindGame,
+    private val soundWrapper: GameSessionSoundWrapper,
+    private val appPreferences: AppPreferences,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(
@@ -51,6 +56,13 @@ class OnlineGameViewModel @Inject constructor(
                         reduce {
                             State.InGame(session = session)
                         }
+                    }
+                    intent {
+                        val settings = SoundSettings(
+                            enabled = appPreferences.soundsEnabled(),
+                            enableNotify = true,
+                        )
+                        soundWrapper.attachSession(session, settings)
                     }
                 }
         }

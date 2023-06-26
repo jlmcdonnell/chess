@@ -582,7 +582,6 @@ private fun TestChessBoard(game: GameSession) {
                             runBlocking { game.move(it.toString()) }
                         },
                         onResign = {},
-                        sounds = {},
                         boardWidth = { size!! },
                     )
                 }

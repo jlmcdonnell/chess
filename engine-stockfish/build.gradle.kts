@@ -74,7 +74,7 @@ dependencies {
         testImplementation("junit:junit:$junit4")
         testImplementation("io.mockk:mockk:$mockk")
         testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
-        testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
-        testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotest")
+        testImplementation("io.kotest:kotest-assertions-core:$kotest")
+        testImplementation("io.kotest:kotest-runner-junit5:$kotest")
     }
 }

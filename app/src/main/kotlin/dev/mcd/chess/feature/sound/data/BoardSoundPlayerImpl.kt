@@ -4,11 +4,14 @@ import android.content.Context
 import android.media.AudioAttributes
 import android.media.AudioManager
 import android.media.MediaPlayer
+import dagger.hilt.android.qualifiers.ApplicationContext
 import dev.mcd.chess.R
 import dev.mcd.chess.feature.sound.domain.BoardSoundPlayer
 import javax.inject.Inject
 
-class BoardSoundPlayerImpl @Inject constructor(context: Context) : BoardSoundPlayer {
+class BoardSoundPlayerImpl @Inject constructor(
+    @ApplicationContext context: Context,
+) : BoardSoundPlayer {
 
     private val attributes = AudioAttributes.Builder()
         .setLegacyStreamType(AudioManager.STREAM_MUSIC)

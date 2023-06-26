@@ -132,10 +132,11 @@ dependencies {
         implementation("com.jakewharton.timber:timber:$timber")
         implementation("androidx.datastore:datastore-preferences:$datastorePreferences")
 
-        testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
-        testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotest")
+        testImplementation("io.kotest:kotest-assertions-core:$kotest")
+        testImplementation("io.kotest:kotest-runner-junit5:$kotest")
         testImplementation("app.cash.turbine:turbine:$turbine")
         testImplementation("io.mockk:mockk:$mockk")
+        testImplementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
         androidTestImplementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
     }
