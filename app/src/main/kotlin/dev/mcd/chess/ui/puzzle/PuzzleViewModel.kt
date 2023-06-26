@@ -6,9 +6,11 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.feature.common.domain.AppPreferences
+import dev.mcd.chess.feature.puzzle.maxPuzzleRatingRange
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInput
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
+import dev.mcd.chess.feature.puzzle.domain.usecase.GetPuzzleOptions
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.online.domain.entity.Puzzle
@@ -22,7 +24,6 @@ import org.orbitmvi.orbit.syntax.simple.intent
 import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
-import java.lang.RuntimeException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -31,6 +32,7 @@ class PuzzleViewModel @Inject constructor(
     private val createPuzzleSession: CreatePuzzleSession,
     private val soundWrapper: GameSessionSoundWrapper,
     private val appPreferences: AppPreferences,
+    private val getPuzzleOptions: GetPuzzleOptions,
 ) : ViewModel(), ContainerHost<PuzzleViewModel.State, PuzzleViewModel.SideEffect> {
 
     private var puzzleInput: PuzzleInput? = null
@@ -42,11 +44,13 @@ class PuzzleViewModel @Inject constructor(
             }
 
             runCatching {
-                val puzzle = getRandomPuzzle()
+                val options = getPuzzleOptions()
+                val puzzle = getRandomPuzzle(ratingRange = options.ratingRange)
                 reduce {
                     state.copy(
                         loading = false,
                         puzzleRating = puzzle.rating,
+                        ratingRange = options.ratingRange,
                     )
                 }
                 startPuzzle(puzzle)
@@ -107,7 +111,7 @@ class PuzzleViewModel @Inject constructor(
                 )
             }
             runCatching {
-                val puzzle = getRandomPuzzle()
+                val puzzle = getRandomPuzzle(appPreferences.puzzleRatingRange())
                 reduce {
                     state.copy(
                         loading = false,
@@ -120,6 +124,15 @@ class PuzzleViewModel @Inject constructor(
             }.onFailure {
                 Timber.e(it, "Retrieving puzzle")
                 reduce { state.copy(loading = false) }
+            }
+        }
+    }
+
+    fun onRatingRangeChanged(range: IntRange) {
+        intent {
+            appPreferences.setPuzzleRatingRange(range)
+            reduce {
+                state.copy(ratingRange = range)
             }
         }
     }
@@ -159,6 +172,8 @@ class PuzzleViewModel @Inject constructor(
         val puzzleRating: Int = 0,
         val failed: Boolean = false,
         val loading: Boolean = false,
+        val ratingRange: IntRange = maxPuzzleRatingRange,
+        val maxRatingRange: IntRange = maxPuzzleRatingRange,
     )
 
     object SideEffect

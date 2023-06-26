@@ -11,7 +11,9 @@ import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBotImpl
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
 import dev.mcd.chess.feature.puzzle.data.usecase.CreatePuzzleSessionImpl
+import dev.mcd.chess.feature.puzzle.data.usecase.GetPuzzleOptionsImpl
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
+import dev.mcd.chess.feature.puzzle.domain.usecase.GetPuzzleOptions
 import javax.inject.Singleton
 
 @Module
@@ -29,4 +31,7 @@ abstract class GameModule {
 
     @Binds
     abstract fun createPuzzleSession(impl: CreatePuzzleSessionImpl): CreatePuzzleSession
+
+    @Binds
+    abstract fun getPuzzleOptions(impl: GetPuzzleOptionsImpl): GetPuzzleOptions
 }

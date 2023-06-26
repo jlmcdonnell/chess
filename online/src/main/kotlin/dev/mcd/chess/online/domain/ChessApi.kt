@@ -12,6 +12,6 @@ internal interface ChessApi {
     suspend fun findGame(authToken: String): GameId
     suspend fun joinGame(authToken: String, id: GameId, block: suspend OnlineGameChannel.() -> Unit)
     suspend fun lobbyInfo(excludeUser: UserId? = null): LobbyInfo
-    suspend fun getRandomPuzzle(): Puzzle
+    suspend fun getRandomPuzzle(options: PuzzleOptions): Puzzle
     suspend fun getPuzzle(id: String): Puzzle
 }

@@ -3,6 +3,7 @@ package dev.mcd.chess.feature.common.data
 import android.content.Context
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -26,6 +27,8 @@ class AppPreferencesImpl @Inject constructor(
     private val userKey = stringPreferencesKey("user")
     private val colorSchemeKey = stringPreferencesKey("color-scheme")
     private val soundsEnabledKey = booleanPreferencesKey("sounds-enabled")
+    private val puzzleRatingRangeStartKey = intPreferencesKey("rating-range-start")
+    private val puzzleRatingRangeEndKey = intPreferencesKey("rating-range-end")
 
     override suspend fun setHost(host: String) {
         store.edit { it[hostKey] = host }
@@ -79,6 +82,21 @@ class AppPreferencesImpl @Inject constructor(
 
     override suspend fun soundsEnabled(): Boolean {
         return store.data.first()[soundsEnabledKey] ?: false
+    }
+
+    override suspend fun setPuzzleRatingRange(range: IntRange) {
+        store.edit {
+            it[puzzleRatingRangeStartKey] = range.first
+            it[puzzleRatingRangeEndKey] = range.last
+        }
+    }
+
+    override suspend fun puzzleRatingRange(): IntRange {
+        return store.data.first().let {
+            val start = it[puzzleRatingRangeStartKey] ?: 0
+            val end = it[puzzleRatingRangeEndKey] ?: 0
+            start..end
+        }
     }
 
     override suspend fun clear() {

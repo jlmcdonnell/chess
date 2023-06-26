@@ -14,6 +14,8 @@ interface AppPreferences : AuthStore {
     suspend fun setColorScheme(colorScheme: String)
     suspend fun setSoundsEnabled(enabled: Boolean)
     suspend fun soundsEnabled(): Boolean
+    suspend fun puzzleRatingRange(): IntRange
+    suspend fun setPuzzleRatingRange(range: IntRange)
     suspend fun clear()
 
     override suspend fun storeToken(token: String?)

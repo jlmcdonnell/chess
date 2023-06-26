@@ -10,6 +10,7 @@ import dev.mcd.chess.online.data.serializer.PuzzleSerializer
 import dev.mcd.chess.online.data.serializer.domain
 import dev.mcd.chess.online.domain.ChessApi
 import dev.mcd.chess.online.domain.OnlineGameChannel
+import dev.mcd.chess.online.domain.PuzzleOptions
 import dev.mcd.chess.online.domain.entity.AuthResponse
 import dev.mcd.chess.online.domain.entity.GameMessage
 import dev.mcd.chess.online.domain.entity.LobbyInfo
@@ -151,10 +152,12 @@ internal class ChessApiImpl constructor(
         }
     }
 
-    override suspend fun getRandomPuzzle(): Puzzle {
+    override suspend fun getRandomPuzzle(options: PuzzleOptions): Puzzle {
         return withContext(Dispatchers.IO) {
             client.get {
                 url("$apiUrl/puzzles/random")
+                parameter("ratingMin", options.ratingRange.first)
+                parameter("ratingMax", options.ratingRange.last)
             }.body<PuzzleSerializer>().domain()
         }
     }

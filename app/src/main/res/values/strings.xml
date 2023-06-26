@@ -42,5 +42,8 @@
     <string name="puzzle_rating">Puzzle rating %1$s</string>
     <string name="promotion_selector_desc">Promotion Selector</string>
     <string name="board_sounds">Board Sounds</string>
+    <string name="rating_range">Puzzle Rating</string>
+    <string name="rating_range_value">%1$s to %2$s</string>
+    <string name="puzzle_options_desc">Puzzle Options</string>
 
 </resources>
