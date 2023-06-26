@@ -22,7 +22,7 @@ interface CreatePuzzleSession {
     }
 
     data class DelaySettings(
-        val beforePuzzleStartDelay: Long = 1000,
+        val beforePuzzleStartDelay: Long = 500,
         val afterPlayerMoveDelay: Long = 175,
     )
 
