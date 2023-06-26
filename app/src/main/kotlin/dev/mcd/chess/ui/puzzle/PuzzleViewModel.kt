@@ -146,7 +146,7 @@ class PuzzleViewModel @Inject constructor(
                 is PuzzleOutput.NoMovesLeft -> handlePuzzleOutputError(output)
                 is PuzzleOutput.NotUserTurn -> handlePuzzleOutputError(output)
                 is PuzzleOutput.ErrorMoveInvalid -> handlePuzzleOutputError(output)
-                is PuzzleOutput.MoveCorrect -> Unit
+                is PuzzleOutput.PlayerToMove -> Unit
             }
         }
     }

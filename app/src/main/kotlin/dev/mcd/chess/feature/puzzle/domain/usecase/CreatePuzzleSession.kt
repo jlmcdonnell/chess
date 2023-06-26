@@ -11,7 +11,7 @@ interface CreatePuzzleSession {
         object Failed : PuzzleOutput
         object NotUserTurn : PuzzleOutput
         object NoMovesLeft : PuzzleOutput
-        object MoveCorrect : PuzzleOutput
+        object PlayerToMove : PuzzleOutput
         data class ErrorMoveInvalid(val id: String) : PuzzleOutput
     }
 

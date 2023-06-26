@@ -65,7 +65,8 @@ class CreatePuzzleSessionImpl @Inject constructor(
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
         }
         delay(settings.afterPlayerMoveDelay)
-        return if (move == nextMove) {
+        val mated = session.termination()?.sideMated != null
+        return if (move == nextMove || mated) {
             moves.pop()
             if (moves.isEmpty()) {
                 PuzzleOutput.Completed
@@ -78,8 +79,6 @@ class CreatePuzzleSessionImpl @Inject constructor(
     }
 
     private suspend fun moveForOpponent(session: GameSession, puzzle: Puzzle, moves: Stack<String>): PuzzleOutput {
-        if (moves.isEmpty()) return PuzzleOutput.NoMovesLeft
-
         val nextMove = moves.peek()
         if (session.move(nextMove) != MoveResult.Moved) {
             return PuzzleOutput.ErrorMoveInvalid(puzzle.puzzleId)
@@ -88,7 +87,7 @@ class CreatePuzzleSessionImpl @Inject constructor(
             PuzzleOutput.Completed
         } else {
             moves.pop()
-            PuzzleOutput.MoveCorrect
+            PuzzleOutput.PlayerToMove
         }
     }
 
