@@ -5,6 +5,7 @@ import dev.mcd.chess.common.engine.EngineCommand.SetPosition
 import dev.mcd.chess.engine.stockfish.data.FenAndDepth
 import dev.mcd.chess.engine.stockfish.data.StockfishEngine
 import dev.mcd.chess.engine.stockfish.data.StockfishJni
+import io.kotest.core.spec.style.StringSpec
 import io.mockk.Awaits
 import io.mockk.andThenJust
 import io.mockk.every
@@ -14,56 +15,50 @@ import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
-import org.junit.Before
-import org.junit.Test
 
-class StockfishEngineTest {
+class StockfishEngineTest : StringSpec(
+    {
+        val coroutineContext = Dispatchers.IO
+        lateinit var bridge: StockfishJni
+        lateinit var adapter: StockfishEngine
 
-    private lateinit var bridge: StockfishJni
-    private lateinit var adapter: StockfishEngine
-
-    private val coroutineContext = Dispatchers.IO
-
-    @Before
-    fun setUp() {
-        bridge = mockk(relaxUnitFun = true)
-        adapter = StockfishEngine(bridge, coroutineContext)
-    }
-
-    @Test
-    fun `Start and emit ready`() = runBlocking {
-        every { bridge.readLine() } returns "Stockfish" andThenJust Awaits
-        every { bridge.main(threadCount = 1) } returns Unit
-
-        CoroutineScope(Dispatchers.Default).launch {
-            adapter.startAndWait()
+        beforeTest {
+            bridge = mockk(relaxUnitFun = true)
+            adapter = StockfishEngine(bridge, coroutineContext)
         }
 
-        adapter.awaitReady()
+        "Start and emit ready" {
+            every { bridge.readLine() } returns "Stockfish" andThenJust Awaits
+            every { bridge.main(threadCount = 1) } returns Unit
 
-        verify(exactly = 1) { bridge.main(threadCount = 1) }
-    }
+            CoroutineScope(Dispatchers.Default).launch {
+                adapter.startAndWait()
+            }
 
-    @Test
-    fun `Get move`(): Unit = runBlocking {
-        val move = CompletableDeferred<String>()
+            adapter.awaitReady()
 
-        every { bridge.writeLine(SetPosition("TEST").toString()) } returns Unit
-        every { bridge.writeLine(GoDepth(0).toString()) } coAnswers {
-            move.complete("${StockfishEngine.BEST_MOVE_TOKEN} e2e4")
-            Unit
+            verify(exactly = 1) { bridge.main(threadCount = any()) }
         }
 
-        every { bridge.readLine() } returns StockfishEngine.INIT_TOKEN coAndThen {
-            move.await()
-        }
-        every { bridge.main(threadCount = 1) } returns Unit
+        "Get move" {
+            val move = CompletableDeferred<String>()
 
-        CoroutineScope(Dispatchers.Default).launch {
-            adapter.startAndWait()
-        }
+            every { bridge.writeLine(SetPosition("TEST").toString()) } returns Unit
+            every { bridge.writeLine(GoDepth(0).toString()) } coAnswers {
+                move.complete("${StockfishEngine.BEST_MOVE_TOKEN} e2e4")
+                Unit
+            }
 
-        adapter.getMove(FenAndDepth("TEST", 0))
-    }
-}
+            every { bridge.readLine() } returns StockfishEngine.INIT_TOKEN coAndThen {
+                move.await()
+            }
+            every { bridge.main(threadCount = any()) } returns Unit
+
+            CoroutineScope(Dispatchers.Default).launch {
+                adapter.startAndWait()
+            }
+
+            adapter.getMove(FenAndDepth("TEST", 0))
+        }
+    },
+)

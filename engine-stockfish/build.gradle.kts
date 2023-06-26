@@ -35,6 +35,10 @@ android {
     }
 }
 
+tasks.withType<Test> {
+    useJUnitPlatform()
+}
+
 val stockfishSrc = "src/main/native/stockfish"
 val unzipIncludes = project.tasks.register<DefaultTask>("unzipIncludes") {
     val destDir = file(stockfishSrc)
@@ -70,5 +74,7 @@ dependencies {
         testImplementation("junit:junit:$junit4")
         testImplementation("io.mockk:mockk:$mockk")
         testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
+        testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
+        testImplementation("io.kotest:kotest-runner-junit5-jvm:$kotest")
     }
 }
