@@ -138,6 +138,7 @@ dependencies {
         testImplementation("org.junit.jupiter:junit-jupiter-params:$junit5")
 
         testImplementation("io.kotest:kotest-assertions-core-jvm:$kotest")
+        testImplementation("io.kotest:kotest-runner-junit5:$kotest")
 
         testImplementation("app.cash.turbine:turbine:$turbine")
         androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
