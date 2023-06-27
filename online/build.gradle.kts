@@ -13,6 +13,10 @@ android {
     defaultConfig {
         minSdk = BuildSettings.minSdk
     }
+
+    sourceSets.configureEach {
+        java.srcDirs("src/$name/kotlin")
+    }
 }
 
 kotlin {

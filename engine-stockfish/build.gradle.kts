@@ -23,6 +23,10 @@ android {
         }
     }
 
+    sourceSets.configureEach {
+        java.srcDirs("src/$name/kotlin")
+    }
+
     kotlin {
         jvmToolchain(BuildSettings.jdkVersion)
     }

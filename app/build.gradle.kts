@@ -34,6 +34,10 @@ android {
         )
     }
 
+    sourceSets.configureEach {
+        java.srcDirs("src/$name/kotlin")
+    }
+
     buildFeatures {
         aidl = true
     }
