@@ -22,7 +22,6 @@ import androidx.compose.ui.window.Dialog
 import dev.mcd.chess.R
 import dev.mcd.chess.ui.theme.ChessTheme
 
-
 @Composable
 fun PuzzleOptionsDialog(
     modifier: Modifier = Modifier,

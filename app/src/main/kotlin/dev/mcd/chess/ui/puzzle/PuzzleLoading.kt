@@ -1,12 +1,6 @@
 package dev.mcd.chess.ui.puzzle
 
-import androidx.compose.animation.core.EaseInCirc
-import androidx.compose.animation.core.EaseInElastic
 import androidx.compose.animation.core.EaseInOutCubic
-import androidx.compose.animation.core.EaseInOutElastic
-import androidx.compose.animation.core.FastOutLinearInEasing
-import androidx.compose.animation.core.FastOutSlowInEasing
-import androidx.compose.animation.core.LinearOutSlowInEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.infiniteRepeatable

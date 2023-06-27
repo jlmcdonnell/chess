@@ -18,7 +18,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.R
 
-
 @Composable
 fun PuzzleImageView() {
     IconImageView(icon = Icons.Rounded.Extension)

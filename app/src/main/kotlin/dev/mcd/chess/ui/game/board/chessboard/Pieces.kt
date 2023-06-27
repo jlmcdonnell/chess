@@ -51,5 +51,7 @@ private fun calculatePieceState(
     if (state.square.relevantToMove(move)) {
         val directionalMove = DirectionalMove(move, undo = false)
         UpdateChessPieceState(moveCount = index, directionalMove, state)
-    } else state
+    } else {
+        state
+    }
 }

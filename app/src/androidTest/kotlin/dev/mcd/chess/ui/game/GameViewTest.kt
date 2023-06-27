@@ -399,7 +399,6 @@ class GameViewTest {
 
     @Test
     fun flipAndUnflipAfterMoving() = runBlocking {
-
         with(composeRule) {
             val board = Board().apply {
                 setPiece(WHITE_KING, E1)
@@ -530,7 +529,6 @@ class GameViewTest {
         pieceSquare.map { onPiece(it) }.onEach(SemanticsNodeInteraction::assertExists)
     }
 
-
     context(ComposeTestRule)
     private fun assertNoPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.forEach {
@@ -546,10 +544,12 @@ class GameViewTest {
     private infix fun Piece.on(square: Square): SquarePieceTag = SquarePieceTag(square, this)
 
     private fun Square.position(): Offset {
-        val squareSize = composeRule.onNodeWithContentDescription("Board")
-            .fetchSemanticsNode()
-            .layoutInfo
-            .width / 8f
+        val squareSize =
+            composeRule
+                .onNodeWithContentDescription("Board")
+                .fetchSemanticsNode()
+                .layoutInfo
+                .width / 8f
 
         val (x, y) = topLeft(isWhite = true, squareSize)
         return Offset(x + squareSize / 2f, y + squareSize / 2f)

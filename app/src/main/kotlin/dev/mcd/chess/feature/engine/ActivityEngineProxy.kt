@@ -10,11 +10,11 @@ import android.os.IBinder
 import android.os.IInterface
 import androidx.activity.ComponentActivity
 import androidx.lifecycle.lifecycleScope
-import dev.mcd.chess.feature.engine.binder.EngineBinderAdapter
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.ActivityBound
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Initializing
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.Ready
 import dev.mcd.chess.feature.engine.ActivityEngineProxy.State.UnboundToActivity
+import dev.mcd.chess.feature.engine.binder.EngineBinderAdapter
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.filterIsInstance

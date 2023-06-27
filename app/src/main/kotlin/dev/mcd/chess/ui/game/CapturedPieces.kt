@@ -13,7 +13,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -62,7 +61,7 @@ fun CapturedPieces(
                         contentScale = ContentScale.FillHeight,
                         painter = painterResource(id = resource),
                         contentDescription = null,
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onTertiaryContainer)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onTertiaryContainer),
                     )
                 }
             }

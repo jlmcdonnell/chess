@@ -8,7 +8,6 @@ import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
-import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject

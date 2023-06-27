@@ -38,20 +38,17 @@ internal class JoinOnlineGameImpl @Inject constructor(
             runCatching {
                 val session: GameSession
 
-                incoming.receiveAsFlow()
-                    .filterIsInstance<GameMessage.GameState>()
-                    .first()
-                    .let { message ->
-                        session = createClientSession(
-                            gameId = message.id,
-                            userId = userId,
-                            whitePlayer = message.whitePlayer,
-                            blackPlayer = message.blackPlayer,
-                            board = message.board,
-                            channel = this
-                        )
-                        send(NewSession(session))
-                    }
+                incoming.receiveAsFlow().filterIsInstance<GameMessage.GameState>().first().let { message ->
+                    session = createClientSession(
+                        gameId = message.id,
+                        userId = userId,
+                        whitePlayer = message.whitePlayer,
+                        blackPlayer = message.blackPlayer,
+                        board = message.board,
+                        channel = this,
+                    )
+                    send(NewSession(session))
+                }
 
                 for (message in incoming) {
                     when (message) {
@@ -72,7 +69,8 @@ internal class JoinOnlineGameImpl @Inject constructor(
 
                         is GameMessage.ErrorNotUsersMove,
                         is GameMessage.ErrorGameTerminated,
-                        is GameMessage.ErrorInvalidMove -> {
+                        is GameMessage.ErrorInvalidMove,
+                        -> {
                             send(JoinOnlineGame.Event.FatalError(message::class.simpleName!!))
                         }
                     }
@@ -114,7 +112,7 @@ internal class JoinOnlineGameImpl @Inject constructor(
     private suspend fun syncWithRemote(
         remoteBoard: Board,
         result: GameResult,
-        localSession: GameSession
+        localSession: GameSession,
     ): JoinOnlineGame.Event? {
         val board = remoteBoard.clone()
         localSession.setBoard(board)

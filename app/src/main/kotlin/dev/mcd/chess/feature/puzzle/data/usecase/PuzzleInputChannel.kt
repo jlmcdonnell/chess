@@ -31,5 +31,4 @@ class PuzzleInputChannel(
     }
 
     fun moves(): ReceiveChannel<String> = channel
-
 }

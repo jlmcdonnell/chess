@@ -6,11 +6,11 @@ import com.github.bhlangonijr.chesslib.move.Move
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.feature.common.domain.AppPreferences
-import dev.mcd.chess.feature.puzzle.maxPuzzleRatingRange
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleInput
 import dev.mcd.chess.feature.puzzle.domain.usecase.CreatePuzzleSession.PuzzleOutput
 import dev.mcd.chess.feature.puzzle.domain.usecase.GetPuzzleOptions
+import dev.mcd.chess.feature.puzzle.maxPuzzleRatingRange
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.online.domain.entity.Puzzle

@@ -38,8 +38,7 @@ fun Routing() {
                 navArgument("bot") { type = NavType.StringType },
                 navArgument("side") { type = NavType.StringType },
             ),
-
-            ) {
+        ) {
             BotGameScreen {
                 navController.popBackStack()
             }

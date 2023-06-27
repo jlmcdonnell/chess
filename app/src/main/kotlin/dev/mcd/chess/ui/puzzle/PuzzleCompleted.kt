@@ -22,7 +22,6 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.unit.dp
 import dev.mcd.chess.R
 
-
 @Composable
 fun PuzzleCompleted(
     rating: Int,

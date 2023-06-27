@@ -23,4 +23,3 @@ internal class Lc0JniImpl : Lc0Jni {
         write("$cmd\n")
     }
 }
-
