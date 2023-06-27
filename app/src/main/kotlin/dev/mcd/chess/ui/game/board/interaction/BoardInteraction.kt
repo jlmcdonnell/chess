@@ -87,7 +87,7 @@ class BoardInteraction(
             for ((sq, offset) in squarePositions) {
                 val (x1, y1) = offset
                 val (x2, y2) = position
-                val distance = sqrt((x2 - x1).pow(2) + (y2 - y1).pow(2))
+                val distance = sqrt((x2 - x1) * (x2 - x1) + (y2 - y1) * (y2 - y1))
 
                 if ((closest == null || distance < closest.second) && distance <= squareSize) {
                     closest = sq to distance

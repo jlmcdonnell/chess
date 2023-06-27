@@ -122,6 +122,14 @@ fun ChessPiece(initialState: ChessPieceState) {
                                 boardInteraction.updateDragPosition(dragPosition)
                             } while (event.changes.none { it.changedToUp() })
 
+                            val dropPan = currentEvent
+                                .calculatePan()
+                                .orZero()
+
+                            val dropPosition = dropPan + pan + state.squareOffset + squareCenter
+
+                            boardInteraction.updateDragPosition(dropPosition)
+
                             when (val result = boardInteraction.dropPiece(state.piece, state.square)) {
                                 DropPieceResult.None -> {
                                     pan = Offset.Zero
