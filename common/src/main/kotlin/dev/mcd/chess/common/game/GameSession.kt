@@ -30,7 +30,9 @@ open class GameSession(
 
     suspend fun setBoard(board: Board) {
         this.board = board
-        this.startingPieces = board.boardToArray().toList()
+        startingPieces = board.boardToArray().toList()
+        undoneMoves.clear()
+        updateTermination()
 
         board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, undo = false)) }
     }
