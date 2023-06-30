@@ -75,6 +75,7 @@ fun PuzzleScreen(
             }
             if (state.completed) {
                 PuzzleCompleted(
+                    modifier = Modifier.padding(16.dp),
                     rating = state.puzzleRating,
                     loading = state.loading,
                 ) {
