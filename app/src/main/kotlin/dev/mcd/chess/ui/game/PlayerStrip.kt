@@ -20,7 +20,7 @@ import dev.mcd.chess.ui.player.PuzzleImageView
 
 @Composable
 fun PlayerStrip(
-    modifier: Modifier,
+    modifier: Modifier = Modifier,
     player: Player,
 ) {
     when (player) {

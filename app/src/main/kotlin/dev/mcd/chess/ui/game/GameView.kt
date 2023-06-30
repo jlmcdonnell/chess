@@ -78,7 +78,6 @@ fun GameView(
                 contentAlignment = Alignment.CenterStart,
             ) {
                 PlayerStrip(
-                    modifier = Modifier,
                     player = game.self,
                 )
                 GameOptions(
