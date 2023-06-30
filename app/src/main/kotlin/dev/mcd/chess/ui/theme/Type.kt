@@ -10,7 +10,7 @@ import dev.mcd.chess.R
 val Typography: Typography
     @Composable
     get() {
-        val font = FontFamily(Font(R.font.roboto_slab))
+        val font = FontFamily(Font(R.font.inter))
         with(MaterialTheme.typography) {
             return Typography(
                 displayLarge = displayLarge.copy(fontFamily = font),

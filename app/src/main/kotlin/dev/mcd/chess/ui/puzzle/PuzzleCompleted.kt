@@ -88,6 +88,7 @@ fun PuzzleCompleted(
                     )
                 } else {
                     Icon(
+                        modifier = Modifier.size(32.dp),
                         painter = rememberVectorPainter(image = Icons.Rounded.NavigateNext),
                         contentDescription = stringResource(id = R.string.next),
                         tint = MaterialTheme.colorScheme.onPrimary,
