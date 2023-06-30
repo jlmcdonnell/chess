@@ -17,6 +17,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.takeOrElse
 import androidx.compose.ui.input.pointer.changedToUp
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.semantics.semantics
@@ -24,7 +25,6 @@ import androidx.compose.ui.zIndex
 import dev.mcd.chess.common.game.extension.relevantToMove
 import dev.mcd.chess.ui.LocalBoardInteraction
 import dev.mcd.chess.ui.LocalGameSession
-import dev.mcd.chess.ui.extension.orZero
 import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.game.board.interaction.DropPieceResult
@@ -111,7 +111,7 @@ fun ChessPiece(initialState: ChessPieceState) {
 
                                 pan += event
                                     .calculatePan()
-                                    .orZero()
+                                    .takeOrElse { Offset.Zero }
 
                                 val dragPosition = pan + state.squareOffset + squareCenter
                                 boardInteraction.updateDragPosition(dragPosition)
@@ -119,7 +119,7 @@ fun ChessPiece(initialState: ChessPieceState) {
 
                             val dropPan = currentEvent
                                 .calculatePan()
-                                .orZero()
+                                .takeOrElse { Offset.Zero }
 
                             val dropPosition = dropPan + pan + state.squareOffset + squareCenter
 
