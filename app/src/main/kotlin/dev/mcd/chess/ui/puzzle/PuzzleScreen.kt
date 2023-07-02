@@ -1,5 +1,9 @@
 package dev.mcd.chess.ui.puzzle
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.shrinkOut
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -14,6 +18,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.stringResource
@@ -73,7 +78,9 @@ fun PuzzleScreen(
             if (state.loading && !state.completed && !state.failed) {
                 Loading(stringResource(id = R.string.finding_puzzle))
             }
-            if (state.completed) {
+            AnimatedVisibility(
+                visible = state.completed,
+            ) {
                 PuzzleCompleted(
                     modifier = Modifier.padding(16.dp),
                     rating = state.puzzleRating,
@@ -81,7 +88,8 @@ fun PuzzleScreen(
                 ) {
                     viewModel.onNextPuzzle()
                 }
-            } else if (state.failed) {
+            }
+            AnimatedVisibility(visible = state.failed) {
                 PuzzleFailed(
                     onSkip = { viewModel.onSkip() },
                     onRetry = { viewModel.onRetry() },
