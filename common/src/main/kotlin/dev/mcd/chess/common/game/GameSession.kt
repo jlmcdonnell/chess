@@ -37,6 +37,8 @@ open class GameSession(
         board.backup.lastOrNull()?.let { moves.emit(DirectionalMove(it, undo = false)) }
     }
 
+    fun board(): Board = board
+
     suspend fun awaitTermination(): TerminationReason {
         return terminationReason.filterNotNull().first()
     }

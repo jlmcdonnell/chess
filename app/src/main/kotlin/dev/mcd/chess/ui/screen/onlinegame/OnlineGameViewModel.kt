@@ -12,6 +12,7 @@ import dev.mcd.chess.common.game.MoveResult
 import dev.mcd.chess.common.game.TerminationReason
 import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
+import dev.mcd.chess.feature.share.domain.CopySessionPGNToClipboard
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.online.domain.OnlineGameSession
@@ -43,6 +44,7 @@ class OnlineGameViewModel @Inject constructor(
     private val findGame: FindGame,
     private val soundWrapper: GameSessionSoundWrapper,
     private val appPreferences: AppPreferences,
+    private val copyPGN: CopySessionPGNToClipboard,
 ) : ViewModel(), ContainerHost<OnlineGameViewModel.State, OnlineGameViewModel.SideEffect> {
 
     override val container = container<State, SideEffect>(
@@ -106,6 +108,18 @@ class OnlineGameViewModel @Inject constructor(
                 } else {
                     Timber.e("Illegal Move: $move")
                 }
+            }
+        }
+    }
+
+    fun onCopyPGN() {
+        intent {
+            runCatching {
+                val session = gameSessionRepository.activeGame().value ?: return@intent
+                copyPGN(session)
+                postSideEffect(SideEffect.NotifyGameCopied)
+            }.onFailure {
+                Timber.e(it, "copying PGN")
             }
         }
     }
@@ -202,6 +216,8 @@ class OnlineGameViewModel @Inject constructor(
             val draw: Boolean = false,
             val resignation: Side? = null,
         ) : SideEffect
+
+        object NotifyGameCopied : SideEffect
 
         object NavigateBack : SideEffect
     }

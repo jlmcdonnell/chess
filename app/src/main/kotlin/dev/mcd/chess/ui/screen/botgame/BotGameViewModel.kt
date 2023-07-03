@@ -18,6 +18,7 @@ import dev.mcd.chess.feature.game.domain.DefaultBots
 import dev.mcd.chess.feature.game.domain.GameSessionRepository
 import dev.mcd.chess.feature.game.domain.usecase.MoveForBot
 import dev.mcd.chess.feature.game.domain.usecase.StartBotGame
+import dev.mcd.chess.feature.share.domain.CopySessionPGNToClipboard
 import dev.mcd.chess.feature.sound.domain.GameSessionSoundWrapper
 import dev.mcd.chess.feature.sound.domain.SoundSettings
 import dev.mcd.chess.ui.compose.StableHolder
@@ -25,6 +26,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
@@ -48,6 +50,7 @@ class BotGameViewModel @Inject constructor(
     private val moveForBot: MoveForBot,
     private val soundWrapper: GameSessionSoundWrapper,
     private val appPreferences: AppPreferences,
+    private val copyPGN: CopySessionPGNToClipboard,
 ) : ViewModel(), ContainerHost<BotGameViewModel.State, BotGameViewModel.SideEffect> {
 
     private lateinit var bot: Bot
@@ -67,6 +70,7 @@ class BotGameViewModel @Inject constructor(
         viewModelScope.launch {
             gameSessionRepository.activeGame()
                 .filterNotNull()
+                .filter { it.termination() == null }
                 .collectLatest { game ->
                     intent {
                         reduce {
@@ -107,6 +111,18 @@ class BotGameViewModel @Inject constructor(
         }
     }
 
+    fun onCopyPGN() {
+        intent {
+            runCatching {
+                val session = gameSessionRepository.activeGame().value ?: return@intent
+                copyPGN(session)
+                postSideEffect(SideEffect.NotifyGameCopied)
+            }.onFailure {
+                Timber.e(it, "copying PGN")
+            }
+        }
+    }
+
     fun onPlayerMove(move: Move) {
         intent {
             gameSessionRepository.activeGame().firstOrNull()?.run {
@@ -133,7 +149,6 @@ class BotGameViewModel @Inject constructor(
 
     private fun handleTermination(reason: TerminationReason) {
         intent {
-            gameSessionRepository.updateActiveGame(null)
             postSideEffect(
                 SideEffect.AnnounceTermination(
                     sideMated = reason.sideMated,
@@ -177,6 +192,8 @@ class BotGameViewModel @Inject constructor(
             val draw: Boolean = false,
             val resignation: Side? = null,
         ) : SideEffect
+
+        object NotifyGameCopied : SideEffect
 
         object NavigateBack : SideEffect
     }

@@ -1,5 +1,6 @@
 package dev.mcd.chess.ui.screen.onlinegame
 
+import android.widget.Toast
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -9,11 +10,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.ContentCopy
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,6 +28,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -33,6 +40,7 @@ import dev.mcd.chess.ui.game.ResignationDialog
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.AnnounceTermination
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.ConfirmResignation
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.NavigateBack
+import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.SideEffect.NotifyGameCopied
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.FatalError
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.FindingGame
 import dev.mcd.chess.ui.screen.onlinegame.OnlineGameViewModel.State.InGame
@@ -45,11 +53,26 @@ fun OnlineGameScreen(
     viewModel: OnlineGameViewModel = hiltViewModel(),
     navigateBack: () -> Unit,
 ) {
-    Scaffold { padding ->
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {},
+                actions = {
+                    IconButton(viewModel::onCopyPGN) {
+                        Icon(
+                            imageVector = Icons.Rounded.ContentCopy,
+                            contentDescription = stringResource(R.string.copy_pgn),
+                        )
+                    }
+                },
+            )
+        },
+    ) { padding ->
         Column(modifier = Modifier.padding(padding)) {
             val state by viewModel.collectAsState()
             var showTermination by remember { mutableStateOf<AnnounceTermination?>(null) }
             var showResignation by remember { mutableStateOf<ConfirmResignation?>(null) }
+            val context = LocalContext.current
 
             BackHandler {
                 Timber.d("Back pressed")
@@ -60,6 +83,7 @@ fun OnlineGameScreen(
                 when (effect) {
                     is AnnounceTermination -> showTermination = effect
                     is ConfirmResignation -> showResignation = effect
+                    is NotifyGameCopied -> Toast.makeText(context, R.string.game_copied, Toast.LENGTH_SHORT).show()
                     is NavigateBack -> navigateBack()
                 }
             }

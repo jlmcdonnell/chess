@@ -33,6 +33,7 @@
     <string name="black_resigned">Black resigned</string>
     <string name="dismiss">Dismiss</string>
     <string name="flip_board">Flip board</string>
+    <string name="copy_pgn">Copy Game PGN</string>
     <string name="player_you">You</string>
     <string name="player_puzzle">Puzzle %s</string>
     <string name="set_color_scheme">Colour scheme</string>
@@ -45,5 +46,9 @@
     <string name="rating_range">Puzzle Rating</string>
     <string name="rating_range_value">%1$s to %2$s</string>
     <string name="puzzle_options_desc">Puzzle Options</string>
-
+    <string name="pgn_site_name">@string/app_name</string>
+    <string name="pgn_online_game">Online Game</string>
+    <string name="pgn_bot_game">Bot Game</string>
+    <string name="pgn_analysis">Analysis</string>
+    <string name="game_copied">Game PGN copied to clipboard</string>
 </resources>
