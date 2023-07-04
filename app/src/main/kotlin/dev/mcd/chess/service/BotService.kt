@@ -10,6 +10,7 @@ import dev.mcd.chess.engine.BotEngineInterface
 import dev.mcd.chess.engine.lc0.FenParam
 import dev.mcd.chess.engine.lc0.Lc0
 import dev.mcd.chess.engine.lc0.MaiaWeights
+import kotlinx.coroutines.CompletableDeferred
 import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 
@@ -20,20 +21,18 @@ class BotService : EngineService<MaiaWeights, FenParam, ChessEngine<MaiaWeights,
     @Inject
     internal lateinit var engine: ChessEngine<MaiaWeights, FenParam>
 
-    private var weight: MaiaWeights? = null
+    private val weight = CompletableDeferred<MaiaWeights>()
 
     override fun engine() = engine
 
-    override fun initParams() = weight ?: throw IllegalStateException("Weight not set (should be set via onBind)")
+    override suspend fun initParams() = weight.await()
 
     override fun onBind(intent: Intent?): IBinder {
-        if (weight != null) {
-            throw IllegalStateException("Already bound")
-        }
-
-        weight = intent?.getStringExtra(EXTRA_WEIGHT)?.let {
+        val weights = intent?.getStringExtra(EXTRA_WEIGHT)?.let {
             MaiaWeights.valueOf(it)
         } ?: throw IllegalArgumentException("Missing weight")
+
+        weight.complete(weights)
 
         return object : BotEngineInterface.Stub() {
             override fun bestMove(fen: String): String {
@@ -46,7 +45,7 @@ class BotService : EngineService<MaiaWeights, FenParam, ChessEngine<MaiaWeights,
 
     override fun unbindService(conn: ServiceConnection) {
         super.unbindService(conn)
-        weight = null
+        weight.cancel()
     }
 
     companion object {

@@ -35,7 +35,7 @@ abstract class EngineService<EngineInit, Move, Engine : ChessEngine<EngineInit, 
         engineJob?.cancel()
     }
 
-    abstract fun initParams(): EngineInit
+    abstract suspend fun initParams(): EngineInit
 
     abstract fun engine(): ChessEngine<EngineInit, Move>
 }

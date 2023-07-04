@@ -18,7 +18,7 @@ class AnalyzerService : EngineService<Unit, FenAndDepth, ChessEngine<Unit, FenAn
     @Inject
     internal lateinit var engine: ChessEngine<Unit, FenAndDepth>
 
-    override fun initParams() = Unit
+    override suspend fun initParams() = Unit
 
     override fun engine() = engine
 
