@@ -1,6 +1,6 @@
 object BuildSettings {
-    val minSdk = 28
-    val compileSdk = 33
-    val targetSdk = 33
+    val minSdk = 35
+    val compileSdk = 36
+    val targetSdk = 36
     val jdkVersion = 17
 }

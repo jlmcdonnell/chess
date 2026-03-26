@@ -29,9 +29,8 @@ import dev.mcd.chess.R
 import dev.mcd.chess.ui.LocalAppColors
 import dev.mcd.chess.ui.extension.topLeft
 
-context(BoardLayout)
 @Composable
-fun Squares(
+fun BoardLayout.Squares(
     modifier: Modifier = Modifier,
     drawLabels: Boolean = true,
 ) {
@@ -56,7 +55,7 @@ fun Squares(
             .fillMaxSize()
             .semantics { contentDescription = boardDesc },
     ) {
-        for (square in Square.values()) {
+        for (square in Square.entries) {
             if (square != Square.NONE) {
                 val color = if (square.isLightSquare) appColors.squareLight else appColors.squareDark
                 drawRect(
@@ -73,16 +72,16 @@ fun Squares(
     }
 }
 
-context(DrawScope, BoardLayout)
-private fun drawRankLabels(
+context(layout: BoardLayout)
+private fun DrawScope.drawRankLabels(
     textMeasurer: TextMeasurer,
     square: Square,
     squareLabelStyleLight: TextStyle,
     squareLabelStyleDark: TextStyle,
 ) {
     if (
-        (perspective == Side.WHITE && square.file == File.FILE_A) ||
-        (perspective == Side.BLACK && square.file == File.FILE_H)
+        (layout.perspective == Side.WHITE && square.file == File.FILE_A) ||
+        (layout.perspective == Side.BLACK && square.file == File.FILE_H)
     ) {
         val style = if (square.isLightSquare) squareLabelStyleLight else squareLabelStyleDark
         drawText(
@@ -94,22 +93,22 @@ private fun drawRankLabels(
     }
 }
 
-context(DrawScope, BoardLayout)
-private fun drawFileLabels(
+context(layout: BoardLayout)
+private fun DrawScope.drawFileLabels(
     textMeasurer: TextMeasurer,
     square: Square,
     squareLabelStyleLight: TextStyle,
     squareLabelStyleDark: TextStyle,
 ) {
     if (
-        (perspective == Side.WHITE && square.rank.ordinal == 0) ||
-        (perspective == Side.BLACK && square.rank.ordinal == 7)
+        (layout.perspective == Side.WHITE && square.rank.ordinal == 0) ||
+        (layout.perspective == Side.BLACK && square.rank.ordinal == 7)
     ) {
         val style = if (square.isLightSquare) squareLabelStyleLight else squareLabelStyleDark
         val label = square.file.notation.lowercase()
         val offset = Offset(
-            x = squareSize - textMeasurer.measure(label).size.width - 1.dp.toPx(),
-            y = squareSize - style.lineHeight.roundToPx() - 4.dp.toPx(),
+            x = layout.squareSize - textMeasurer.measure(label).size.width - 1.dp.toPx(),
+            y = layout.squareSize - style.lineHeight.roundToPx() - 4.dp.toPx(),
         )
         drawText(
             textMeasurer = textMeasurer,

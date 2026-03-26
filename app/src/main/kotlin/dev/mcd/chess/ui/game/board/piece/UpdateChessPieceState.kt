@@ -8,7 +8,7 @@ import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
 object UpdateChessPieceState {
 
-    context(BoardLayout)
+    context(layout: BoardLayout)
     operator fun invoke(
         moveCount: Int,
         directionalMove: DirectionalMove,
@@ -30,7 +30,6 @@ object UpdateChessPieceState {
     }
 }
 
-context(BoardLayout)
 private inline fun undoMove(
     moveBackup: MoveBackup,
     state: ChessPieceState,
@@ -61,7 +60,6 @@ private inline fun undoMove(
     }
 }
 
-context(BoardLayout)
 private inline fun move(
     moveBackup: MoveBackup,
     moveCount: Int,

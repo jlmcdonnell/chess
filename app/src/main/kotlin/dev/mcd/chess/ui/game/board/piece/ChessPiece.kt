@@ -33,9 +33,8 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.launch
 
-context(BoardLayout)
 @Composable
-fun ChessPiece(initialState: ChessPieceState) {
+fun BoardLayout.ChessPiece(initialState: ChessPieceState) {
     val gameManager = LocalGameSession.current
     val boardInteraction = LocalBoardInteraction.current
 

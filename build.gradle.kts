@@ -6,13 +6,14 @@ plugins {
     alias(libs.plugins.android.test) apply false
     alias(libs.plugins.android.library) apply false
     alias(libs.plugins.google.dagger.hilt.android) apply false
-    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.google.ksp) apply false
+    alias(libs.plugins.kotlin.compose) apply false
     alias(libs.plugins.kotlin.serialization) apply false
     alias(libs.plugins.ktlint) apply false
 }
 
-tasks.create("clean", Delete::class) {
-    delete.add(rootProject.buildDir)
+tasks.register("clean", Delete::class) {
+    delete.add(rootProject.layout.buildDirectory.get().asFile)
 }
 
 allprojects {

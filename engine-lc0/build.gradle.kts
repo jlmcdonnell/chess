@@ -1,10 +1,7 @@
-@file:android.annotation.SuppressLint("ChromeOsAbiSupport")
-
 plugins {
     id("com.android.library")
-    id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
+    alias(libs.plugins.google.ksp)
 }
 
 android {
@@ -62,5 +59,5 @@ dependencies {
     api(project(":common"))
     api(libs.jakewharton.timber)
     api(libs.google.dagger.hilt.android)
-    kapt(libs.google.dagger.hilt.compiler)
+    ksp(libs.google.dagger.hilt.compiler)
 }

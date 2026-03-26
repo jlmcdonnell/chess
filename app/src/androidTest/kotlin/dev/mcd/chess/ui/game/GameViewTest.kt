@@ -1,6 +1,6 @@
-package dev.mcd.chess.ui.game
+@file:OptIn(ExperimentalTestApi::class)
 
-/* ktlint-disable no-wildcard-imports other-rule-id */
+package dev.mcd.chess.ui.game
 
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -14,6 +14,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.test.ExperimentalTestApi
 import androidx.compose.ui.test.SemanticsMatcher
 import androidx.compose.ui.test.SemanticsNodeInteraction
 import androidx.compose.ui.test.getBoundsInRoot
@@ -27,10 +28,37 @@ import androidx.compose.ui.test.performClick
 import androidx.compose.ui.test.performTouchInput
 import com.github.bhlangonijr.chesslib.Board
 import com.github.bhlangonijr.chesslib.Piece
-import com.github.bhlangonijr.chesslib.Piece.*
+import com.github.bhlangonijr.chesslib.Piece.BLACK_BISHOP
+import com.github.bhlangonijr.chesslib.Piece.BLACK_KING
+import com.github.bhlangonijr.chesslib.Piece.BLACK_PAWN
+import com.github.bhlangonijr.chesslib.Piece.BLACK_ROOK
+import com.github.bhlangonijr.chesslib.Piece.WHITE_KING
+import com.github.bhlangonijr.chesslib.Piece.WHITE_KNIGHT
+import com.github.bhlangonijr.chesslib.Piece.WHITE_PAWN
+import com.github.bhlangonijr.chesslib.Piece.WHITE_QUEEN
+import com.github.bhlangonijr.chesslib.Piece.WHITE_ROOK
 import com.github.bhlangonijr.chesslib.Side
 import com.github.bhlangonijr.chesslib.Square
-import com.github.bhlangonijr.chesslib.Square.*
+import com.github.bhlangonijr.chesslib.Square.A1
+import com.github.bhlangonijr.chesslib.Square.A7
+import com.github.bhlangonijr.chesslib.Square.A8
+import com.github.bhlangonijr.chesslib.Square.B7
+import com.github.bhlangonijr.chesslib.Square.D1
+import com.github.bhlangonijr.chesslib.Square.D4
+import com.github.bhlangonijr.chesslib.Square.D5
+import com.github.bhlangonijr.chesslib.Square.D7
+import com.github.bhlangonijr.chesslib.Square.E1
+import com.github.bhlangonijr.chesslib.Square.E2
+import com.github.bhlangonijr.chesslib.Square.E3
+import com.github.bhlangonijr.chesslib.Square.E4
+import com.github.bhlangonijr.chesslib.Square.E5
+import com.github.bhlangonijr.chesslib.Square.E7
+import com.github.bhlangonijr.chesslib.Square.E8
+import com.github.bhlangonijr.chesslib.Square.F8
+import com.github.bhlangonijr.chesslib.Square.G7
+import com.github.bhlangonijr.chesslib.Square.H1
+import com.github.bhlangonijr.chesslib.Square.H5
+import com.github.bhlangonijr.chesslib.Square.H8
 import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.test.createGameSessionRule
 import dev.mcd.chess.ui.LocalGameSession
@@ -477,8 +505,7 @@ class GameViewTest {
         }
     }
 
-    context(ComposeContentTestRule)
-    private fun setupChessBoard(game: GameSession = gameRule.game) {
+    private fun ComposeContentTestRule.setupChessBoard(game: GameSession = gameRule.game) {
         mainClock.autoAdvance = false
         setContent {
             TestChessBoard(game)
@@ -486,14 +513,12 @@ class GameViewTest {
         mainClock.advanceTimeBy(1000)
     }
 
-    context(ComposeTestRule)
-    private suspend fun move(move: String) {
+    private suspend fun ComposeTestRule.move(move: String) {
         gameRule.game.move(move)
         mainClock.advanceTimeBy(200)
     }
 
-    context(ComposeTestRule)
-    private fun dragPiece(piece: Piece, move: String) {
+    private fun ComposeTestRule.dragPiece(piece: Piece, move: String) {
         dragPiece(
             piece,
             Square.valueOf(move.substring(0, 2).uppercase()),
@@ -501,8 +526,7 @@ class GameViewTest {
         )
     }
 
-    context(ComposeTestRule)
-    private fun dragPiece(piece: Piece, from: Square, to: Square) {
+    private fun ComposeTestRule.dragPiece(piece: Piece, from: Square, to: Square) {
         onPiece(piece on from)
             .performTouchInput {
                 down(from.position())
@@ -512,32 +536,27 @@ class GameViewTest {
         mainClock.advanceTimeBy(500)
     }
 
-    context(ComposeTestRule)
-    private fun undoMove() {
+    private fun ComposeTestRule.undoMove() {
         onNode(hasContentDescription("Undo move")).performClick()
         mainClock.advanceTimeBy(500)
     }
 
-    context(ComposeTestRule)
-    private fun flipBoard() {
+    private fun ComposeTestRule.flipBoard() {
         onNode(hasContentDescription("Flip board")).performClick()
         mainClock.advanceTimeBy(500)
     }
 
-    context(ComposeTestRule)
-    private fun assertPiece(vararg pieceSquare: SquarePieceTag) {
+    private fun ComposeTestRule.assertPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.map { onPiece(it) }.onEach(SemanticsNodeInteraction::assertExists)
     }
 
-    context(ComposeTestRule)
-    private fun assertNoPiece(vararg pieceSquare: SquarePieceTag) {
+    private fun ComposeTestRule.assertNoPiece(vararg pieceSquare: SquarePieceTag) {
         pieceSquare.forEach {
             onPiece(it).assertDoesNotExist()
         }
     }
 
-    context(ComposeTestRule)
-    private fun onPiece(tag: SquarePieceTag): SemanticsNodeInteraction {
+    private fun ComposeTestRule.onPiece(tag: SquarePieceTag): SemanticsNodeInteraction {
         return onNode(SemanticsMatcher.expectValue(PieceSquareKey, tag))
     }
 

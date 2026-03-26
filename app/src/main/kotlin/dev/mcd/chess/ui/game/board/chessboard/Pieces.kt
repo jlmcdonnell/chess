@@ -15,9 +15,8 @@ import dev.mcd.chess.ui.game.board.piece.ChessPiece
 import dev.mcd.chess.ui.game.board.piece.ChessPieceState
 import dev.mcd.chess.ui.game.board.piece.UpdateChessPieceState
 
-context(BoardLayout)
 @Composable
-fun Pieces() {
+fun BoardLayout.Pieces() {
     val gameManager = LocalGameSession.current
     val game by gameManager.sessionUpdates().collectAsState(null)
     val pieces = remember(game?.id) { game?.piecesAtVariationStart() ?: emptyList() }
@@ -35,8 +34,7 @@ fun Pieces() {
     }
 }
 
-context(BoardLayout)
-private fun calculatePieceState(
+private fun BoardLayout.calculatePieceState(
     piece: Piece,
     initialSquare: Square,
     history: List<MoveBackup>,

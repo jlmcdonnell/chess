@@ -28,7 +28,7 @@ import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 import dev.mcd.chess.ui.rememberBoardColors
 
-context(BoardLayout)
+context(layout: BoardLayout)
 @Composable
 fun LegalMoves() {
     val gameManager = LocalGameSession.current
@@ -68,7 +68,7 @@ fun LegalMoves() {
                         x = offset.x.toDp(),
                         y = offset.y.toDp(),
                     )
-                    .size(squareSizeDp),
+                    .size(layout.squareSizeDp),
             ) {
                 val border = size.width / 8f
                 drawArc(
@@ -85,11 +85,11 @@ fun LegalMoves() {
             Box(
                 modifier = Modifier
                     .offset(
-                        x = offset.x.toDp() + squareSizeDp / 4,
-                        y = offset.y.toDp() + squareSizeDp / 4,
+                        x = offset.x.toDp() + layout.squareSizeDp / 4,
+                        y = offset.y.toDp() + layout.squareSizeDp / 4,
                     )
                     .clip(CircleShape)
-                    .size(squareSizeDp / 2)
+                    .size(layout.squareSizeDp / 2)
                     .background(boardColors.legalMoveHighlight),
             )
         }

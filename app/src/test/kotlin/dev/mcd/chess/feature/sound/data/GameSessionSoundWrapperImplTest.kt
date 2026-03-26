@@ -126,8 +126,7 @@ class GameSessionSoundWrapperImplTest : BehaviorSpec(
     },
 )
 
-context(BehaviorSpecGivenContainerScope)
-private inline fun withSoundWrapperTest(block: SoundWrapperTestScope.() -> Unit) {
+private inline fun BehaviorSpecGivenContainerScope.withSoundWrapperTest(block: SoundWrapperTestScope.() -> Unit) {
     block(SoundWrapperTestScope())
 }
 

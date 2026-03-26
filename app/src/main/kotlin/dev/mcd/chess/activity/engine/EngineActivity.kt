@@ -17,10 +17,10 @@ import javax.inject.Inject
 abstract class EngineActivity : ComponentActivity() {
 
     @Inject
-    protected lateinit var analyzerProxy: AnalyzerEngineProxy
+    lateinit var analyzerProxy: AnalyzerEngineProxy
 
     @Inject
-    protected lateinit var botProxy: BotEngineProxy
+    lateinit var botProxy: BotEngineProxy
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

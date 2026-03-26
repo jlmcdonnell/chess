@@ -1,10 +1,8 @@
-@file:Suppress("UnstableApiUsage")
-
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
+    alias(libs.plugins.google.ksp)
+    alias(libs.plugins.kotlin.compose)
     id("kotlinx-serialization")
     id("androidx.baselineprofile")
 }
@@ -34,10 +32,6 @@ android {
         )
     }
 
-    sourceSets.configureEach {
-        java.srcDirs("src/$name/kotlin")
-    }
-
     buildFeatures {
         aidl = true
     }
@@ -55,40 +49,35 @@ android {
         }
     }
 
-    kotlin {
-        jvmToolchain(BuildSettings.jdkVersion)
-    }
-
-    kotlinOptions {
-        freeCompilerArgs += "-Xcontext-receivers"
-        freeCompilerArgs += "-Xopt-in=androidx.compose.material3.ExperimentalMaterial3Api"
-        freeCompilerArgs += "-Xopt-in=kotlinx.coroutines.ExperimentalCoroutinesApi"
-        freeCompilerArgs += "-Xopt-in=kotlin.ExperimentalStdlibApi"
-
-        if (project.hasProperty("enableComposeCompilerReports")) {
-            val metricsDir = "${project.buildDir.absolutePath}/compose_metrics"
-            freeCompilerArgs += listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$metricsDir")
-            freeCompilerArgs += listOf("-P", "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsDir")
-        }
-    }
-
     buildFeatures {
         compose = true
         buildConfig = true
     }
+}
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-        useLiveLiterals = false
+kotlin {
+    jvmToolchain(BuildSettings.jdkVersion)
+    compilerOptions {
+        freeCompilerArgs.add("-opt-in=androidx.compose.material3.ExperimentalMaterial3Api")
+        freeCompilerArgs.add("-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi")
+        freeCompilerArgs.add("-opt-in=kotlin.ExperimentalStdlibApi")
+        freeCompilerArgs.add("-Xcontext-parameters")
+        if (project.hasProperty("enableComposeCompilerReports")) {
+            val metricsDir = project.layout.buildDirectory.dir("compose_metrics").get().asFile.absolutePath
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=$metricsDir",
+                    "-P",
+                    "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=$metricsDir",
+                ),
+            )
+        }
     }
 }
 
 tasks.withType<Test> {
     useJUnitPlatform()
-}
-
-kapt {
-    correctErrorTypes = true
 }
 
 dependencies {
@@ -126,7 +115,7 @@ dependencies {
     // Hilt
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.google.dagger.hilt.android)
-    kapt(libs.google.dagger.hilt.compiler)
+    ksp(libs.google.dagger.hilt.compiler)
 
     // Other
     implementation(libs.androidx.activity.compose)
@@ -140,6 +129,7 @@ dependencies {
     testImplementation(libs.turbine)
     testImplementation(libs.mockk)
     testImplementation(libs.kotlin.reflect)
+    testImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.kotlinx.coroutines.test)
     androidTestImplementation(libs.androidx.benchmark.macro.junit4)
 }

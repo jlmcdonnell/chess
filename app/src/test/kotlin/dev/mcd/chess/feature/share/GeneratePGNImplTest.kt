@@ -6,12 +6,12 @@ import dev.mcd.chess.common.game.GameSession
 import dev.mcd.chess.common.player.HumanPlayer
 import dev.mcd.chess.feature.common.domain.Translations
 import dev.mcd.chess.feature.share.data.GeneratePGNImpl
-import io.kotest.common.runBlocking
 import io.kotest.core.spec.IsolationMode
 import io.kotest.core.spec.style.StringSpec
 import io.kotest.matchers.string.shouldContain
 import io.mockk.every
 import io.mockk.mockk
+import kotlinx.coroutines.runBlocking
 import java.time.LocalDate
 
 class GeneratePGNImplTest : StringSpec(

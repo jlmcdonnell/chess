@@ -19,7 +19,7 @@ class BaselineProfileGenerator {
 
     @Test
     fun generate() {
-        rule.collectBaselineProfile("dev.mcd.chess") {
+        rule.collect("dev.mcd.chess") {
             pressHome()
             startActivityAndWait()
             device.findObject(text("Play Computer")).click()

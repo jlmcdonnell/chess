@@ -4,9 +4,9 @@ import androidx.compose.ui.geometry.Offset
 import com.github.bhlangonijr.chesslib.Square
 import dev.mcd.chess.ui.game.board.chessboard.BoardLayout
 
-context(BoardLayout)
+context(layout: BoardLayout)
 fun Square.topLeft(): Offset {
-    return topLeft(isWhite, squareSize)
+    return topLeft(layout.isWhite, layout.squareSize)
 }
 
 fun Square.topLeft(isWhite: Boolean, squareSize: Float): Offset {
@@ -21,9 +21,9 @@ fun Square.topLeft(isWhite: Boolean, squareSize: Float): Offset {
     }
 }
 
-context (BoardLayout)
+context (layout: BoardLayout)
 fun Square.center(): Offset {
-    return center(isWhite, squareSize)
+    return center(layout.isWhite, layout.squareSize)
 }
 
 fun Square.center(isWhite: Boolean, squareSize: Float): Offset {

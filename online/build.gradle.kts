@@ -1,9 +1,8 @@
 plugins {
     id("com.android.library")
     id("kotlinx-serialization")
-    id("org.jetbrains.kotlin.android")
     id("com.google.dagger.hilt.android")
-    id("kotlin-kapt")
+    alias(libs.plugins.google.ksp)
 }
 
 android {
@@ -40,7 +39,7 @@ dependencies {
     // Hilt
     api(libs.androidx.hilt.navigation.compose)
     api(libs.google.dagger.hilt.android)
-    kapt(libs.google.dagger.hilt.compiler)
+    ksp(libs.google.dagger.hilt.compiler)
 
     testImplementation(libs.ktor.client.cio)
     testImplementation(libs.junit.junit)

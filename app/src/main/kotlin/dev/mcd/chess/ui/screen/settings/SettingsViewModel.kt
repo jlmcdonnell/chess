@@ -8,8 +8,6 @@ import dev.mcd.chess.feature.common.domain.AppColorScheme
 import dev.mcd.chess.feature.common.domain.AppPreferences
 import dev.mcd.chess.feature.common.domain.Environment
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.reduce
 import org.orbitmvi.orbit.viewmodel.container
 import javax.inject.Inject
 

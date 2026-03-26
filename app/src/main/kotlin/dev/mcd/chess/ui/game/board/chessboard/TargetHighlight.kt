@@ -22,9 +22,8 @@ import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.rememberBoardColors
 
-context(BoardLayout)
 @Composable
-fun TargetHighlight() {
+fun BoardLayout.TargetHighlight() {
     val target by LocalBoardInteraction.current.targets().collectAsState(Square.NONE)
     val boardColors = rememberBoardColors()
 

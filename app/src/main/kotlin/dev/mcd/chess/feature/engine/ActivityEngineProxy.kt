@@ -93,8 +93,7 @@ class ActivityEngineProxy<Init, Move, Binder : IInterface, Adapter : EngineBinde
         }
     }
 
-    context(ActivityBound<Init>)
-    private suspend fun startEngine(params: Init, intent: Intent) {
+    private fun ActivityBound<Init>.startEngine(params: Init, intent: Intent) {
         if (state.value !is Ready<*, *>) {
             with(context as ComponentActivity) {
                 bindService(intent, connection, BIND_AUTO_CREATE)

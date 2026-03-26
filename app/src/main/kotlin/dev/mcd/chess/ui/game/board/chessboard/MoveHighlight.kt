@@ -14,7 +14,7 @@ import dev.mcd.chess.ui.extension.toDp
 import dev.mcd.chess.ui.extension.topLeft
 import dev.mcd.chess.ui.rememberBoardColors
 
-context(BoardLayout)
+context(layout: BoardLayout)
 @Composable
 fun MoveHighlight() {
     val lastMove by LocalGameSession.current.moveUpdates().collectAsState(null)
@@ -38,14 +38,14 @@ fun MoveHighlight() {
         Box(
             modifier = Modifier
                 .testTag("highlight-from")
-                .size(squareSizeDp)
+                .size(layout.squareSizeDp)
                 .offset(moveFromOffset.x.toDp(), moveFromOffset.y.toDp())
                 .background(fromColor),
         )
         Box(
             modifier = Modifier
                 .testTag("highlight-to")
-                .size(squareSizeDp)
+                .size(layout.squareSizeDp)
                 .offset(moveToOffset.x.toDp(), moveToOffset.y.toDp())
                 .background(toColor),
         )

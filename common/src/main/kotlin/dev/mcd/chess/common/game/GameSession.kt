@@ -53,7 +53,7 @@ open class GameSession(
         } else {
             val moved = board.doMove(move)
             if (moved) {
-                val moveBackup = board.backup.last
+                val moveBackup = board.backup.last()
                 moves.emit(DirectionalMove(moveBackup, undo = false))
                 updateTermination()
                 MoveResult.Moved
@@ -70,7 +70,7 @@ open class GameSession(
     fun isSelfTurn() = selfSide == board.sideToMove
 
     fun undo(eraseHistory: Boolean = false) {
-        if (board.backup.size > 0) {
+        if (board.backup.isNotEmpty()) {
             val lastMove = board.backup.last()
             board.undoMove()
             if (!eraseHistory) {
@@ -81,9 +81,9 @@ open class GameSession(
     }
 
     fun redo() {
-        if (undoneMoves.size > 0) {
+        if (undoneMoves.isNotEmpty()) {
             board.doMove(undoneMoves.pop().move)
-            moves.tryEmit(DirectionalMove(board.backup.last, undo = false))
+            moves.tryEmit(DirectionalMove(board.backup.last(), undo = false))
         }
     }
 
@@ -97,7 +97,7 @@ open class GameSession(
         return board.boardToArray().toList()
     }
 
-    fun isLive() = undoneMoves.size == 0
+    fun isLive() = undoneMoves.isEmpty()
 
     fun moves(): Flow<DirectionalMove> = moves.filterNotNull()
 

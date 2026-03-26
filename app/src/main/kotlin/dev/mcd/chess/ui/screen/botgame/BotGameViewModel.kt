@@ -30,22 +30,18 @@ import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.suspendCancellableCoroutine
 import org.orbitmvi.orbit.ContainerHost
-import org.orbitmvi.orbit.syntax.simple.intent
-import org.orbitmvi.orbit.syntax.simple.postSideEffect
-import org.orbitmvi.orbit.syntax.simple.reduce
-import org.orbitmvi.orbit.syntax.simple.repeatOnSubscription
 import org.orbitmvi.orbit.viewmodel.container
 import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
-import kotlin.coroutines.suspendCoroutine
 
 @HiltViewModel
 class BotGameViewModel @Inject constructor(
     private val engine: BotEngineProxy,
     private val gameSessionRepository: GameSessionRepository,
-    private val state: SavedStateHandle,
+    private val savedState: SavedStateHandle,
     private val startBotGame: StartBotGame,
     private val moveForBot: MoveForBot,
     private val soundWrapper: GameSessionSoundWrapper,
@@ -89,8 +85,8 @@ class BotGameViewModel @Inject constructor(
                     }
                 }
         }
-        bot = DefaultBots.fromSlug(state.get<String>("bot")!!)
-        side = Side.valueOf(state.get<String>("side")!!)
+        bot = DefaultBots.fromSlug(savedState.get<String>("bot")!!)
+        side = Side.valueOf(savedState.get<String>("side")!!)
         startGame()
     }
 
@@ -160,7 +156,7 @@ class BotGameViewModel @Inject constructor(
     }
 
     private suspend fun confirmResignation(): Boolean {
-        return suspendCoroutine { continuation ->
+        return suspendCancellableCoroutine { continuation ->
             intent {
                 postSideEffect(
                     SideEffect.ConfirmResignation(

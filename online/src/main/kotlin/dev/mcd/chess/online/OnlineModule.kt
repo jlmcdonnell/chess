@@ -27,8 +27,10 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.plugins.websocket.WebSockets
+import io.ktor.client.plugins.websocket.pingInterval
 import io.ktor.serialization.kotlinx.json.json
 import javax.inject.Singleton
+import kotlin.time.Duration.Companion.milliseconds
 import io.ktor.client.plugins.logging.Logger as KtorLogger
 
 @Module
@@ -79,7 +81,7 @@ abstract class OnlineModule {
         fun httpClient(logger: KtorLogger): HttpClient {
             return HttpClient(OkHttp) {
                 install(WebSockets) {
-                    pingInterval = 1500
+                    pingInterval = 1500.milliseconds
                 }
                 install(ContentNegotiation) {
                     json()

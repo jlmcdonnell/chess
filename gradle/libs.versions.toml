@@ -1,36 +1,36 @@
 [versions]
-activityCompose = "1.7.0"
-androidGradlePlugin = "8.1.0-rc01"
-androidBenchmarkJunit = "1.2.0-alpha12"
-androidProfileInstaller = "1.3.0"
-baselineProfilePlugin = "1.2.0-SNAPSHOT"
+activityCompose = "1.13.0"
+androidGradlePlugin = "9.1.0"
+androidBenchmarkJunit = "1.5.0-alpha05"
+androidProfileInstaller = "1.4.1"
+baselineProfilePlugin = "1.5.0-alpha05"
 chessLib = "1.3.3"
-compose = "2023.04.00"
-composeCompiler = "1.4.5"
-coreKtx = "1.9.0"
-coroutines = "1.6.4"
-datastorePreferences = "1.0.0"
-hilt = "2.45"
-hiltNavigationCompose = "1.0.0"
+compose = "2026.03.01"
+coreKtx = "1.18.0"
+coroutines = "1.10.2"
+datastorePreferences = "1.2.1"
+hilt = "2.59.2"
+hiltNavigationCompose = "1.3.0"
 javaxInject = "1"
 junit4 = "4.13.2"
 junit5 = "5.8.0"
-junitExt = "1.1.5"
-ktor = "2.2.4"
-kotlin = "1.8.20"
-kotlinxSerializationJson = "1.5.0"
-kotest = "5.6.1"
-ktlintPlugin = "11.4.2"
+junitExt = "1.3.0"
+ktor = "3.4.1"
+kotlin = "2.3.20"
+ksp = "2.3.6"
+kotlinxSerializationJson = "1.10.0"
+kotest = "6.1.9"
+ktlintPlugin = "14.2.0"
 ktlintTool = "0.49.1"
-lifecycleRuntimeKtx = "2.6.1"
-mockk = "1.13.4"
-navigationCompose = "2.5.3"
-orbit = "4.6.1"
-slf4j = "2.0.7"
-testRunner = "1.5.2"
+lifecycleRuntimeKtx = "2.10.0"
+mockk = "1.14.9"
+navigationCompose = "2.9.7"
+orbit = "11.0.0"
+slf4j = "2.0.17"
+testRunner = "1.7.0"
 timber = "5.0.1"
-turbine = "0.12.1"
-uiautomator = "2.2.0"
+turbine = "1.2.1"
+uiautomator = "2.3.0"
 
 [libraries]
 androidx-activity-compose = { module = "androidx.activity:activity-compose", version.ref = "activityCompose" }
@@ -84,6 +84,7 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 android-test = { id = "com.android.test", version.ref = "androidGradlePlugin" }
 androidx-baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineProfilePlugin" }
 google-dagger-hilt-android = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
+google-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 ktlint = { id = "org.jlleitschuh.gradle.ktlint", version.ref = "ktlintPlugin" }

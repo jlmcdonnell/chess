@@ -16,7 +16,7 @@ data class ChessPieceState(
     var moveCount: Int = -1,
     val moves: Stack<String> = Stack(),
 ) {
-    context(BoardLayout)
+    context(layout: BoardLayout)
     val position: Offset
-        get() = squareOffset + Offset(squareSize / 2f, squareSize / 2f)
+        get() = squareOffset + Offset(layout.squareSize / 2f, layout.squareSize / 2f)
 }
