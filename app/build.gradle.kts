@@ -78,7 +78,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = Versions.composeCompiler
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
         useLiveLiterals = false
     }
 }
@@ -92,56 +92,54 @@ kapt {
 }
 
 dependencies {
-    with(Versions) {
-        // Projects
-        implementation(project(":engine-stockfish"))
-        implementation(project(":engine-lc0"))
-        implementation(project(":common"))
-        implementation(project(":online"))
-        "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
+    // Projects
+    implementation(project(":engine-stockfish"))
+    implementation(project(":engine-lc0"))
+    implementation(project(":common"))
+    implementation(project(":online"))
+    "baselineProfile"(project(mapOf("path" to ":baselineprofile")))
 
-        // Core
-        implementation("org.slf4j:slf4j-nop:$slf4j")
-        implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-        implementation("androidx.core:core-ktx:$coreKtx")
-        implementation("androidx.lifecycle:lifecycle-runtime-ktx:$lifecycleRuntimeKtx")
-        implementation("androidx.profileinstaller:profileinstaller:$androidProfileInstaller")
+    // Core
+    implementation(libs.slf4j.nop)
+    implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.profileinstaller)
 
-        // Compose
-        implementation(platform("androidx.compose:compose-bom:$compose"))
-        androidTestImplementation(platform("androidx.compose:compose-bom:$compose"))
-        implementation("androidx.compose.ui:ui")
-        implementation("androidx.compose.foundation:foundation")
-        implementation("androidx.compose.material3:material3")
-        implementation("androidx.compose.material:material-icons-extended")
-        debugImplementation("androidx.compose.ui:ui-tooling")
-        implementation("androidx.compose.ui:ui-tooling-preview")
-        androidTestImplementation("androidx.compose.ui:ui-test-junit4")
-        debugImplementation("androidx.compose.ui:ui-test-manifest")
+    // Compose
+    implementation(platform(libs.androidx.compose.bom))
+    androidTestImplementation(platform(libs.androidx.compose.bom))
+    implementation(libs.androidx.compose.ui)
+    implementation(libs.androidx.compose.foundation)
+    implementation(libs.androidx.compose.material3)
+    implementation(libs.androidx.compose.material.icons.extended)
+    debugImplementation(libs.androidx.compose.ui.tooling)
+    implementation(libs.androidx.compose.ui.tooling.preview)
+    androidTestImplementation(libs.androidx.compose.ui.test.junit4)
+    debugImplementation(libs.androidx.compose.ui.test.manifest)
 
-        // Orbit
-        implementation("org.orbit-mvi:orbit-core:$orbit")
-        implementation("org.orbit-mvi:orbit-viewmodel:$orbit")
-        implementation("org.orbit-mvi:orbit-compose:$orbit")
+    // Orbit
+    implementation(libs.orbit.core)
+    implementation(libs.orbit.viewmodel)
+    implementation(libs.orbit.compose)
 
-        // Hilt
-        implementation("androidx.hilt:hilt-navigation-compose:$hiltNavigationCompose")
-        implementation("com.google.dagger:hilt-android:$hilt")
-        kapt("com.google.dagger:hilt-compiler:$hilt")
+    // Hilt
+    implementation(libs.androidx.hilt.navigation.compose)
+    implementation(libs.google.dagger.hilt.android)
+    kapt(libs.google.dagger.hilt.compiler)
 
-        // Other
-        implementation("androidx.activity:activity-compose:$activityCompose")
-        implementation("androidx.navigation:navigation-compose:$navigationCompose")
-        implementation("com.github.bhlangonijr:chesslib:$chessLib")
-        implementation("com.jakewharton.timber:timber:$timber")
-        implementation("androidx.datastore:datastore-preferences:$datastorePreferences")
+    // Other
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
+    implementation(libs.chesslib)
+    implementation(libs.jakewharton.timber)
+    implementation(libs.androidx.datastore.preferences)
 
-        testImplementation("io.kotest:kotest-assertions-core:$kotest")
-        testImplementation("io.kotest:kotest-runner-junit5:$kotest")
-        testImplementation("app.cash.turbine:turbine:$turbine")
-        testImplementation("io.mockk:mockk:$mockk")
-        testImplementation("org.jetbrains.kotlin:kotlin-reflect:$kotlin")
-        androidTestImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
-        androidTestImplementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
-    }
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.runner.junit5)
+    testImplementation(libs.turbine)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlin.reflect)
+    androidTestImplementation(libs.kotlinx.coroutines.test)
+    androidTestImplementation(libs.androidx.benchmark.macro.junit4)
 }

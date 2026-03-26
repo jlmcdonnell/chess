@@ -1,6 +1,6 @@
 plugins {
     id("com.android.test")
-    id("kotlin-android")
+    alias(libs.plugins.kotlin.android)
     id("androidx.baselineprofile")
 }
 
@@ -27,10 +27,8 @@ kotlin {
 }
 
 dependencies {
-    with(Versions) {
-        implementation("androidx.test.ext:junit:$junitExt")
-        implementation("androidx.test.uiautomator:uiautomator:$uiautomator")
-        implementation("androidx.benchmark:benchmark-macro-junit4:$androidBenchmarkJunit")
-        implementation("androidx.test:runner:$testRunner")
-    }
+    implementation(libs.androidx.test.ext.junit)
+    implementation(libs.androidx.test.uiautomator)
+    implementation(libs.androidx.benchmark.macro.junit4)
+    implementation(libs.androidx.test.runner)
 }

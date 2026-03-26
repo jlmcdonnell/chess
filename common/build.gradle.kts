@@ -7,9 +7,7 @@ kotlin {
 }
 
 dependencies {
-    with(Versions) {
-        api("com.github.bhlangonijr:chesslib:$chessLib")
-        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-        implementation("javax.inject:javax.inject:$javaxInject")
-    }
+    api(libs.chesslib)
+    api(libs.kotlinx.coroutines.core)
+    implementation(libs.javax.inject)
 }

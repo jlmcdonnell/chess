@@ -24,27 +24,24 @@ kotlin {
 }
 
 dependencies {
-    with(Versions) {
-        api(project(":common"))
-        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-        api("com.github.bhlangonijr:chesslib:$chessLib")
-        api("org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinxSerializationJson")
-        api("javax.inject:javax.inject:1")
+    api(project(":common"))
+    api(libs.kotlinx.coroutines.core)
+    api(libs.chesslib)
+    api(libs.kotlinx.serialization.json)
+    api(libs.javax.inject)
 
-        // Ktor
-        api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-        api("io.ktor:ktor-client-core:$ktor")
-        api("io.ktor:ktor-client-okhttp:$ktor")
-        api("io.ktor:ktor-client-content-negotiation:$ktor")
-        api("io.ktor:ktor-serialization-kotlinx-json:$ktor")
-        api("io.ktor:ktor-client-logging:$ktor")
+    // Ktor
+    api(libs.ktor.serialization.kotlinx.json)
+    api(libs.ktor.client.core)
+    api(libs.ktor.client.okhttp)
+    api(libs.ktor.client.content.negotiation)
+    api(libs.ktor.client.logging)
 
-        // Hilt
-        api("androidx.hilt:hilt-navigation-compose:$hiltNavigationCompose")
-        api("com.google.dagger:hilt-android:$hilt")
-        kapt("com.google.dagger:hilt-compiler:$hilt")
+    // Hilt
+    api(libs.androidx.hilt.navigation.compose)
+    api(libs.google.dagger.hilt.android)
+    kapt(libs.google.dagger.hilt.compiler)
 
-        testImplementation("io.ktor:ktor-client-cio:$ktor")
-        testImplementation("junit:junit:$junit4")
-    }
+    testImplementation(libs.ktor.client.cio)
+    testImplementation(libs.junit.junit)
 }

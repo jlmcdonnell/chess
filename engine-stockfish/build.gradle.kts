@@ -66,19 +66,17 @@ tasks.named("preBuild").configure {
 }
 
 dependencies {
-    with(Versions) {
-        api(project(":common"))
+    api(project(":common"))
 
-        api("org.slf4j:slf4j-nop:$slf4j")
-        api("com.jakewharton.timber:timber:$timber")
-        api("org.jetbrains.kotlinx:kotlinx-coroutines-core:$coroutines")
-        api("com.google.dagger:hilt-android:$hilt")
-        kapt("com.google.dagger:hilt-compiler:$hilt")
+    api(libs.slf4j.nop)
+    api(libs.jakewharton.timber)
+    api(libs.kotlinx.coroutines.core)
+    api(libs.google.dagger.hilt.android)
+    kapt(libs.google.dagger.hilt.compiler)
 
-        testImplementation("junit:junit:$junit4")
-        testImplementation("io.mockk:mockk:$mockk")
-        testImplementation("org.jetbrains.kotlinx:kotlinx-coroutines-test:$coroutines")
-        testImplementation("io.kotest:kotest-assertions-core:$kotest")
-        testImplementation("io.kotest:kotest-runner-junit5:$kotest")
-    }
+    testImplementation(libs.junit.junit)
+    testImplementation(libs.mockk)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.kotest.assertions.core)
+    testImplementation(libs.kotest.runner.junit5)
 }
